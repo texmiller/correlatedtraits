@@ -1,11 +1,12 @@
 Package: correlatedtraits
-Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
-Encoding: UTF-8
+Title: Data and Analyses for [paper title]
+Version: 0.0.0.900
+Authors@R: c(
+    person("Brad", "Ochocki",  email = "brad.ochocki@gmail.com", role = "cre"),
+    person("Julia B", "Saltz", email = "Julia.B.Saltz@rice.edu", role = "aut"),
+    person("Tom EX", "Miller", email = "Tom.Miller@rice.edu",    role = "aut"))
+Description: A package that contains the data and analyses used for the paper
+    [paper].
+Depends: R (>= 3.4.0)
+License: MIT
 LazyData: true
