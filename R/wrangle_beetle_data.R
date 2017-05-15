@@ -16,7 +16,7 @@
 #'     arrays.
 #' @param dates_path A string that provides the path to the file that contains
 #'     data for mating, dispersal, and freezing dates.
-#' @return A dataframe of all the data, cleaned and compiled.
+#' @return A data frame of all the data, cleaned and compiled.
 #' @export
 wrangle_beetle_data = function(female_fd_path, female_f_path,
                              male_d_path, dates_path) {

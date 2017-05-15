@@ -22,7 +22,7 @@ arrays.}
 data for mating, dispersal, and freezing dates.}
 }
 \value{
-A dataframe of all the data, cleaned and compiled.
+A data frame of all the data, cleaned and compiled.
 }
 \description{
 Wrangle raw data into a form amenable to analysis.
