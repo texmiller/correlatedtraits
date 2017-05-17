@@ -1,9 +1,3 @@
-#
-# female_fd_path <- "D:/Dropbox/1 Projects/Academic/2016 genetic covariance invasions/data/fecundity_dispersal_raw.csv"
-# female_f_path  <- "D:/Dropbox/1 Projects/Academic/2016 genetic covariance invasions/data/fecundity_no_dispersal_raw.csv"
-# dates_path <- "D:/Dropbox/1 Projects/Academic/2016 genetic covariance invasions/data/experiment_dates.csv"
-# male_d_path <- "D:/Dropbox/1 Projects/Academic/2016 genetic covariance invasions/data/male_dispersal.csv"
-
 #' Wrangle raw data into a form amenable to analysis.
 #'
 #' @param female_fd_path A string that provides the path to the file that
