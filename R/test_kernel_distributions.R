@@ -92,9 +92,6 @@ lines(patch,
       compoisson::dcom(x = patch, lambda = a_c$par[1], nu = a_c$par[2]),
       col = "green", lwd = 2)
 lines(patch,
-      dnbinom(x = patch, mu = a_n$par[1], size = a_n$par[2]),
-      col = "red", lwd = 2)
-lines(patch,
       gamlss.dist::dSICHEL(x = patch, mu = a_i$par[1], sigma = a_i$par[2],
                            nu = -0.5),
       col = "purple", lwd = 2)
@@ -102,6 +99,9 @@ lines(patch,
       gamlss.dist::dSICHEL(x = patch, mu = a_s$par[1], sigma = a_s$par[2],
                            nu = a_s$par[3]),
       col="orange", lwd = 2)
+lines(patch,
+      dnbinom(x = patch, mu = a_n$par[1], size = a_n$par[2]),
+      col = "red", lwd = 2)
 points(patch, get_frequency(a), pch = 20)
 legend("topright", c("Poisson", "CMP", "NegBinom", "PIG", "Sichel"), lwd=2,
        col = c("blue", "green", "red", "purple", "orange"))
@@ -115,9 +115,6 @@ lines(patch,
       compoisson::dcom(x = patch, lambda = f_c$par[1], nu = f_c$par[2]),
       col = "green", lwd = 2)
 lines(patch,
-      dnbinom(x = patch, mu = f_n$par[1], size = f_n$par[2]),
-      col = "red", lwd = 2)
-lines(patch,
       gamlss.dist::dSICHEL(x = patch, mu = f_i$par[1], sigma = f_i$par[2],
                            nu = -0.5),
       col = "purple", lwd = 2)
@@ -125,6 +122,9 @@ lines(patch,
       gamlss.dist::dSICHEL(x = patch, mu = f_s$par[1], sigma = f_s$par[2],
                            nu = f_s$par[3]),
       col="orange", lwd = 2)
+lines(patch,
+      dnbinom(x = patch, mu = f_n$par[1], size = f_n$par[2]),
+      col = "red", lwd = 2)
 points(patch, get_frequency(f), pch = 20)
 legend("topright", c("Poisson", "CMP", "NegBinom", "PIG", "Sichel"), lwd=2,
        col = c("blue", "green", "red", "purple", "orange"))
@@ -138,9 +138,6 @@ lines(patch,
       compoisson::dcom(x = patch, lambda = m_c$par[1], nu = m_c$par[2]),
       col = "green", lwd = 2)
 lines(patch,
-      dnbinom(x = patch, mu = m_n$par[1], size = m_n$par[2]),
-      col = "red", lwd = 2)
-lines(patch,
       gamlss.dist::dSICHEL(x = patch, mu = m_i$par[1], sigma = m_i$par[2],
                            nu = -0.5),
       col = "purple", lwd = 2)
@@ -148,6 +145,9 @@ lines(patch,
       gamlss.dist::dSICHEL(x = patch, mu = m_s$par[1], sigma = m_s$par[2],
                            nu = m_s$par[3]),
       col="orange", lwd = 2)
+lines(patch,
+      dnbinom(x = patch, mu = m_n$par[1], size = m_n$par[2]),
+      col = "red", lwd = 2)
 points(patch, get_frequency(m), pch = 20)
 legend("topright", c("Poisson", "CMP", "NegBinom", "PIG", "Sichel"), lwd=2,
        col = c("blue", "green", "red", "purple", "orange"))
