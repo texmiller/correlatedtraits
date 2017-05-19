@@ -8,7 +8,7 @@ fit_nb <- function(params, y) {
   -sum(log(dnbinom(y, mu = params[1], size = params[2])))
 }
 
-# Maximum likelihood fit to a Poisson Inverse-Gaussian distribution
+# Maximum likelihood fit to a Poisson Inverse Gaussian distribution
 fit_pig <- function(params, y) {
   -sum(log(
     gamlss.dist::dSICHEL(y, mu = params[1], sigma = params[2], nu = -0.5)
@@ -62,13 +62,58 @@ plot_distribution_fits <- function(fits, obs, title) {
   return(p)
 }
 
+#' Test multiple kernel fits to dispersal data.
+#'
+#' \code{test_kernel_fits} takes output from \code{\link{wrangle_beetle_data}}
+#'    and runs tests to determine the best-fitting dispersal kernel for all
+#'    beetles as a whole, for females independently, and for males
+#'    independently. The following kernels are tested: the Poisson distribution
+#'    (\code{\link[stats]{Poisson}}), the negative binomial distribution
+#'    (\code{\link[stats]{NegBinomial}}), the Sichel distribution
+#'    (\code{\link[gamlss.dist]{SICHEL}}), and the Poisson Inverse Gaussian
+#'    distribution (a special case of the Sichel distribution where
+#'    \eqn{\nu = -0.5}).
+#'
+#' @inheritParams fit_Bev_Holt
+#' @return A list of lists. Each top-level list (\code{$all}, \code{$females},
+#'     or \code{$males}) contains the following objects:
+#'     \itemize{
+#'         \item{\code{$dist}}{ - A vector of the distances that were measured
+#'             for each individual in the data subset.}
+#'         \item{\code{$x}}{ - A vector of patch distances relevant to the study
+#'             (\code{x = 0:40}).}
+#'         \item{\code{$AIC}}{ - An AIC table ranking each distribution by its
+#'             AIC score when fit to the data in \code{$dist}.}
+#'         \item{\code{$frequency}}{ - The frequency of each distance measured in
+#'             $dist, measured over the patches in \code{$x}.}
+#'         \item{\code{$plot}}{ - A \code{\link[ggplot2]{ggplot}} object showing
+#'             the data in \code{$frequency} along with the best-fit plot of
+#'             each candidate distribution.}
+#'         \item{\code{$<distribution>}}{ - The results of maximum-likelihood
+#'             fits of each distribution to the data in $dist, where
+#'             \code{<distribution>} is either \code{poisson}, \code{nbinom},
+#'             \code{pig}, or \code{sichel}. The structure of these results
+#'             exaclty follows the output from \code{\link[stats]{optim}}.
+#'             For example, to get parameter estimates for fits to the Poisson
+#'             distribution, using data from female beetles, use
+#'             \code{output$females$poisson$par}.}
+#'         \item{\code{$<distribution>$fit}}{ - The mass density function for a
+#'             given distribution over \code{$x} (i.e., the line drawn in
+#'             \code{$plot}.}
+#'     }
 #' @export
-test_kernel_fits <- function(data) {
+test_kernel_fits <- function(clean_data) {
   # SUBSET DATA ------------------------------------------------------------------
   # all the data, males only, and females only
-  all     <- list(dist = as.numeric(abs(na.omit(data$dist))))
-  females <- list(dist = as.numeric(abs(na.omit(data[data$sex == 'f', ]$dist))))
-  males   <- list(dist = as.numeric(abs(na.omit(data[data$sex == 'm', ]$dist))))
+  all     <- list(dist = as.numeric(abs(na.omit(
+    clean_data$dist
+    ))))
+  females <- list(dist = as.numeric(abs(na.omit(
+    clean_data[clean_data$sex == 'f', ]$dist
+    ))))
+  males   <- list(dist = as.numeric(abs(na.omit(
+    clean_data[clean_data$sex == 'm', ]$dist
+    ))))
 
   # FREQUENCY OF EACH DISTANCE -------------------------------------------------
   all$frequency     <- get_frequency(all$dist)
@@ -89,7 +134,7 @@ test_kernel_fits <- function(data) {
   females$nbinom <- optim(par = c(5, 1), fn = fit_nb, y = females$dist)
   males$nbinom   <- optim(par = c(5, 1), fn = fit_nb, y = males$dist)
 
-  # Poisson Inverse-Gaussian distribution
+  # Poisson Inverse Gaussian distribution
   all$pig     <- optim(par = c(5, 0.1), fn = fit_pig, y = all$dist)
   females$pig <- optim(par = c(5, 0.1), fn = fit_pig, y = females$dist)
   males$pig   <- optim(par = c(5, 0.1), fn = fit_pig, y = males$dist)
@@ -122,7 +167,7 @@ test_kernel_fits <- function(data) {
                                 mu   = males$nbinom$par[1],
                                 size = males$nbinom$par[2])
 
-  # Poisson Inverse-Gaussian distribution
+  # Poisson Inverse Gaussian distribution
   all$pig$fit     <- gamlss.dist::dSICHEL(x = x,
                                           mu    = all$pig$par[1],
                                           sigma = all$pig$par[2],
@@ -184,7 +229,7 @@ test_kernel_fits <- function(data) {
   # MODEL SELECTION ------------------------------------------------------------
   all$AIC     <- AIC_table(models = c("Poisson",
                                       "Negative Binomial",
-                                      "Poisson Inverse-Gaussian",
+                                      "Poisson Inverse Gaussian",
                                       "Sichel"),
                            aics = c(AIC_calc(all$poisson),
                                     AIC_calc(all$nbinom),
@@ -193,7 +238,7 @@ test_kernel_fits <- function(data) {
 
   females$AIC <- AIC_table(models = c("Poisson",
                                       "Negative Binomial",
-                                      "Poisson Inverse-Gaussian",
+                                      "Poisson Inverse Gaussian",
                                       "Sichel"),
                            aics = c(AIC_calc(females$poisson),
                                     AIC_calc(females$nbinom),
@@ -202,7 +247,7 @@ test_kernel_fits <- function(data) {
 
   males$AIC   <- AIC_table(models = c("Poisson",
                                       "Negative Binomial",
-                                      "Poisson Inverse-Gaussian",
+                                      "Poisson Inverse Gaussian",
                                       "Sichel"),
                            aics = c(AIC_calc(males$poisson),
                                     AIC_calc(males$nbinom),
