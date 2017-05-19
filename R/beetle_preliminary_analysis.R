@@ -57,7 +57,7 @@
 #'         10/10, 3.33/10, 2/10, 1/10
 #'     }
 #'
-#' @param clean_data the cleaned and compiled data returned from
+#' @param clean_data The cleaned and compiled data returned from
 #'     \code{\link{wrangle_beetle_data}}.
 #' @param show_plot Should the plot be drawn? Default is \code{TRUE}.
 #' @param xmax The maximum x-axis value for the plot.
