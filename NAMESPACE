@@ -2,4 +2,5 @@
 
 export(fit_Bev_Holt)
 export(pdf_doc)
+export(test_kernel_fits)
 export(wrangle_beetle_data)
