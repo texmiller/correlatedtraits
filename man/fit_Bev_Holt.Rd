@@ -7,7 +7,7 @@
 fit_Bev_Holt(clean_data, show_plot = TRUE, xmax = 30)
 }
 \arguments{
-\item{clean_data}{the cleaned and compiled data returned from
+\item{clean_data}{The cleaned and compiled data returned from
 \code{\link{wrangle_beetle_data}}.}
 
 \item{show_plot}{Should the plot be drawn? Default is \code{TRUE}.}
