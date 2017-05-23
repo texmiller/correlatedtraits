@@ -12,7 +12,7 @@
 #'     data for mating, dispersal, and freezing dates.
 #' @return A data frame of all the data, cleaned and compiled.
 #' @export
-wrangle_beetle_data = function(female_fd_path, female_f_path,
+wrangle_beetle_data <- function(female_fd_path, female_f_path,
                              male_d_path, dates_path) {
   # load dates of mating, dispersal, and freezing
   dates <- read.csv(dates_path)
