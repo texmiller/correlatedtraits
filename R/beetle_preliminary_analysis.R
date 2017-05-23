@@ -68,7 +68,7 @@
 #' @references Otto and Day (2007). A Biologist's Guide to Mathematical Modeling
 #'     in Ecology and Evolution. Princeton University Press. Page 185.
 #' @export
-fit_Bev_Holt = function(clean_data, show_plot = TRUE, xmax = 30) {
+fit_Bev_Holt <- function(clean_data, show_plot = TRUE, xmax = 30) {
 
   # remove NA rows from clean_data
   tmp <- na.omit(clean_data)
@@ -99,25 +99,49 @@ fit_Bev_Holt = function(clean_data, show_plot = TRUE, xmax = 30) {
   K <- as.numeric(format((L - 1) * a, digits = 3))
 
   # plot results
-  p <- ggplot(data = data, aes(x = x, y = y)) +
-    theme_classic() +
-    geom_jitter(width = 0.2, height = 1,
-                alpha = 0.5, pch = 19, colour = "grey50") +
-    geom_line(data = data_predict[1:(xmax + 1), ], aes(x, y),
-              color = 'red', size=1) +
-    geom_hline(yintercept = K, linetype = "dashed") +
-    annotate("text", x = 3, y = 90, size = 3,
-             label = paste0("italic(lambda) == ", L), parse = TRUE) +
-    scale_y_continuous(name   = expression(italic(N[t+1])),
-                       limits = c(0, 105), expand = c(0, 0),
-                       breaks = c(seq(0, 100, by = 25), K),
-                       labels = c(seq(0, 100, by = 25),
-                                  bquote(italic("K ") ~ "=" ~ .(K)))) +
-    scale_x_continuous(name   = expression(italic(N[t])),
-                       limits = c(0, xmax),  expand = c(0, 0) ,
-                       breaks = c(0, 1, 2,  3.33,  seq(10, xmax, length = 3)),
-                       labels = c(0, 1, 2, "3.33", seq(10, xmax, length = 3))) +
-    stat_summary(fun.y = mean, geom = "point", size = 2)
+  p <-
+    ggplot2::ggplot(
+      data = data,
+      ggplot2::aes(x = x, y = y)) +
+    ggplot2::theme_classic() +
+    ggplot2::geom_jitter(
+      width = 0.2,
+      height = 1,
+      alpha = 0.5,
+      pch = 19,
+      colour = "grey50") +
+    ggplot2::geom_line(
+      data = data_predict[1:(xmax + 1), ],
+      ggplot2::aes(x, y),
+      color = 'red',
+      size = 1) +
+    ggplot2::geom_hline(
+      yintercept = K,
+      linetype = "dashed") +
+    ggplot2::annotate(
+      "text",
+      x = 3,
+      y = 90,
+      size = 3,
+      label = paste0("italic(lambda) == ", L),
+      parse = TRUE) +
+    ggplot2::scale_y_continuous(
+      name   = expression(italic(N[t+1])),
+      limits = c(0, 105),
+      expand = c(0, 0),
+      breaks = c(seq(0, 100, by = 25), K),
+      labels = c(seq(0, 100, by = 25),
+      bquote(italic("K ") ~ "=" ~ .(K)))) +
+    ggplot2::scale_x_continuous(
+      name   = expression(italic(N[t])),
+      limits = c(0, xmax),
+      expand = c(0, 0) ,
+      breaks = c(0, 1, 2,  3.33,  seq(10, xmax, length = 3)),
+      labels = c(0, 1, 2, "3.33", seq(10, xmax, length = 3))) +
+    ggplot2::stat_summary(
+      fun.y = mean,
+      geom = "point",
+      size = 2)
 
   if(show_plot) {
     print(p)

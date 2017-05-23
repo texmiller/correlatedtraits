@@ -45,19 +45,32 @@ AIC_table <- function(models, aics) {
 
 # plot distribution fits
 plot_distribution_fits <- function(fits, obs, title) {
-  p <- ggplot2::ggplot(data = fits, aes(x = x, y = y)) +
-    theme_classic() +
-    ggtitle(title) +
-    scale_y_continuous(name = "Frequency", expand = c(0, 0)) +
-    scale_x_continuous(name = "Distance (in patches)", expand = c(0, 0)) +
-    geom_line(aes(col = d, linetype = d), size = 1) +
-    geom_point(data = na.omit(data.frame(x = obs$x, y = obs$frequency)),
-               aes(x = x, y = y), pch = 19, size = 1.4) +
-    scale_linetype_manual(values = c("solid", "solid", "solid", "dashed"),
-                          guide = guide_legend(title = "Distribution")) +
-    scale_color_manual(values = c('#4daf4a', '#e41a1c', '#984ea3', '#377eb8'),
-                       guide = guide_legend(title = "Distribution")) +
-    theme(legend.position = c(0.8, 0.8))
+  p <- ggplot2::ggplot(data = fits, ggplot2::aes(x = x, y = y)) +
+    ggplot2::theme_classic() +
+    ggplot2::ggtitle(
+      title) +
+    ggplot2::scale_y_continuous(
+      name = "Frequency",
+      expand = c(0, 0)) +
+    ggplot2::scale_x_continuous(
+      name = "Distance (in patches)",
+      expand = c(0, 0)) +
+    ggplot2::geom_line(
+      ggplot2::aes(col = d, linetype = d),
+      size = 1) +
+    ggplot2::geom_point(
+      data = na.omit(data.frame(x = obs$x, y = obs$frequency)),
+      ggplot2::aes(x = x, y = y),
+      pch = 19,
+      size = 1.4) +
+    ggplot2::scale_linetype_manual(
+      values = c("solid", "solid", "solid", "dashed"),
+      guide = ggplot2::guide_legend(title = "Distribution")) +
+    ggplot2::scale_color_manual(
+      values = c('#4daf4a', '#e41a1c', '#984ea3', '#377eb8'),
+      guide = ggplot2::guide_legend(title = "Distribution")) +
+    ggplot2::theme(
+      legend.position = c(0.8, 0.8))
 
   return(p)
 }
@@ -107,13 +120,13 @@ test_kernel_fits <- function(clean_data) {
   # all the data, males only, and females only
   all     <- list(dist = as.numeric(abs(na.omit(
     clean_data$dist
-    ))))
+  ))))
   females <- list(dist = as.numeric(abs(na.omit(
     clean_data[clean_data$sex == 'f', ]$dist
-    ))))
+  ))))
   males   <- list(dist = as.numeric(abs(na.omit(
     clean_data[clean_data$sex == 'm', ]$dist
-    ))))
+  ))))
 
   # FREQUENCY OF EACH DISTANCE -------------------------------------------------
   all$frequency     <- get_frequency(all$dist)
