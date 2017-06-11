@@ -1,17 +1,24 @@
-#' Fit raw beetle data to a Beverton-Holt recruitment curve.
+#' Fit raw beetle data to a specified growth function..
 #'
 #' This code takes data returned from \code{\link{wrangle_beetle_data}}, fits a
-#'     Beverton-Holt recruitement curve, plots the resulting curve, and returns
+#'     user-specified growth function, plots the resulting curve, and returns
 #'     relevant parameter values as well as a transformed dataset.
-#'     \code{fit_Bev_Holt} transforms the data -- which has constant female
+#'     \code{fit_growth} transforms the data -- which has constant female
 #'     density but variable bean density -- to have constant bean density and
 #'     variable female density.
 #'
 #' The form of the Beverton-Holt equation is taken from Otto and Day (2007):
 #'     \deqn{
-#'         N_{t+1} = \frac{\lambda N_t}{1 + \alpha N_t}
+#'         N_{t+1} = \frac{R_{0} N_t}{1 + \alpha N_t}
 #'     }{
-#'         N(t+1) = \lambda N(t)/ (1 + \alpha N(t))
+#'         N(t+1) = R_0 * N(t)/ (1 + \alpha N(t))
+#'     }
+#'
+#' The logistic equation uses the discrete-time logistic formula:
+#'     \deqn{
+#'         N_{t+1} = N_{t} + N_{t}r_{d} (1 - \frac{N_t}{K})
+#'     }{
+#'         N(t+1) = N(t) + N(t)r * (1 - N(t)/K)
 #'     }
 #'
 #' Data were originally collected by varying resource density (i.e., number of
@@ -57,46 +64,100 @@
 #'         10/10, 3.33/10, 2/10, 1/10
 #'     }
 #'
-#' @param clean_data The cleaned and compiled data returned from
+#' @param data The cleaned and compiled data returned from
 #'     \code{\link{wrangle_beetle_data}}.
 #' @param show_plot Should the plot be drawn? Default is \code{TRUE}.
 #' @param xmax The maximum x-axis value for the plot.
-#' @return A plot of the cleaned data and the fitted Beverton-Holt function, the
-#'     result of the model fit, Beverton-Holt parameters \code{lambda},
-#'      \code{K}, and \code{alpha}, and the transformed data set.
+#' @param model Which model should be used to fit the growth data? Currenly,
+#'     either \code{Beverton-Holt} or \code{logistic}.
+#' @return A plot of the cleaned data and the fitted growth function, the
+#'     result of the model fit, parameter estimates for the growth rate,
+#'      carrying capacity, and any other model parameters, and the transformed
+#'      data set.
 #'
 #' @references Otto and Day (2007). A Biologist's Guide to Mathematical Modeling
 #'     in Ecology and Evolution. Princeton University Press. Page 185.
+#' @references Gotelli (2001). A Primer of Ecology, Third Edition. Sinauer Associates,
+#'     Inc. Page 35.
 #' @export
-fit_Bev_Holt <- function(clean_data, show_plot = TRUE, xmax = 30) {
+fit_growth <- function(data, show_plot = TRUE, xmax = 30, model) {
 
-  # remove NA rows from clean_data
-  tmp <- na.omit(clean_data)
+  # remove NA rows from data
+  tmp <- na.omit(data)
 
   # Modify the fraction of females per bean so that all resource densities are
   # constant.
   data <- data.frame(x = 10 / tmp$beans, y = tmp$f * 10 / tmp$beans)
 
-  # fit a Beverton-Holt Model.
-  # The alpha (a) in the equation below is the inverse (1/alpha) from Otto and
-  # Day (2007), because the model won't converge otherwise.
+  if(grepl(model, "Beverton-Holt", ignore.case = TRUE)){
+    # fit a Beverton-Holt model
+    # The alpha (a) in the equation below is the inverse (1/alpha) from Otto and
+    # Day (2007), because the model won't converge otherwise.
 
-  # get starter values for `nls` using the log of y; this function is a bit
-  # finicky and occasionally won't run otherwise.
-  start <- nls(log(y) ~ log((lambda * x) / (1 + x / alpha)), data,
-               list(lambda = 1, alpha = 1))
+    # get starter values for `nls` using the log of y; this function is a bit
+    # finicky and occasionally won't run otherwise.
+    start <- nls(log(y) ~ log((R0 * x) / (1 + x / alpha)), data,
+                 list(R0 = 1, alpha = 1))
 
-  # use starter values to get estimates for untransformed data.
-  logfit <- nls(y ~ (lambda * x) / (1 + x / alpha), data, coef(start))
+    # use starter values to get estimates for untransformed data.
+    fit <- nls(y ~ (R0 * x) / (1 + x / alpha), data, coef(start))
+
+    # Get coefficients and calculate K
+    a <- coef(fit)[2]
+    params <- list(R0     = coef(fit)[1],
+                   K      = coef(fit)[2] * (coef(fit)[1] - 1),
+                   alpha  = coef(fit)[2])
+  } else if(grepl(model, "logistic", ignore.case = TRUE)){
+
+    # fit a discrete-time logistic model
+    fit <- nls(y ~ K * x * exp(r) / (K + x * (exp(r) - 1)),
+                data, list(r = 2.42, K = 36.1))
+
+    # Get coefficients
+    params <- list(r = coef(fit)[1],
+                   K = coef(fit)[2])
+
+  } else if(grepl(model, "monomolecular", ignore.case = TRUE)){
+
+    fit <- nls(y ~ K * (1 - exp(-r * x)),
+               data, list(r = 1, K = 36.1))
+
+    # Get coefficients
+    params <- list(r = coef(fit)[1],
+                   K = coef(fit)[2])
+
+  } else if(grepl(model, "Ricker", ignore.case = TRUE)){
+
+    fit <- nls(y ~ x * exp(r * (1 - x / K)),
+               data, list(r = 1, K = 36.1))
+
+    # Get coefficients
+    params <- list(r = coef(fit)[1],
+                   K = coef(fit)[2])
+  } else if(grepl(model, "r-k Skellam", ignore.case = TRUE)){
+
+    fit <- nls(y ~  K * (1 - (1 - r / K)^x),
+               data, list(r = 11, K = 36))
+
+    # Get coefficients
+    params <- list(r = coef(fit)[1],
+                   K = coef(fit)[2])
+
+  } else {
+    stop("The specified model is not available. See ?fit_growth")
+  }
+
+  # calculate AIC
+  AIC <- 2 * length(coef(fit)) + nrow(data) * log(fit$m$deviance())
+
+  # format parameters for plotting
+  r <- as.numeric(format(params[[1]], digits = 3))
+  K <- as.numeric(format(params[[2]], digits = 3))
 
   # make predictions on a range of values from 0:100 individuals
   data_predict <- data.frame(x = 0:100,
-                             y = predict(logfit, newdata = data.frame(x=0:100)))
-
-  # Get coefficients and calculate K
-  a <- coef(logfit)[2]
-  L <- as.numeric(format(coef(logfit)[1], digits = 3))
-  K <- as.numeric(format((L - 1) * a, digits = 3))
+                             y = predict(fit,
+                                         newdata = data.frame(x = 0:100)))
 
   # plot results
   p <-
@@ -118,12 +179,16 @@ fit_Bev_Holt <- function(clean_data, show_plot = TRUE, xmax = 30) {
     ggplot2::geom_hline(
       yintercept = K,
       linetype = "dashed") +
+    ggplot2::geom_abline(
+      intercept = 0,
+      slope = mean(data[data$x == 1, ]$y),
+      linetype = "dashed") +
     ggplot2::annotate(
       "text",
       x = 3,
       y = 90,
       size = 3,
-      label = paste0("italic(lambda) == ", L),
+      label = paste0("italic(r) == ", r),
       parse = TRUE) +
     ggplot2::scale_y_continuous(
       name   = expression(italic(N[t+1])),
@@ -148,10 +213,9 @@ fit_Bev_Holt <- function(clean_data, show_plot = TRUE, xmax = 30) {
   }
 
   return(list(plot   = p,
-              fit    = logfit,
-              lambda = as.numeric(coef(logfit)[1]),
-              K      = as.numeric((coef(logfit)[1] - 1) * coef(logfit)[2]),
-              alpha  = as.numeric(coef(logfit)[2]),
+              fit    = fit,
+              AIC    = AIC,
+              params = params,
               data   = data)
   )
 }
