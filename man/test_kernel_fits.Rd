@@ -6,10 +6,6 @@
 \usage{
 test_kernel_fits(clean_data)
 }
-\arguments{
-\item{clean_data}{The cleaned and compiled data returned from
-\code{\link{wrangle_beetle_data}}.}
-}
 \value{
 A list of lists. Each top-level list (\code{$all}, \code{$females},
     or \code{$males}) contains the following objects:
