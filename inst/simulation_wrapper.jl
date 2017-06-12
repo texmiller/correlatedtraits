@@ -4,7 +4,7 @@ import DataFrames
 println("# of cores: ", Base.CPU_CORES, "; # of workers: ", nworkers())
 
 # load simulation functions
-@everywhere include("batchrun.jl")
+@everywhere include("simulation.jl")
 
 TIME = time()
 tic()
