@@ -93,8 +93,8 @@ function init_inds(n, spX, M, V, C, H)
 	X  = rand(Uniform(-spX, spX), n)
 
   # additive genetic covariances
-	CV = [  0  C[1];
-	      C[1]   0]
+	CV = [0 C;
+	      C 0]
 	ΣA = eye(2) .* (V .* H) + CV           # additive genetic covariance matrix
 	ΣE = eye(2) .* (V .* (1 - H))          # environmental covariance matrix
   G = rand(MvNormal(M, ΣA), n)'          # genotypes
@@ -295,7 +295,9 @@ function metrics(popmatrix, bw)
 	Nx    = Array{Float64}(n)
 	MeanD = Array{Float64}(n)
 	Meanr = Array{Float64}(n)
-
+	V_D    = Array{Float64}(n)
+	V_r    = Array{Float64}(n)
+	C_Dr   = Array{Float64}(n)
 	tmpX  = Array{Float64}(length(x))     # temporary array for calculations
 
 	# Calculations, looped over individuals
@@ -314,7 +316,7 @@ function metrics(popmatrix, bw)
 	end
 
 	out = convert(DataFrame, [Nx MeanD Meanr V_D V_r C_Dr])
-  names!(out, [:Nx :MeanD :Meanr :V_D :V_r :C_Dr])
+  names!(out, [:Nx, :MeanD, :Meanr, :V_D, :V_r, :C_Dr])
 	return out
 end
 
@@ -380,7 +382,7 @@ function sum_metrics(popmatrix, bw)
 	end
 
 	out = convert(DataFrame, [b Nx MeanD Meanr MeanPD MeanPr V_D V_r C_Dr])
-  names!(out, [:b :Nx :MeanD :Meanr :MeanPD :MeanPr :V_D :V_r :C_Dr])
+  names!(out, [:b, :Nx, :MeanD, :Meanr, :MeanPD, :MeanPr, :V_D, :V_r, :C_Dr])
 
   return out
 end
@@ -449,7 +451,7 @@ function LE_sum_metrics(popmatrix, bw)
 	end
 
 	out = convert(DataFrame, [b Nx MeanD Meanr MeanPD MeanPr V_D V_r C_Dr])
-	names!(out, [:b :Nx :MeanD :Meanr :MeanPD :MeanPr :V_D :V_r :C_Dr])
+	names!(out, [:b, :Nx, :MeanD, :Meanr, :MeanPD, :MeanPr, :V_D, :V_r, :C_Dr])
   return out
 end
 
@@ -532,7 +534,7 @@ function repro_disp(popmatrix, H, V, K, bw)
 
   # Density-dependent population growth (with demographic stochasticity)
   for i = 1:size(popmatrix, 1)
-		Noff[i] = rand(Poisson(growth(mets[i,:Nx], K,	popmatrix[i,:Pr])))
+		Noff[i] = rand(Poisson(growth(mets[i,:Nx], K,	abs(popmatrix[i,:Pr]))))
   end
 
   # If there are no offspring, return NULL
@@ -577,10 +579,10 @@ function repro_disp(popmatrix, H, V, K, bw)
 										mets[i, :C_Dr] mets[i, :V_r]]
 
 				# calculate genotypes
-				(npm[c, :D], npm[c,:r]) = rand(MvNormal(mpv, 0.5 * ΣA)), 1)
+				(npm[c, :D], npm[c,:r]) = rand(MvNormal(mpv, 0.5 * ΣA), 1)
 
 				# calculate phenotypes
-				(npm[c, :PD], npm[c,:Pr]) = rand(Normal([0 0], ΣE), 1) +
+				(npm[c, :PD], npm[c,:Pr]) = rand(MvNormal([0, 0], ΣE), 1) +
 				                                        [npm[c, :D], npm[c, :r]]
 
 				# (3) Offspring dispersal ----------------------------------------------
@@ -676,7 +678,7 @@ function timeoutoutput(p, r, gp, dk, h2D, i, bw)
 end
 
 # Run the simulation -----------------------------------------------------------
-function runsim(popmatrix, n, spX, ngens, M, V, C, H, ρ, bw, p, r, TIME, outname = "_")
+function runsim(popmatrix, n, spX, ngens, M, V, C, H, K, ρ, bw, p, r, TIME, outname = "_")
 	# Given [popmatrix, n, spX, ngens, M, V, C, H, bw, p, r, TIME, outname]
 	# returns changes in population size, extent, and genetic variance over time.
   # popmatrix : see init_inds
@@ -699,7 +701,7 @@ function runsim(popmatrix, n, spX, ngens, M, V, C, H, ρ, bw, p, r, TIME, outnam
 	flag = ""
 
 	# set a unique seed based on H, p, and r, so simulations can be repeated.
-	srand(Int(([1 10] * H + (ρ + 1) * 100)[] * 10000 + 42 * p + r))
+	srand(Int(([1 10] .* H + (ρ + 1) * 100)[] * 10000 + 42 * p + r))
 
 	# initialize output
 	batchoutput = Array{Any}(ngens * 9, 2314)
@@ -708,7 +710,7 @@ function runsim(popmatrix, n, spX, ngens, M, V, C, H, ρ, bw, p, r, TIME, outnam
   for i = 1:ngens
 
 		# do reproduction and dispersal
-		popmatrix = repro_disp(popmatrix, H, V, bw)
+		popmatrix = repro_disp(popmatrix, H, V, K, bw)
 
 		# if population goes extinct, make output blank for remaining generations
     if size(popmatrix, 1) < 1
@@ -719,7 +721,7 @@ function runsim(popmatrix, n, spX, ngens, M, V, C, H, ρ, bw, p, r, TIME, outnam
 		# if rerunwrap.jl has been running for more than 16 hours, get out
 	  elseif (time() - TIME) > 16 * 3600
 			for j = i:ngens
-				batchoutput[(1:9) + (9) * (j - 1), :] = timeoutoutput(p, r, gp, dk, h2D, i, bw)
+				batchoutput[(1:9) + (9) * (j - 1), :] = timeoutoutput(p, r, H[1], H[2], i, bw)
 				flag = "!BATCHRUNTIMEOUT!"
 			end
 		break
