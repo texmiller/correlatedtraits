@@ -4,7 +4,7 @@ import DataFrames
 println("# of cores: ", Base.CPU_CORES, "; # of workers: ", nworkers())
 
 # load simulation functions
-@everywhere include("simulation.jl")
+@everywhere include("simulation_2.jl")
 
 TIME = time()
 tic()
@@ -12,17 +12,22 @@ tic()
 ## PARAMETER VALUES ############################################################
 
 # parse input arguments
-h2D = eval(parse(ARGS[1]))  # dispersal heritability parameter
+H   = [0.5 0.5] #eval(parse(ARGS[1]))  # heritability vector
 pop = eval(parse(ARGS[2]))  # population number
 rep = eval(parse(ARGS[3]))  # replicate number
 
 # fixed parameters
-μD   = log(2) #log(5)# mean dispersal trait value
+M    = [log(6), 11.5]
 n    = 20     # starting N of individs
 spX  = 0.01   # starting +/- extent
-VPD  = 0.5    # total phenotypic variance
+V    = [22 76] # total phenotypic variance
 ngen = 20     # number of generations
 K    = 40     # carrying capacity
+
+ρ    = 0.5
+
+C    = (sqrt(V .* H)' * sqrt(V .* H) .* [1 ρ; ρ 1])[1, 2]
+K    = 36.1
 
 # Make vectors to store parameter combinations
 vl = 70#105   # vector length
@@ -49,7 +54,10 @@ c = 0
 srand(Int(h2D*10000 + 42*pop))
 
 # generate a single founding population
-popmatrix = init_inds(n, spX, μD, h2D, VPD)
+popmatrix = init_inds(n, spX, M, V, C, H)
+
+@everywhere include("simulation_2.jl")
+runsim(popmatrix, n, spX, 1, M, V, C, H, K, ρ, 0.5, 1, 1, 10, "_")
 
 # loop over Allee threshold
 for Nt in [5] #[2.5, 2, 3, 5]
