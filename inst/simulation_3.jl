@@ -61,31 +61,6 @@ end
 
 ### GROWTH FUNCTIONS ###########################################################
 
-# Hockey-stick population growth -----------------------------------------------
-# Hockey-stick growth parameters
-immutable growth_paramsHS
-	lambda::Float64  # low density growth rate
-	Nt::Float64      # threshold dens. for low-density -> high density growth rate
-	K::Float64       # carrying capacity
-end
-
-function hockey_stick(N, gp)
-	# Given [N, lambda, Nt, K] returns [per-capita growth rate]
-  # N      : number of individuals
-	# lambda : low-density per-capita growth rate
-  # Nt     : threshold density for low-density -> high density growth rate
-  # K      : carrying capacity
-	# NOTE: for no Allee effect, lambda = K/Nt
-
-	if N <=0
-		return 0
-	elseif N <= gp.Nt
-    return gp.lambda
-  else
-    return gp.K/N
-  end
-end
-
 # Modified 'Skellam' (exponential) population growth ---------------------------
 function hockey_stick(N, K, r)
 	# Given [N, K, r] returns expected [per-capita growth rate]
@@ -101,7 +76,7 @@ end
 
 # Initialize population --------------------------------------------------------
 function init_inds(n, spX, M, V, C, H)
-	# Given [n, spX, μD, h2D, VPD] returns [X, D, K, r, PD, PK, Pr], which is
+	# Given [n, spX, M, V, C, H] returns [X, D, PD, K, PK, r, Pr], which is
 	# referred to in other functions as 'popmatrix'.
   # n   : number of starting individuals
 	# spX : absolute value of starting population's spatial boundaries
@@ -113,51 +88,37 @@ function init_inds(n, spX, M, V, C, H)
 	# X   : spatial location of each individual
 	# D   : dispersal genotype
 	# PD  : dispersal phenotype (accounts for environmental variance)
-	# K   : carrying capacity genotype
+	# K   : carrying capacity (K) genotype
 	# PK  : carrying capacity phenotype (accounts for environmental variance)
-	# r   : low-density growth rate (ldgr) genotype
-	# Pr  : ldgr phenotype (accounts for environmental variance)
+	# r   : low-density growth rate (r) genotype
+	# Pr  : r phenotype (accounts for environmental variance)
 	# ΣA  : additive genetic covariance matrix
 	# ΣE  : environmental covariance matrix
 
-	X  = rand(Uniform(-spX,spX), n)
+	X  = rand(Uniform(-spX, spX), n)
 
+  # additive genetic covariances
 	CV = [  0  C[1] C[2];
 	      C[1]   0  C[3];
 				C[2] C[3]   0]
-	ΣA = eye(3) .* (V .* H) + CV
-	ΣE = eye(3) .* (V .* (1 - H))
-  G = rand(MvNormal(M, ΣA), n)'
-	P = rand(MvNormal([0, 0, 0], ΣE), n)' + G
+	ΣA = eye(3) .* (V .* H) + CV           # additive genetic covariance matrix
+	ΣE = eye(3) .* (V .* (1 - H))          # environmental covariance matrix
+  G = rand(MvNormal(M, ΣA), n)'               # genotypes
+	P = rand(MvNormal([0, 0, 0], ΣE), n)' + G   # phenotypes
 
 	return(DataFrame(X=X, D=G[:, 1], PD=P[:, 1],
 	                      K=G[:, 2], PK=P[:, 2],
 												r=G[:, 3], Pr=P[:, 3]))
 end
 
-# function init_inds(n, spX, μD, h2D, VPD)
-# 	# Given [n, spX, μD, h2D, VPD] returns [X, D, PD], which is referred to in
-# 	# future functions as 'popmatrix'.
-#   # n   : number of starting individuals
-# 	# spX : absolute value of starting population's spatial boundaries
-# 	# μD  : mean dispersal genotype
-# 	# h2D : dispersal heritability
-# 	# VPD : phenotypic variance in dispersal
-# 	# X   : spatial location of each individual
-# 	# D   : dispersal genotype
-# 	# PD  : dispersal phenotype (accounts for environmental variance)
-#
-# 	X  = rand(Uniform(-spX,spX), n)
-#   D  = rand(Normal(μD,sqrt(h2D*VPD)), n)
-#   PD = rand(Normal(0,sqrt((1-h2D)*VPD)), n) + D
-# 	return(DataFrame(X=X, D=D, PD=PD))
-# end
-
 # Calculate non-additive (environmental) phenotypic variance -------------------
-function VE(H,V)
+function VE(H, V)
 	# Given [H and V], returns [ΣE]
 	# V   : vector of total phenotypic variance [VD VK Vr]
 	# H   : vector of heritabilities [h²D h²K h²r]
+
+	# ΣE  : environmental variance matrix
+
 	return eye(3) .* (V .* (1 - H))
 end
 
@@ -167,9 +128,9 @@ end
 function accordian_bins(A::Array{Float64,1}, bw::Float64)
 	x = vcat(minimum(A), maximum(A))
 
-	scl = bw * 4
 	# make a scale so that accordian_bins changes appropriately with bw; when
 	# bw = 0.25, "fixed" bins should be spaced 1 unit apart.
+	scl = bw * 4
 
 	# center
 	C = collect(linspace(-50.0, 50.0, 101) * scl)
@@ -262,7 +223,7 @@ function Mean_calc!(Mean::Array{Float64,1}, R::Array{Float64,1},
 	# Nx    : the density at the location of ind. i
 	# i     : the index of the invididual
 
-	Mean[i]  = (*(R',w)/Nx)[1] # sum of weighted RD, scaled by patch density
+	Mean[i]  = (*(R', w) / Nx)[1] # sum of weighted RD, scaled by patch density
 	nothing
 end
 
@@ -307,12 +268,21 @@ end
 
 # Calculate breeding value metrics wrt individuals -----------------------------
 function metrics(popmatrix, bw)
-	# Given [popmatrix], returns [Nx, MeanD, and SDD].
+	# Given   [popmatrix, bw]
+	# returns [Nx MeanD MeanK Meanr V_D V_K V_r C_DK C_Dr C_Kr]
 	# popmatrix : see init_inds
 	# bw        : neighborhood (bin) width, Gaussian σ
+
 	# Nx        : population density in continuous, Gaussian neighborhood
 	# MeanD			: mean dispersal genotype in neighborhood
-	# SDD       : σ(D), standard deviation in dispersal breeding values
+	# MeanK			: mean carrying capacity genotype in neighborhood
+	# Meanr			: mean low-density growth rate genotype in neighborhood
+	# V_D       : additive genetic variance in D
+	# V_K       : additive genetic variance in K
+	# V_r       : additive genetic variance in r
+	# C_DK      : additive genetic covariance between D and K
+	# C_Dr      : additive genetic covariance between D and r
+	# C_Kr      : additive genetic covariance between K and r
 
   # If the population is extinct, return NULL
   if size(popmatrix, 1) < 1
@@ -320,29 +290,29 @@ function metrics(popmatrix, bw)
   end
 
   # Define within-function variables
-  n   = size(popmatrix,1)              # number of individuals in population
-  x   = convert(Array,popmatrix[:X])   # individual locations
-  RD  = convert(Array,popmatrix[:D])   # individual dispersal genotypes
-	RK  = convert(Array,popmatrix[:K])   # individual carrying capacity genotypes
-	Rr  = convert(Array,popmatrix[:r])   # individual ldgr genotypes
-	scl = 1 / pdf(Normal(0, bw), 0)      # a scaling factor for n'hood size
+  n   = size(popmatrix, 1)              # number of individuals in population
+  x   = convert(Array, popmatrix[:X])   # individual locations
+  RD  = convert(Array, popmatrix[:D])
+	RK  = convert(Array, popmatrix[:K])
+	Rr  = convert(Array, popmatrix[:r])
+	scl = 1 / pdf(Normal(0, bw), 0)       # a scaling factor for n'hood size
 
 	# NOTE: For Gaussian distribution, ~95% of values are within 2σ of the mean.
-	# When bw=0.25, an individual at spatial location 0.5 will have a neighborhood
-	# where ~95% of its neighborhood is within the bounds 0:1, which roughly
-	# translates to a discrete-patch system.
+	# When bw = 0.25, an individual at spatial location 0.5 will have a
+	# neighborhood where ~95% of its neighborhood is within the bounds 0:1, which
+	# roughly translates to a discrete-patch system.
 
   # Initialize pre-allocated arrays
-	w     = Array{Float64}(n)            # density wrt individual
-	Nx    = Array{Float64}(n)            # total density each ind. experiences
-	MeanD = Array{Float64}(n)            # mean dispersal genotype at each ind.'s n'hood
-	MeanK = Array{Float64}(n)            # mean carrying capacity genotype
-	Meanr = Array{Float64}(n)            # mean ldgr genotype
+	w     = Array{Float64}(n)             # density wrt individual
+	Nx    = Array{Float64}(n)
+	MeanD = Array{Float64}(n)
+	MeanK = Array{Float64}(n)
+	Meanr = Array{Float64}(n)
 
-	tmpX  = Array{Float64}(length(x))    # temporary array for calculations
+	tmpX  = Array{Float64}(length(x))     # temporary array for calculations
 
 	# Calculations, looped over individuals
-	# NOTE: densities (w) are calculated s.t. solitary individuals experience w=1
+	# NOTE: densities (w) are calculated st solitary individuals experience w = 1
 	for i = 1:n
 		x_calc!(tmpX, x, x[i])
 		w_calc!(w, tmpX, bw, scl)
@@ -360,21 +330,31 @@ function metrics(popmatrix, bw)
 	  COV_calc!(C_Kr, w, RK, Rr, MeanK[i], Meanr[i], Nx[i], i, tmpX)
 	end
 
-	out = convert(DataFrame,[Nx MeanD MeanK Meanr V_D V_K V_r C_DK C_Dr C_Kr])
+	out = convert(DataFrame, [Nx MeanD MeanK Meanr V_D V_K V_r C_DK C_Dr C_Kr])
   names!(out, [:Nx :MeanD :MeanK :Meanr :V_D :V_K :V_r :C_DK :C_Dr :C_Kr])
 	return out
 end
 
 # Calculate breeding value metrics wrt spatial location ------------------------
 function sum_metrics(popmatrix, bw)
-	# Given [popmatrix], returns [b, Nx, MeanD, MeanPD, and SDD].
+	# Given   [popmatrix, bw]
+	# returns [b Nx MeanD MeanK Meanr MeanPD MeanPK MeanPr V_D V_K V_r C_DK C_Dr C_Kr]
 	# popmatrix : see init_inds
 	# bw        : neighborhood (bin) width, Gaussian σ
-  # b         : spatial bin
+
 	# Nx        : population density in continuous, Gaussian neighborhood
 	# MeanD			: mean dispersal genotype in neighborhood
-	# MeanPD    : mean dispersal phenotype in neighborhood
-	# SDD       : σ(D), standard deviation in dispersal breeding values
+	# MeanK			: mean carrying capacity genotype in neighborhood
+	# Meanr			: mean low-density growth rate genotype in neighborhood
+	# MeanPD		: mean dispersal phenotype in neighborhood
+	# MeanPK		: mean carrying capacity phenotype in neighborhood
+	# MeanPr		: mean low-density growth rate phenotype in neighborhood
+	# V_D       : additive genetic variance in D
+	# V_K       : additive genetic variance in K
+	# V_r       : additive genetic variance in r
+	# C_DK      : additive genetic covariance between D and K
+	# C_Dr      : additive genetic covariance between D and r
+	# C_Kr      : additive genetic covariance between K and r
 
   # If the population is extinct, return NULL
   if(size(popmatrix, 1) < 1)
@@ -383,33 +363,33 @@ function sum_metrics(popmatrix, bw)
 
   # Define within-function variables
   n   = size(popmatrix,1)               # number of individuals in population
-  x   = convert(Array,popmatrix[:X])    # individual locations
-	RD  = convert(Array,popmatrix[:D])    # individual dispersal genotypes
-	RK  = convert(Array,popmatrix[:K])    # individual carrying capacity genotypes
-	Rr  = convert(Array,popmatrix[:r])    # individual ldgr genotypes
-	PD = convert(Array,popmatrix[:PD])    # individual D phenotypes
-	PK = convert(Array,popmatrix[:PK])    # individual K phenotypes
-	PR = convert(Array,popmatrix[:Pr])    # individual r phenotypes
-	b   = accordian_bins(x,bw)            # spatial extent
+  x   = convert(Array, popmatrix[:X])   # individual locations
+	RD  = convert(Array, popmatrix[:D])
+	RK  = convert(Array, popmatrix[:K])
+	Rr  = convert(Array, popmatrix[:r])
+	PD = convert(Array, popmatrix[:PD])
+	PK = convert(Array, popmatrix[:PK])
+	PR = convert(Array, popmatrix[:Pr])
+	b   = accordian_bins(x, bw)           # spatial extent
 	nb  = length(b)                       # number of bins
 	scl = 1 / pdf(Normal(0, bw), 0)       # a scaling factor for n'hood size
 
   # Initialize pre-allocated arrays
 	w      = Array{Float64}(length(x))    # density wrt bin
-	Nx     = Array{Float64}(nb)           # total density each bin experiences
-	MeanD  = Array{Float64}(nb)           # mean genotype at each bin
-	MeanK  = Array{Float64}(nb)           # mean genotype at each bin
-	Meanr  = Array{Float64}(nb)           # mean genotype at each bin
-	MeanPD = Array{Float64}(nb)           # mean genotype at each bin
-	MeanPK = Array{Float64}(nb)           # mean genotype at each bin
-	MeanPr = Array{Float64}(nb)           # mean genotype at each bin
-	V_D   = Array{Float64}(n)             # variance in dispersal breeding values
-	V_K   = Array{Float64}(n)             # var in carrying capacity b.v.
-	V_r   = Array{Float64}(n)             # var in ldgr b.v.
-	C_DK  = Array{Float64}(n)             # cov in D and K breeding values
-	C_Dr  = Array{Float64}(n)             # cov in D and r b.v.
-	C_Kr  = Array{Float64}(n)             # cov in K and r b.v.
-	tmpX   = Array(Float64,length(x))     # temporary array for calculations
+	Nx     = Array{Float64}(nb)
+	MeanD  = Array{Float64}(nb)
+	MeanK  = Array{Float64}(nb)
+	Meanr  = Array{Float64}(nb)
+	MeanPD = Array{Float64}(nb)
+	MeanPK = Array{Float64}(nb)
+	MeanPr = Array{Float64}(nb)
+	V_D   = Array{Float64}(n)
+	V_K   = Array{Float64}(n)
+	V_r   = Array{Float64}(n)
+	C_DK  = Array{Float64}(n)
+	C_Dr  = Array{Float64}(n)
+	C_Kr  = Array{Float64}(n)
+	tmpX   = Array(Float64, length(x))    # temporary array for calculations
 
 	# Calculations, looped over bin
 	for i = 1:nb
@@ -433,7 +413,7 @@ function sum_metrics(popmatrix, bw)
 		COV_calc!(C_Kr, w, RK, Rr, MeanK[i], Meanr[i], Nx[i], i, tmpX)
 	end
 
-	out = convert(DataFrame,[b Nx MeanD MeanK Meanr MeanPD MeanPK MeanPr V_D V_K V_r C_DK C_Dr C_Kr])
+	out = convert(DataFrame, [b Nx MeanD MeanK Meanr MeanPD MeanPK MeanPr V_D V_K V_r C_DK C_Dr C_Kr])
   names!(out, [:b :Nx :MeanD :MeanK :Meanr :MeanPD :MeanPK :MeanPr :V_D :V_K :V_r :C_DK :C_Dr :C_Kr])
 
   return out
@@ -441,14 +421,24 @@ end
 
 # Calculate breeding value metrics wrt leading-edge (and zero) locations -------
 function LE_sum_metrics(popmatrix, bw)
-	# Given [popmatrix], returns [b, Nx, MeanD, MeanPD, and SDD].
+	# Given   [popmatrix, bw]
+	# returns [b Nx MeanD MeanK Meanr MeanPD MeanPK MeanPr V_D V_K V_r C_DK C_Dr C_Kr]
 	# popmatrix : see init_inds
 	# bw        : neighborhood (bin) width, Gaussian σ
-  # b         : spatial bin
+
 	# Nx        : population density in continuous, Gaussian neighborhood
 	# MeanD			: mean dispersal genotype in neighborhood
-	# MeanPD    : mean dispersal phenotype in neighborhood
-	# SDD       : σ(D), standard deviation in dispersal breeding values
+	# MeanK			: mean carrying capacity genotype in neighborhood
+	# Meanr			: mean low-density growth rate genotype in neighborhood
+	# MeanPD		: mean dispersal phenotype in neighborhood
+	# MeanPK		: mean carrying capacity phenotype in neighborhood
+	# MeanPr		: mean low-density growth rate phenotype in neighborhood
+	# V_D       : additive genetic variance in D
+	# V_K       : additive genetic variance in K
+	# V_r       : additive genetic variance in r
+	# C_DK      : additive genetic covariance between D and K
+	# C_Dr      : additive genetic covariance between D and r
+	# C_Kr      : additive genetic covariance between K and r
 
   # If the population is extinct, return NULL
   if(size(popmatrix, 1) < 1)
@@ -456,35 +446,35 @@ function LE_sum_metrics(popmatrix, bw)
   end
 
   # Define within-function variables
-  n   = size(popmatrix,1)               # number of individuals in population
-  x   = convert(Array,popmatrix[:X])    # individual locations
-	RD  = convert(Array,popmatrix[:D])    # individual dispersal genotypes
-	RK  = convert(Array,popmatrix[:K])    # individual carrying capacity genotypes
-	Rr  = convert(Array,popmatrix[:r])    # individual ldgr genotypes
-  PD = convert(Array,popmatrix[:PD])    # individual D phenotypes
-	PK = convert(Array,popmatrix[:PK])    # individual K phenotypes
-	PR = convert(Array,popmatrix[:Pr])    # individual r phenotypes
-	b   = [findmin(popmatrix[:X])[1],     # leftmost density > 0
-				findmin(abs(popmatrix[:X]))[1], # density closest to X=0 (center)
-				findmax(popmatrix[:X])[1]]      # rightmost density > 0
-	nb  = 3                               # number of bins
-	scl = 1 / pdf(Normal(0, bw), 0)       # a scaling factor for n'hood size
+  n   = size(popmatrix, 1)               # number of individuals in population
+  x   = convert(Array, popmatrix[:X])    # individual locations
+	RD  = convert(Array, popmatrix[:D])
+	RK  = convert(Array, popmatrix[:K])
+	Rr  = convert(Array, popmatrix[:r])
+  PD = convert(Array, popmatrix[:PD])
+	PK = convert(Array, popmatrix[:PK])
+	PR = convert(Array, popmatrix[:Pr])
+	b  = [findmin(popmatrix[:X])[1],       # leftmost density > 0
+				findmin(abs(popmatrix[:X]))[1],  # density closest to X=0 (center)
+				findmax(popmatrix[:X])[1]]       # rightmost density > 0
+	nb  = 3                                # number of bins
+	scl = 1 / pdf(Normal(0, bw), 0)        # a scaling factor for n'hood size
 
   # Initialize pre-allocated arrays
 	w      = Array{Float64}(length(x))    # density wrt bin
-	Nx     = Array{Float64}(nb)           # total density each bin experiences
-	MeanD  = Array{Float64}(nb)           # mean genotype at each bin
-	MeanK  = Array{Float64}(nb)           # mean genotype at each bin
-	Meanr  = Array{Float64}(nb)           # mean genotype at each bin
-	MeanPD = Array{Float64}(nb)           # mean genotype at each bin
-	MeanPK = Array{Float64}(nb)           # mean genotype at each bin
-	MeanPr = Array{Float64}(nb)           # mean genotype at each bin
-	V_D   = Array{Float64}(n)             # variance in dispersal breeding values
-	V_K   = Array{Float64}(n)             # var in carrying capacity b.v.
-	V_r   = Array{Float64}(n)             # var in ldgr b.v.
-	C_DK  = Array{Float64}(n)             # cov in D and K breeding values
-	C_Dr  = Array{Float64}(n)             # cov in D and r b.v.
-	C_Kr  = Array{Float64}(n)             # cov in K and r b.v.
+	Nx     = Array{Float64}(nb)
+	MeanD  = Array{Float64}(nb)
+	MeanK  = Array{Float64}(nb)
+	Meanr  = Array{Float64}(nb)
+	MeanPD = Array{Float64}(nb)
+	MeanPK = Array{Float64}(nb)
+	MeanPr = Array{Float64}(nb)
+	V_D   = Array{Float64}(n)
+	V_K   = Array{Float64}(n)
+	V_r   = Array{Float64}(n)
+	C_DK  = Array{Float64}(n)
+	C_Dr  = Array{Float64}(n)
+	C_Kr  = Array{Float64}(n)
 	tmpX   = Array(Float64,length(x))     # temporary array for calculations
 
 	# Calculations, looped over bin
@@ -509,7 +499,7 @@ function LE_sum_metrics(popmatrix, bw)
 		COV_calc!(C_Kr, w, RK, Rr, MeanK[i], Meanr[i], Nx[i], i, tmpX)
 	end
 
-	out = convert(DataFrame,[b Nx MeanD MeanK Meanr MeanPD MeanPK MeanPr V_D V_K V_r C_DK C_Dr C_Kr])
+	out = convert(DataFrame, [b Nx MeanD MeanK Meanr MeanPD MeanPK MeanPr V_D V_K V_r C_DK C_Dr C_Kr])
 	names!(out, [:b :Nx :MeanD :MeanK :Meanr :MeanPD :MeanPK :MeanPr :V_D :V_K :V_r :C_DK :C_Dr :C_Kr])
   return out
 end
@@ -517,32 +507,33 @@ end
 ### LIFE HISTORY FUNCTIONS #####################################################
 
 # Sexual mating ----------------------------------------------------------------
+# NOTE: This mating assumes sampling with replacement
 function mate(popmatrix, bw)
-	# Given [popmatrix], returns [M].
+	# Given [popmatrix, bw], returns [M].
 	# popmatrix : see init_inds
 	# bw        : neighborhood (bin) width, Gaussian σ
+
 	# M         : a mate for each individual
-	# NOTE: This mating assumes sampling with replacement
 
 	# If the population is extinct, return NULL
-  if size(popmatrix,1) < 1
+  if size(popmatrix, 1) < 1
   	return []
   end
 
   # Define within-function variables
-  n   = size(popmatrix,1)               # number of individuals in pop
+  n   = size(popmatrix, 1)              # number of individuals in pop
   x   = convert(Array,popmatrix[:X])    # individual locations
-  scl = 1/pdf(Normal(0,bw),0)           # a scaling factor for n'hood size
+  scl = 1 / pdf(Normal(0, bw), 0)       # a scaling factor for n'hood size
 
 	# Initialize pre-allocated arrays
-	w      = Array{Float64,1}(n)          # weighted dens. to all other inds.
+	w      = Array{Float64, 1}(n)         # weighted dens. to all other inds.
 	D      = Array{Float64}(n)            # n'hood density (excluding yourself)
 	M      = Array{Int}(n)                # mate matches
 	tmpX   = Array{Float64}(length(x))    # temporary array for calculations
 	tmpvec = Vector{Float64}(n)           # temp. vector to store cumulative sums
 
 	# Draw a random number for each individual
-  rnum = rand(Uniform(0,1), n)
+  rnum = rand(Uniform(0, 1), n)
 
 	# Loop over all invividuals
 	for i = 1:n
@@ -552,7 +543,7 @@ function mate(popmatrix, bw)
 
 		# Matchmaker, matchmaker, make me a match
 		if D[i] == 0   # if there's nobody near you...
-			M[i] = -99   # no mate (results in mate-finding Allee effect)
+			M[i] = -99   # ...no mate (results in mate-finding Allee effect)
 		else
 			scale!(w, 1 / D[i])                       # scale w by density for ind. i
 			cumsum!(tmpvec, w, 1)                     # calculate cumsum of densities
@@ -562,38 +553,13 @@ function mate(popmatrix, bw)
   return M
 end
 
-# Asexual "mating" -------------------------------------------------------------
-function clone_mate(popmatrix)
-	# Given [popmatrix], returns [M].
-	# popmatrix : see init_inds
-	# M         : a mate (themselves) for each individual
-	# NOTE: This mating assumes each individual mates with itself
-
-  # If the population is extinct, return NULL
-  if size(popmatrix,1) < 1
-  	return []
-  end
-
-  # Define within-function variables
-  n = size(popmatrix,1)
-  M = Array{Int}(n)
-
-	# Matchmaker, matchmaker, make me my match
-  for i = 1:n
-  	M[i] = i
-  end
-  return M
-end
-
 # Reproduction and dispersal ---------------------------------------------------
-function repro_disp(popmatrix, dk, H, V, bw)
-	# Given [popmatrix(t), gp, dk, h2D, VPD], returns [popmatrix(t+1)]
+function repro_disp(popmatrix, H, V, bw)
+	# Given [popmatrix(t), H, V, bw], returns [popmatrix(t+1)]
 	# popmatrix : see init_inds
-	# gp        : see growth_params
-	# dk        : dispersal kernel (see NSt)
-	# h2D       : dispersal trait heritability
-	# VPD       : phenotypic variance in dispersal
-	# bw        : neighborhood (bin) width, Gaussian σ
+	# H   : vector of heritabilities [h²D h²K h²r]
+	# V   : vector of total phenotypic variance [VD VK Vr]
+	# bw  : neighborhood (bin) width, Gaussian σ
 
 	# repro_disp simulates:
 	# (1) Density-dependent reproduction
@@ -603,12 +569,11 @@ function repro_disp(popmatrix, dk, H, V, bw)
 	# If the population is extinct, or if there is only 1 individual, return NULL
   if size(popmatrix,1) < 2
 		return []
-		#return DataFrame(X=[], D=[], H=[], PD=[], PH=[])
   end
 
 	# (1) Density-dependent reproduction -----------------------------------------
   # a place to store the number of offspring produced by each parent
-  Noff = Array{Int}(size(popmatrix,1))
+  Noff = Array{Int}(size(popmatrix, 1))
 
   # Calculate non-additive (environmental) phenotypic variances
   ΣE = VE(H, V)
@@ -616,27 +581,26 @@ function repro_disp(popmatrix, dk, H, V, bw)
   # Calculate traits through space
   mets = metrics(popmatrix, bw)
 
-  # Density-dependent population growth
-  for i = 1:size(popmatrix,1)
-		# with demographic stochasticity:
-		Noff[i] = rand(Poisson(growth(mets[i,:Nx], popmatrix[i,:PK], popmatrix[i,:Pr])))
+  # Density-dependent population growth (with demographic stochasticity)
+  for i = 1:size(popmatrix, 1)
+		Noff[i] = rand(Poisson(growth(mets[i,:Nx],
+		                              popmatrix[i,:PK],
+																	popmatrix[i,:Pr])))
   end
 
   # If there are no offspring, return NULL
   if sum(Noff) == 0
 		return []
-		#return DataFrame(X=[], D=[], H=[], PD=[], PH=[])
   end
 
 	# (2) Inheritence of dispersal phenotype from parents to offspring -----------
 
 	# Find a mate for each individual
-	# m = clone_mate(popmatrix) # asexual
-  m = mate(popmatrix, bw)     # sexual
+  m = mate(popmatrix, bw)
 
   # Create a new popmatrix (npm), accounting for the number of new offspring
-  npm = DataFrame(Float64,sum(Noff),8)
-  names!(npm,[:pX, :D, :PD, :K, :PK, :r, :Pr, :X])
+  npm = DataFrame(Float64, sum(Noff), 8)
+  names!(npm, [:pX, :D, :PD, :K, :PK, :r, :Pr, :X])
 
 	# initiate some variables
 	ΣA  = Array{Float64}(3, 3)  # an additive genetic covariance matrix
@@ -644,20 +608,22 @@ function repro_disp(popmatrix, dk, H, V, bw)
 	c   = 0                     # a counter for indexing
 
 	# loop over all of the parents
-	for i = 1:size(popmatrix,1)
+	for i = 1:size(popmatrix, 1)
 		if m[i] == -99
 			continue   # if thre's no mate, there are no offspring
     else
  			# loop over all of the offspring from each parent:
 			for j = 1:Noff[i]
-				c += 1   # increment counter
+
+				# increment counter
+				c += 1
 
 				# offspring inherit location from their parents
-        npm[c,:pX] = popmatrix[i,:X]
+        npm[c, :pX] = popmatrix[i, :X]
 
 				# get midparent values (MPV) for each (mating) parent
-        mpv[:] = ([popmatrix[  i, :D] popmatrix[  i, :K] popmatrix[  i, :r]]  +
-				          [popmatrix[m[i],:D] popmatrix[m[i],:K] popmatrix[m[i],:r]]) *
+        mpv[:] = ([popmatrix[  i,  :D] popmatrix[  i,  :K] popmatrix[  i,  :r]]  +
+				          [popmatrix[m[i], :D] popmatrix[m[i], :K] popmatrix[m[i], :r]]) *
 									0.5
 
 				# get the additive genetic covariance matrix
@@ -666,104 +632,28 @@ function repro_disp(popmatrix, dk, H, V, bw)
 										mets[i, :C_Dr] mets[i, :C_Kr] mets[i, :V_r]]
 
 				# calculate genotypes
-				(npm[c,:D], npm[c,:K], npm[c,:R]) = rand(MvNormal(mpv, 0.5 * ΣA)), 1)
+				(npm[c, :D], npm[c,:K], npm[c,:R]) = rand(MvNormal(mpv, 0.5 * ΣA)), 1)
 
 				# calculate phenotypes
-				(npm[c,:PD], npm[c,:PK], npm[c,:PR]) = rand(Normal([0 0 0], ΣE), 1) +
-				                                       [npm[c,:D], npm[c,:K], npm[c,:R]]
+				(npm[c, :PD], npm[c,:PK], npm[c,:PR]) = rand(Normal([0 0 0], ΣE), 1) +
+				                                        [npm[c, :D], npm[c, :K], npm[c, :R]]
 
 				# (3) Offspring dispersal ----------------------------------------------
-				npm[c,:X] = rand(Normal(npm[c,:pX], exp(npm[c,:PD])),1)[]
+				npm[c, :X] = rand(Normal(npm[c, :pX], exp(npm[c, :PD])), 1)[]
       end
     end
   end
 
   # Delete NA rows that result from building npm without knowing which matings
   # were unsuccessful (i.e., m[i] == -99).
-  deleterows!(npm,find(isna(npm[:,Symbol("X")])))
+  deleterows!(npm, find(isna(npm[:, Symbol("X")])))
   return npm[:, [:X, :D, :PD, :K, :PK, :r, :Pr]]
 end
 
 ### SIMULATION FUNCTIONS #######################################################
 
-# Run the simulation -----------------------------------------------------------
-function runsim(popmatrix,n,spX,gp,dk,ngens,μD,h2D,VPD,bw,p,r,TIME,outname="_")
-	# Given [popmatrix, n, spX, gp, dk, ngens, μD, h2D, VPD, p, r], returns
-	# changes in population size, extent, and genetic variance over time.
-  # popmatrix : see init_inds
-	# n  	      : initial number of starting individuals
-	# spX       : initial spatial locations
-	# gp        : see growth_params
-	# dk        : dispersal kernel (see NSt)
-	# ngens     : number of generations to simulate
-	# μD	      : initial mean dispersal genotype of population
-	# h2D       : dispersal heritability
-	# VPD	      : initial total phenotypic variance in dispersal
-	# p         : population number for this generation
-	# r         : replicate number for this simulation
-	# outname   : the output name for this simulation
-
-	# start timers
-	tic()
-	simtime = time()
-	flag = ""
-
-	# set a unique seed based on h2D, p, and r, so simulations can be repeated.
-	srand(Int(([1 10 100] * H)[] * 10000 + 42 * p + r))
-
-	# initialize output
-	batchoutput = Array{Any}(ngens * 9, 2314)
-
-	# loop over generations
-  for i = 1:ngens
-
-		# do reproduction and dispersal
-		popmatrix = repro_disp(popmatrix, gp, dk, h2D, VPD, bw)
-
-		# if population goes extinct, make output blank for remaining generations
-    if size(popmatrix,1) < 1
-      for j = i:ngens
-        batchoutput[(1:9)+(9)*(j-1),:] = blankoutput(p,r,gp,dk,h2D,j,bw)
-      end
-			break
-		# if rerunwrap.jl has been running for more than 16 hours, get out
-	elseif (time()-TIME) > 16*3600
-			for j = i:ngens
-				batchoutput[(1:9)+(9)*(j-1),:] = timeoutoutput(p,r,gp,dk,h2D,i,bw)
-				flag = "!BATCHRUNTIMEOUT!"
-			end
-			break
-		# if this simulation has been running for more than 8 hours, stop it
-	elseif (time()-simtime) > 10*3600
-			for j = i:ngens
-				batchoutput[(1:9)+(9)*(j-1),:] = timeoutoutput(p,r,gp,dk,h2D,i,bw)
-				flag = "!SIMTIMEOUT!"
-			end
-			break
-		# otherwise, calculate relevant output metrics for this generation
-		else
-      batchoutput[(1:9)+(9)*(i-1),:] = calcoutput(popmatrix,p,r,gp,dk,h2D,i,bw)
-    end
-		# print("gen:",i, " pop. size:", size(popmatrix)[1],"\n") # track progress
-  end
-
-	# track simulation info and runtimes
-	print(  "rep ",       (@sprintf "%2.0f" r),
-				", pop ",       (@sprintf "%2.0f" p),
-				", h2D ",       (@sprintf "%0.3f" h2D),
-				", Nt ",        (@sprintf "%2.0f" gp.Nt),
-				", bw ",        (@sprintf "%4.2f" bw),
-				", kur ",       (@sprintf "%4.1f" dk.kur),
-				", lam ",       (@sprintf "%5.2f" gp.lambda),
-				", time ",      (clocktime(toq())),
-				", final pop ", (@sprintf "%-6.0f" batchoutput[end,10]),
-				" | total time ", (clocktime(time()-TIME)),
-				" | ", flag, "\n")
-
-	return batchoutput
-end
-
-function calcoutput(popmatrix, p, r, gp, dk, h2D, i, bw)
+# Save output ------------------------------------------------------------------
+function calcoutput(popmatrix, p, r, H, C, i, bw)
 	# Given [popmatrix, p, r, gp, h2D, i], get summary stats for gen i
 	# popmatrix : see init_inds
 	# p         : population number for this simulation
@@ -776,7 +666,7 @@ function calcoutput(popmatrix, p, r, gp, dk, h2D, i, bw)
 
 	popsize = nrow(popmatrix)                 # population size
   sm      = sum_metrics(popmatrix, bw)      # summary metrics
-	le      = LE_sum_metrics(popmatrix,bw)
+	le      = LE_sum_metrics(popmatrix, bw)
 
 	# summary data sepecific to simulation, generation, etc.
 	tmp = repmat([p,r,bw,gp.lambda,gp.Nt,gp.K,dk.kur,h2D,i,popsize]',5,1)
@@ -836,4 +726,81 @@ function timeoutoutput(p, r, gp, dk, h2D, i, bw)
 	metrix = vcat(sm')
 
   return hcat(tmp,metrix)
+end
+
+# Run the simulation -----------------------------------------------------------
+function runsim(popmatrix, n, spX, ngens, M, V, C, H, bw, p, r, TIME, outname = "_")
+	# Given [popmatrix, n, spX, ngens, M, V, C, H, p, r]
+	# returns changes in population size, extent, and genetic variance over time.
+  # popmatrix : see init_inds
+	# n  	      : initial number of starting individuals
+	# spX       : initial spatial locations
+	# ngens     : number of generations to simulate
+	# M         : vector of mean phenotypes [μD μK μr]
+	# V         : vector of total phenotypic variance [VD VK Vr]
+	# C         : vector of covariances [C_DK C_Dr C_Kr]
+	# H         : vector of heritabilities [h²D h²K h²r]
+	# bw        : bin width
+	# p         : population number for this generation
+	# r         : replicate number for this simulation
+	# TIME      : processing time
+	# outname   : the output name for this simulation
+
+	# start timers
+	tic()
+	simtime = time()
+	flag = ""
+
+	# set a unique seed based on H, p, and r, so simulations can be repeated.
+	srand(Int(([1 10 100] * H)[] * 10000 + 42 * p + r))
+
+	# initialize output
+	batchoutput = Array{Any}(ngens * 9, 2314)
+
+	# loop over generations
+  for i = 1:ngens
+
+		# do reproduction and dispersal
+		popmatrix = repro_disp(popmatrix, H, V, bw)
+
+		# if population goes extinct, make output blank for remaining generations
+    if size(popmatrix, 1) < 1
+      for j = i:ngens
+        batchoutput[(1:9) + (9) * (j - 1), :] = blankoutput(p, r, gp, dk, h2D, j, bw)
+      end
+		break
+		# if rerunwrap.jl has been running for more than 16 hours, get out
+	  elseif (time() - TIME) > 16 * 3600
+			for j = i:ngens
+				batchoutput[(1:9) + (9) * (j - 1), :] = timeoutoutput(p, r, gp, dk, h2D, i, bw)
+				flag = "!BATCHRUNTIMEOUT!"
+			end
+		break
+		# if this simulation has been running for more than 8 hours, stop it
+	  elseif (time() - simtime) > 10 * 3600
+			for j = i:ngens
+				batchoutput[(1:9) + (9) * (j - 1), :] = timeoutoutput(p, r, gp, dk, h2D, i, bw)
+				flag = "!SIMTIMEOUT!"
+			end
+		break
+		# otherwise, calculate relevant output metrics for this generation
+		else
+      batchoutput[(1:9) + (9) * (i - 1), :] = calcoutput(popmatrix, p, r, gp, dk, h2D, i, bw)
+    end
+  end
+
+	# track simulation info and runtimes
+	print(  "rep ",       (@sprintf "%2.0f" r),
+				", pop ",       (@sprintf "%2.0f" p),
+				", h2D ",       (@sprintf "%0.3f" h2D),
+				", Nt ",        (@sprintf "%2.0f" gp.Nt),
+				", bw ",        (@sprintf "%4.2f" bw),
+				", kur ",       (@sprintf "%4.1f" dk.kur),
+				", lam ",       (@sprintf "%5.2f" gp.lambda),
+				", time ",      (clocktime(toq())),
+				", final pop ", (@sprintf "%-6.0f" batchoutput[end,10]),
+				" | total time ", (clocktime(time()-TIME)),
+				" | ", flag, "\n")
+
+	return batchoutput
 end
