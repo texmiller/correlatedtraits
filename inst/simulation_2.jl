@@ -41,7 +41,7 @@ end
 
 # function for naming output files
 function outname(H, ρ, p, r)
-	return string(H[1], "_", H[2], "_", ρ[1], "_", Int(p), "_" , Int(r), "_R.csv")
+	return string(H[1], "_", H[2], "_", ρ[1], "_", ρ[2], "_", Int(p), "_" , Int(r), "_R.csv")
 end
 
 # function for turning seconds into a HH:MM:SS:mmm format
@@ -90,7 +90,9 @@ function init_inds(n, spX, M, V, C, H)
 	# ΣA  : additive genetic covariance matrix
 	# ΣE  : environmental covariance matrix
 
-	X  = rand(Uniform(-spX, spX), n)
+  # set all starting locations to zero
+	X  = Vector{Int64}(n)
+	X[:] = 0
 
   # additive genetic covariances
 	CV = [0 C;
@@ -118,157 +120,44 @@ end
 ### FUNCTIONS FOR NEIGHBORHOOD-RELATED CALCULATIONS ############################
 
 # Determine which spatial locations to sample from -----------------------------
-function accordian_bins(A::Array{Float64,1}, bw::Float64)
+function accordian_bins(A::Array{Float64,1})
 	x = vcat(minimum(A), maximum(A))
 
-	# make a scale so that accordian_bins changes appropriately with bw; when
-	# bw = 0.25, "fixed" bins should be spaced 1 unit apart.
-	scl = bw * 4
-
 	# center
-	C = collect(linspace(-50.0, 50.0, 101) * scl)
+	C = collect(linspace(-50.0, 50.0, 101))
 
 	# left side
-	if x[1] < -1150 * scl
-	  L  = collect(linspace(  x[1], x[1] + 99 * scl,  100))
-	  LC = collect(linspace(L[100],            C[1], 1002))[2:1001]
+	if x[1] < -1150
+	  L  = collect(linspace(  x[1], x[1] + 99,  100))
+	  LC = collect(linspace(L[100],      C[1], 1002))[2:1001]
 	else
-	  L  = collect(linspace(-1150 * scl, -1051 * scl,  100))
-	  LC = collect(linspace(-1050 * scl,   -51 * scl, 1000))
+	  L  = collect(linspace(-1150, -1051,  100))
+	  LC = collect(linspace(-1050,   -51, 1000))
 	end
 
 	# right side
-	if x[2] > 1150 * scl
-	  R  = collect(linspace(x[2] - 99 * scl, x[2],  100))
-	  CR = collect(linspace(         C[101], R[1], 1002))[2:1001]
+	if x[2] > 1150
+	  R  = collect(linspace(x[2] - 99, x[2],  100))
+	  CR = collect(linspace(   C[101], R[1], 1002))[2:1001]
 	else
-	  R  = collect(linspace(1051 * scl, 1150 * scl,  100))
-	  CR = collect(linspace(  51 * scl, 1050 * scl, 1000))
+	  R  = collect(linspace(1051, 1150,  100))
+	  CR = collect(linspace(  51, 1050, 1000))
 	end
 
 	return vcat(L, LC, C, CR, R)
 end
 
-# Calculate distance between one location (b) and all other locations (A) ------
-function x_calc!(tmpX::Array{Float64,1}, A::Array{Float64,1}, b::Float64)
-	# tmpX : a pre-allocated array to store the result
-	# A    : an array of all locations
-	# b    : the focal location
-
-	@fastmath @inbounds @simd for j = 1:length(tmpX)
-		tmpX[j] = A[j] - b
-	end
-	nothing
-end
-
-# Calculate the weighted density of individuals wrt distance -------------------
-function w_calc!(w::Array{Float64,1}, A::Array{Float64,1}, sd::Float64,
-	               scl::Float64)
-	# w   : the neighborhood-weighted density of each location in A
-	# A   : distance between one location and all other locations (from x_calc!)
-	# sd  : the bin-width of the Gaussian neighborhood
-	# scl : a scaling factor for the neighborhood, given by pdf(Normal(0,sd),0)
-
-	# The original code, which was simpler to write but much slower:
-	#  Distributions.pdf!(w, Normal(0,sd), A)
-  #  scale!(w,scl)
-
-	# Manually calculating the normal pdf for A:
-	C1 = -1 / (2 * sd * sd)            # A constant for the pdf's exponent
-	C2 = scl / sqrt(2 * sd * sd * pi)  # A constant for the first term in the pdf
-	@fastmath @inbounds @simd for j = 1:length(w)
-		w[j] = A[j] * A[j] * C1          # calculate (A^2) * C1
-		if w[j] < -15.5                  # 0 when density will be < than exp(-15.5)
-			w[j] = 0.0
-		else
-			w[j] = exp(w[j]) * C2          # calculate C2 * exp((A^2) * C1)
-		end
-	end
-	nothing
-end
-
-# Calculate the total density at a location ------------------------------------
-function Nx_calc!(Nx::Array{Float64,1}, w::Array{Float64,1}, i::Int64)
-	# Nx : the density at the location of individual i
-	# w  : the weighted density of all individuals in the population wrt ind. i
-	# i  : the index of the individual
-
-	Nx[i] = sum(w)
-	nothing
-end
-
-# Calculate the density at a location at a location, minus the individual itself
-function D_calc!(D::Array{Float64,1}, w::Array{Float64,1}, i::Int64)
-	# D : the density at the location of individual i minus the individual itself
-	# w : the weighted density of all individuals in the population wrt ind. i
-	# i : the index of the individual
-
-	D[i] = sum(w) - w[i]
-	nothing
-end
-
-# Calculate the mean genotype for each location --------------------------------
-function Mean_calc!(Mean::Array{Float64,1}, R::Array{Float64,1},
-	                   w::Array{Float64,1}, Nx::Float64, i::Int64)
-	# Mean  : the average genotype in a location given by index i
-	# R     : the value of genotypes for each index
-	# w     : the weighted density of all individuals in the population wrt ind. i
-	# Nx    : the density at the location of ind. i
-	# i     : the index of the invididual
-
-	Mean[i]  = (*(R', w) / Nx)[1] # sum of weighted RD, scaled by patch density
-	nothing
-end
-
-# Calculate the mean phenotype for each location -------------------------------
-function MeanP_calc!(MeanP::Array{Float64,1}, P::Array{Float64,1},
-	                    w::Array{Float64,1}, Nx::Float64, i::Int64)
-	# MeanP  : the average phenotype in a location given by index i
-	# P      : the value of phenotypes for each index
-	# w      : the weighted dens. of all individuals in the population wrt ind. i
-	# Nx     : the density at the location of ind. i
-	# i      : the index of the invididual
-
-	MeanP[i]  = (*(P', w) / Nx)[1] # sum of weighted P, scaled by patch density
-	nothing
-end
-
-# Calculate the covariance among breeding values for a location ----------------
-function COV_calc!(COV::Array{Float64,1}, w::Array{Float64,1},
-	                 R1::Array{Float64,1}, R2::Array{Float64,1},
-									 Mean1::Float64, Mean2::Float64,
-									 Nx::Float64, i::Int64, tmp::Array{Float64,1})
-	# COV   : covariance among breeding values at location i
-	# w     : the weighted density of all individuals in the population wrt ind. i
-	# R1    : the genotype of trait 1 at index i
-	# R2    : the genotype of trait 2 at index i
-	# Mean1 : the average genotype of trait 1 in a location given by index i
-	# Mean2 : the average genotype of trait 1 in a location given by index i
-	# Nx    : the density at the location of ind. i
-	# i     : the index of the invididual
-	# tmp   : vector to store the output
-
-	@fastmath @inbounds @simd for j = 1:length(tmp)
-		tmp[j] = (R1[j] - Mean1) * (R2[j] - Mean2)
-		tmp[j] = tmp[j] * w[j]
-	end
-
-	COV[i] = sum(tmp) / Nx
-	nothing
-end
-
 ### METRICS FUNCTIONS ##########################################################
 
 # Calculate breeding value metrics wrt individuals -----------------------------
-function metrics(popmatrix, bw)
-	# Given   [popmatrix, bw]
+function metrics(popmatrix)
+	# Given   [popmatrix]
 	# returns [Nx MeanD Meanr V_D V_r C_Dr]
 	# popmatrix : see init_inds
-	# bw        : neighborhood (bin) width, Gaussian σ
 
-	# Nx        : population density in continuous, Gaussian neighborhood
-	# MeanD			: mean dispersal genotype in neighborhood
-	# Meanr			: mean low-density growth rate genotype in neighborhood
+	# Nx        : population density in patch
+	# MeanD			: mean dispersal genotype in patch
+	# Meanr			: mean low-density growth rate genotype in patch
 	# V_D       : additive genetic variance in D
 	# V_r       : additive genetic variance in r
 	# C_Dr      : additive genetic covariance between D and r
@@ -283,14 +172,8 @@ function metrics(popmatrix, bw)
   x   = convert(Array, popmatrix[:X])   # individual locations
   RD  = convert(Array, popmatrix[:D])
 	Rr  = convert(Array, popmatrix[:r])
-	scl = 1 / pdf(Normal(0, bw), 0)       # a scaling factor for n'hood size
 
-	# NOTE: For Gaussian distribution, ~95% of values are within 2σ of the mean.
-	# When bw = 0.25, an individual at spatial location 0.5 will have a
-	# neighborhood where ~95% of its neighborhood is within the bounds 0:1, which
-	# roughly translates to a discrete-patch system.
-
-  # Initialize pre-allocated arrays
+	# Initialize pre-allocated arrays
 	w     = Array{Float64}(n)             # density wrt individual
 	Nx    = Array{Float64}(n)
 	MeanD = Array{Float64}(n)
