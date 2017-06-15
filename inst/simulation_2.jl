@@ -60,13 +60,13 @@ end
 ### GROWTH FUNCTIONS ###########################################################
 
 # Modified 'Skellam' (exponential) population growth ---------------------------
-function growth(N, K, r)
+function growth(N::Float64, K::Float64, r::Float64)
 	# Given [N, K, r] returns expected [per-capita growth rate]
   # N : number of individuals
 	# K : carrying capacity
 	# r : low-density per-capita growth rate
 
-	return K - K * (1 - r / K)^N
+	return (K - K * (1.0 - r / K).^N) ./ N
 end
 
 ### GENETIC VARIANCE FUNCTIONS #################################################
@@ -359,9 +359,9 @@ function sum_metrics(popmatrix, bw)
 	Meanr  = Array{Float64}(nb)
 	MeanPD = Array{Float64}(nb)
 	MeanPr = Array{Float64}(nb)
-	V_D    = Array{Float64}(n)
-	V_r    = Array{Float64}(n)
-	C_Dr   = Array{Float64}(n)
+	V_D    = Array{Float64}(nb)
+	V_r    = Array{Float64}(nb)
+	C_Dr   = Array{Float64}(nb)
 	tmpX   = Array(Float64, length(x))    # temporary array for calculations
 
 	# Calculations, looped over bin
@@ -428,9 +428,9 @@ function LE_sum_metrics(popmatrix, bw)
 	Meanr  = Array{Float64}(nb)
 	MeanPD = Array{Float64}(nb)
 	MeanPr = Array{Float64}(nb)
-	V_D    = Array{Float64}(n)
-	V_r    = Array{Float64}(n)
-	C_Dr   = Array{Float64}(n)
+	V_D    = Array{Float64}(nb)
+	V_r    = Array{Float64}(nb)
+	C_Dr   = Array{Float64}(nb)
 	tmpX   = Array(Float64,length(x))     # temporary array for calculations
 
 	# Calculations, looped over bin
@@ -534,8 +534,13 @@ function repro_disp(popmatrix, H, V, K, bw)
 
   # Density-dependent population growth (with demographic stochasticity)
   for i = 1:size(popmatrix, 1)
-		Noff[i] = rand(Poisson(growth(mets[i,:Nx], K,	abs(popmatrix[i,:Pr]))))
+		println([mets[i,:Nx], K,	abs(popmatrix[i,:Pr])])
+		Noff[i] = rand(Poisson(growth(mets[i,:Nx], K,	exp(popmatrix[i,:Pr]))))
   end
+
+	println(Noff)
+	println(length(Noff))
+	println(sum(Noff))
 
   # If there are no offspring, return NULL
   if sum(Noff) == 0
@@ -619,13 +624,13 @@ function calcoutput(popmatrix, p, r, H, C, ρ, i, bw)
 	tmp = repmat([p, r, bw, H[1], H[2], C, ρ, i, popsize]', 9, 1)
 
 	# reshaped summary statistics from sum_metrics and LE_sum_metrics
-	metrix = vcat(sm[:, :b]', sm[:, :Nx]', sm[:,:MeanD]', sm[:,:Meanr]', sm[:,:MeanPD]', sm[:,:MeanPr]', sm[:,:V_D], sm[:,:V_r], sm[:,:C_Dr])
-	le_met = vcat(le[:, :b]', le[:, :Nx]', le[:,:MeanD]', le[:,:Meanr]', le[:,:MeanPD]', le[:,:MeanPr]', le[:,:V_D], le[:,:V_r], le[:,:C_Dr])
+	metrix = vcat(sm[:, :b]', sm[:, :Nx]', sm[:,:MeanD]', sm[:,:Meanr]', sm[:,:MeanPD]', sm[:,:MeanPr]', sm[:,:V_D]', sm[:,:V_r]', sm[:,:C_Dr]')
+	le_met = vcat(le[:, :b]', le[:, :Nx]', le[:,:MeanD]', le[:,:Meanr]', le[:,:MeanPD]', le[:,:MeanPr]', le[:,:V_D]', le[:,:V_r]', le[:,:C_Dr]')
 
 	return hcat(tmp, le_met, metrix)
 end
 
-function blankoutput(p, r, gp, dk, h2D, i, bw)
+function blankoutput(popmatrix, p, r, H, C, ρ, i, bw)
 	# Given [popmatrix, p, r, H, C, ρ, i, bw], get summary stats for gen i
 	# popmatrix : see init_inds
 	# p         : population number for this simulation
@@ -651,7 +656,7 @@ function blankoutput(p, r, gp, dk, h2D, i, bw)
   return hcat(tmp, metrix)
 end
 
-function timeoutoutput(p, r, gp, dk, h2D, i, bw)
+function timeoutoutput(popmatrix, p, r, H, C, ρ, i, bw)
 	# Given [popmatrix, p, r, H, C, ρ, i, bw], get summary stats for gen i
 	# popmatrix : see init_inds
 	# p         : population number for this simulation
@@ -704,7 +709,7 @@ function runsim(popmatrix, n, spX, ngens, M, V, C, H, K, ρ, bw, p, r, TIME, out
 	srand(Int(([1 10] .* H + (ρ + 1) * 100)[] * 10000 + 42 * p + r))
 
 	# initialize output
-	batchoutput = Array{Any}(ngens * 9, 2314)
+	batchoutput = Array{Any}(ngens * 9, 2313)
 
 	# loop over generations
   for i = 1:ngens
@@ -715,39 +720,38 @@ function runsim(popmatrix, n, spX, ngens, M, V, C, H, K, ρ, bw, p, r, TIME, out
 		# if population goes extinct, make output blank for remaining generations
     if size(popmatrix, 1) < 1
       for j = i:ngens
-        batchoutput[(1:9) + (9) * (j - 1), :] = blankoutput(p, r, gp, dk, h2D, j, bw)
+        batchoutput[(1:9) + (9) * (j - 1), :] = blankoutput(popmatrix, p, r, H, C, ρ, i, bw)
       end
 		break
 		# if rerunwrap.jl has been running for more than 16 hours, get out
 	  elseif (time() - TIME) > 16 * 3600
 			for j = i:ngens
-				batchoutput[(1:9) + (9) * (j - 1), :] = timeoutoutput(p, r, H[1], H[2], i, bw)
+				batchoutput[(1:9) + (9) * (j - 1), :] = timeoutoutput(popmatrix, p, r, H, C, ρ, i, bw)
 				flag = "!BATCHRUNTIMEOUT!"
 			end
 		break
 		# if this simulation has been running for more than 8 hours, stop it
 	  elseif (time() - simtime) > 10 * 3600
 			for j = i:ngens
-				batchoutput[(1:9) + (9) * (j - 1), :] = timeoutoutput(p, r, gp, dk, h2D, i, bw)
+				batchoutput[(1:9) + (9) * (j - 1), :] = timeoutoutput(popmatrix, p, r, H, C, ρ, i, bw)
 				flag = "!SIMTIMEOUT!"
 			end
 		break
 		# otherwise, calculate relevant output metrics for this generation
 		else
-      batchoutput[(1:9) + (9) * (i - 1), :] = calcoutput(popmatrix, p, r, gp, dk, h2D, i, bw)
+      batchoutput[(1:9) + (9) * (i - 1), :] = calcoutput(popmatrix, p, r, H, C, ρ, i, bw)
     end
   end
 
 	# track simulation info and runtimes
 	print(  "rep ",       (@sprintf "%2.0f" r),
 				", pop ",       (@sprintf "%2.0f" p),
-				", h2D ",       (@sprintf "%0.3f" h2D),
-				", Nt ",        (@sprintf "%2.0f" gp.Nt),
+				", h²D ",       (@sprintf "%0.3f" H[1]),
+				", h²r ",       (@sprintf "%0.3f" H[2]),
+				", ρ ",         (@sprintf "%0.3f" ρ),
 				", bw ",        (@sprintf "%4.2f" bw),
-				", kur ",       (@sprintf "%4.1f" dk.kur),
-				", lam ",       (@sprintf "%5.2f" gp.lambda),
 				", time ",      (clocktime(toq())),
-				", final pop ", (@sprintf "%-6.0f" batchoutput[end,10]),
+				", final pop ", (@sprintf "%-6.0f" batchoutput[end,9]),
 				" | total time ", (clocktime(time()-TIME)),
 				" | ", flag, "\n")
 
