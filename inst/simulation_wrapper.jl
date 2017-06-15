@@ -13,17 +13,17 @@ tic()
 
 # parse input arguments
 H   = [0.5 0.5] #eval(parse(ARGS[1]))  # heritability vector
-pop = eval(parse(ARGS[2]))  # population number
-rep = eval(parse(ARGS[3]))  # replicate number
+pop = 1#eval(parse(ARGS[2]))  # population number
+rep = 1#eval(parse(ARGS[3]))  # replicate number
 
 # fixed parameters
 M    = [log(6), 11.5]
 n    = 20     # starting N of individs
 spX  = 0.01   # starting +/- extent
 V    = [22 76] # total phenotypic variance
-ngen = 20     # number of generations
+ngen = 3     # number of generations
 K    = 40     # carrying capacity
-
+bw   = 0.25
 ρ    = 0.5
 
 C    = (sqrt(V .* H)' * sqrt(V .* H) .* [1 ρ; ρ 1])[1, 2]
@@ -51,13 +51,13 @@ c = 0
 
 # set a unique seed based on h2D and pop, so simulations can be repeated with
 # the same popmatrix
-srand(Int(h2D*10000 + 42*pop))
+srand(Int(([1 10] .* H)[] * 10000 + 42 * pop))
 
 # generate a single founding population
 popmatrix = init_inds(n, spX, M, V, C, H)
 
 @everywhere include("simulation_2.jl")
-runsim(popmatrix, n, spX, 1, M, V, C, H, K, ρ, 0.5, 1, 1, 10, "_")
+runsim(popmatrix, n, spX, 1, M, V, C, H, K, ρ, bw, pop, rep, TIME, "_")
 
 # loop over Allee threshold
 for Nt in [5] #[2.5, 2, 3, 5]
