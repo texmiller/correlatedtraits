@@ -194,8 +194,8 @@ fit_growth <- function(data, show_plot = TRUE, xmax = 30, model) {
       name   = expression(italic(N[t+1])),
       limits = c(0, 105),
       expand = c(0, 0),
-      breaks = c(seq(0, 100, by = 25), K),
-      labels = c(seq(0, 100, by = 25),
+      breaks = c(seq(0, 100, by = 10), K),
+      labels = c(seq(0, 100, by = 10),
       bquote(italic("K ") ~ "=" ~ .(K)))) +
     ggplot2::scale_x_continuous(
       name   = expression(italic(N[t])),
