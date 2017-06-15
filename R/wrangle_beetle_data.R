@@ -140,5 +140,11 @@ wrangle_beetle_data <- function(female_fd_path, female_f_path,
   clean_data[sub_mid, ]$dist <- clean_data[sub_mid, ]$dist - 66
   clean_data[sub_hi,  ]$dist <- clean_data[sub_hi,  ]$dist - 114
 
+  # finally, the raw counts of males an females in each fecundity trial includes
+  # the dam and sire for each trial, so 1 beetle needs to be subtracted from
+  # the 'f' and 'm' columns in clean data.
+  clean_data$f <- clean_data$f - 1
+  clean_data$m <- clean_data$m - 1
+
   return(clean_data)
 }
