@@ -33,8 +33,10 @@ A = rand(100); B = rand(100)
 C = Vector{Float64}(100); C[:] = A
 
 @test vector_add(A, B)  == A .+ B
-#vector_add!()        #----------------------------------------------------------------------------
-#vector_scalar_add!() #----------------------------------------------------------------------------
+vector_add!(A,  B); @test A == C .+ B
+vector_add!(A, -B); @test A == C
+vector_scalar_add!(A,  0.5); @test A == C .+ 0.5
+vector_scalar_add!(A, -0.5); @test A == C
 @test vector_mult(A, B) == A .* B
 vector_scalar_mult!(A, 0.5); @test A == C .* 0.5
 
@@ -81,12 +83,31 @@ group_index!(B, A, collect(1:4), 4, 5); @test B == [1 1; 2 3; 4 4; 5 5]
 @test r1(-pi) == -3.1
 @test r1(0) == 0
 
+# test random seed generator
+seed_test = Vector{Int64}(21 * 21 * 11 * 11 * 10 * 20)
+c = 0
+for i in vcat(-0.99, -0.9:0.1:0.9, 0.99)
+  for j in vcat(-0.99, -0.9:0.1:0.9, 0.99)
+    for k in vcat(0.01, 0.1:0.1:0.9, 0.99)
+      for l in vcat(0.01, 0.1:0.1:0.9, 0.99)
+        for m in 1:10
+          for n in 1:20
+            c += 1
+            seed_test[c] = plant_seed([i j], [k l], m, n)
+          end
+        end
+      end
+    end
+  end
+end
+@test length(seed_test) == length(unique(seed_test))
+
 # ------------------------------------------------------------------------------
 # from simulation.jl -----------------------------------------------------------
 # ------------------------------------------------------------------------------
 
 # helper functions #############################################################
-@test outname(H, ρ, p, r) == "80_80_90_0_3_5_R.csv"
+@test outname(p, r) == "correlated_traits_3_5.csv"
 
 # growth functions #############################################################
 @test growth(0, K, M[2], a) == 0
@@ -241,17 +262,17 @@ m  = ones(Int64, 10^6)
 # dispersal --------------------------------------------------------------------
 # this requires fairly large sample sizes for the variance to work out correctly
 x = zeros(Int64, 10^7)
-μ = rep_each([exp(M[1])], [10^7])
+μ = rep_each([exp.(M[1])], [10^7])
 @test r1(mean(    disperse(x, μ, s)))  == 0
-@test r1(mean(abs(disperse(x, μ, s)))) == r1(exp(M[1]))
-@test r1( var(abs(disperse(x, μ, s)))) == r1(exp(M[1]) + exp(M[1])^2 / s)
+@test r1(mean(abs(disperse(x, μ, s)))) == r1(exp.(M[1]))
+@test r1( var(abs(disperse(x, μ, s)))) == r1(exp.(M[1]) + exp.(M[1])^2 / s)
 
 @test abs(minimum(disperse(x, μ, s))) < 75
 @test abs(maximum(disperse(x, μ, s))) < 75
 
 x = floor(Int64, vcat(1:(10^6)/2, 1:(10^6)/2))
-μ = rep_each([exp(M[1])], [10^6])
-@test r1(mean(abs(disperse(x, μ, s)  .- x))) == r1(exp(M[1]))
+μ = rep_each([exp.(M[1])], [10^6])
+@test r1(mean(abs(disperse(x, μ, s)  .- x))) == r1(exp.(M[1]))
 
 # combined reproduction and dispersal ------------------------------------------
 
@@ -274,8 +295,8 @@ pmx1 = repro_disp(pmx, M, V1, ρ1, H1, K, a, s, true)
 @test r1(nrow(pmx1) / nrow(pmx)) ≈ 9.5
 
 # test dispersal
-@test r1(mean(abs(pmx1[:X] - pmx1[:dX]))) ≈ r1(exp(M[1]))
-@test r1( var(abs(pmx1[:X] - pmx1[:dX]))) ≈ r1(exp(M[1]) + exp(M[1])^2 / s)
+@test r1(mean(abs(pmx1[:X] - pmx1[:dX]))) ≈ r1(exp.(M[1]))
+@test r1( var(abs(pmx1[:X] - pmx1[:dX]))) ≈ r1(exp.(M[1]) + exp.(M[1])^2 / s)
 @test abs(maximum(pmx1[:X]) -  maximum(pmx[:X])) < 75
 @test abs(minimum(pmx1[:X]) -  minimum(pmx[:X])) < 75
 
@@ -309,22 +330,22 @@ pmx = init_inds(20, M, V, ρ, H)
 pars = [p, r, M[1], M[2], H[1], H[2], ρ[1], ρ[2], i]
 
 A  = generate_output(pmx, p, r, M, H, ρ, i, "full")
-@test size(A)    == (12, 2314)
-@test A[1, 1:10] == vcat(pars, nrow(pmx))
-@test A[2, 1164] == nrow(pmx)
-@test A[2, 12]   == 20
+@test size(A)    == (12, 2315)
+@test A[1, 2:11] == vcat(pars, nrow(pmx))
+@test A[2, 1165] == nrow(pmx)
+@test A[2, 13]   == 20
 
 A  = generate_output(pmx, p, r, M, H, ρ, i, "zero")
-@test size(A)       == (12, 2314)
-@test A[1, 1:10]    == vcat(pars, 0)
-@test A[2, 11:2314] == rep_each([0.0], [2304])
-@test A[2, 12]      == 0
+@test size(A)       == (12, 2315)
+@test A[1, 2:11]    == vcat(pars, 0)
+@test A[2, 12:2315] == rep_each([0.0], [2304])
+@test A[2, 13]      == 0
 
 A  = generate_output(pmx, p, r, M, H, ρ, i, "timeout")
-@test size(A)       == (12, 2314)
-@test A[1, 1:10]    == vcat(pars, -i)
-@test A[2, 14:2314] == rep_each([0.0], [2301])
-@test A[2, 12]      == -999
+@test size(A)       == (12, 2315)
+@test A[1, 2:11]    == vcat(pars, -i)
+@test A[2, 15:2315] == rep_each([0.0], [2301])
+@test A[2, 13]      == -999
 
 #runsim ------------------------------------------------------------------------
 p = r = 2
@@ -332,23 +353,23 @@ pmx = init_inds(20, M, V, ρ, H)
 pars = [p, r, M[1], M[2], H[1], H[2], ρ[1], ρ[2]]
 
 A = runsim(pmx, 5, M, V, ρ, H, K, a, s, p, r, time())
-@test size(A)          == (60, 2314)
-@test A[1:12:60, 1:8] == repmat(pars', 5, 1)
-@test A[1:12:60, 9]   == vcat(1.0:5.0)
+@test size(A)          == (60, 2315)
+@test A[1:12:60, 2:9]  == repmat(pars', 5, 1)
+@test A[1:12:60, 10]   == vcat(1.0:5.0)
 
 A = runsim(pmx, 5, M, V, ρ, H, K, a, s, p, r, time() - 3600*40)
-@test size(A)          == (60, 2314)
-@test A[1:12:60, 1:8]  == repmat(pars', 5, 1)
-@test A[1:12:60, 9]    == vcat(1.0:5.0)
-@test A[1:12:60, 10]   == -vcat(1.0:5.0)
-@test A[2, 14:2314]    == rep_each([0.0], [2301])
-@test A[2, 11:13]      == [-999, -999, -999]
+@test size(A)          == (60, 2315)
+@test A[1:12:60, 2:9]  == repmat(pars', 5, 1)
+@test A[1:12:60, 10]   == vcat(1.0:5.0)
+@test A[1:12:60, 11]   == -vcat(1.0:5.0)
+@test A[2, 15:2315]    == rep_each([0.0], [2301])
+@test A[2, 12:14]      == [-999, -999, -999]
 
 pmx = init_inds(0, M, V, ρ, H)
 A = runsim(pmx, 5, M, V, ρ, H, K, a, s, p, r, time())
-@test size(A)          == (60, 2314)
-@test A[1:12:60, 1:8]  == repmat(pars', 5, 1)
-@test A[1:12:60, 9]    == vcat(1.0:5.0)
-@test A[1:12:60, 10]   == rep_each([0.0], [5])
-@test A[2, 14:2314]    == rep_each([0.0], [2301])
-@test A[2, 11:13]      == [0, 0, 0]
+@test size(A)          == (60, 2315)
+@test A[1:12:60, 2:9]  == repmat(pars', 5, 1)
+@test A[1:12:60, 10]   == vcat(1.0:5.0)
+@test A[1:12:60, 11]   == rep_each([0.0], [5])
+@test A[2, 15:2315]    == rep_each([0.0], [2301])
+@test A[2, 12:14]      == [0, 0, 0]
