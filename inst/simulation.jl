@@ -44,7 +44,9 @@ include("utilities.jl")
 
 # function for naming output files
 function outname(H, ρ, p, r)
-	return string(H[1], "_", H[2], "_", ρ[1], "_", ρ[2], "_", p, "_" , r, "_R.csv")
+  a = Vector{Int64}(H .* 100)
+  b = Vector{Int64}(ρ .* 100)
+	return string(a[1], "_", a[2], "_", b[1], "_", b[2], "_", p, "_" , r, "_R.csv")
 end
 
 ### GROWTH FUNCTIONS ###########################################################
@@ -59,10 +61,15 @@ function growth(N::Int64, K::Float64, r::Float64, a::Float64)
 
 	# use a logistic link function to map growth phenotype to a growth rate that
 	# is bounded between 0 and K.
-	r_link = K / (1.0 + exp(-a * r))
-
-	return (K - K * (1.0 - r_link / K).^N) ./ N
+  if N == 0
+    out = 0
+  else
+    r_link = K / (1.0 + exp(-a * r))
+    out = (K - K * (1.0 - r_link / K).^N) ./ N
+  end
+  return out
 end
+
 
 ### GENETIC VARIANCE FUNCTIONS #################################################
 
@@ -159,7 +166,7 @@ end
 ### METRICS FUNCTIONS ##########################################################
 
 # Calculate breeding value metrics wrt individuals -----------------------------
-function metrics(popmatrix, phenotypes = false, patches = "occupied")
+function metrics(popmatrix, M, phenotypes = false, patches = "occupied")
 	# Given   [popmatrix, phenotypes, occupied]
 	# returns [Nx MeanD Meanr V_D V_r C_Dr pID]
 	# popmatrix : see init_inds
@@ -186,13 +193,16 @@ function metrics(popmatrix, phenotypes = false, patches = "occupied")
 	# get individual-level data
 	x  = convert(Vector{Int64}, popmatrix[:X])
 
-  if phenotypes
-    D = convert(Vector{Float64}, popmatrix[:PD])
-    r = convert(Vector{Float64}, popmatrix[:Pr])
-  else
-    D = convert(Vector{Float64}, popmatrix[:D])
-    r = convert(Vector{Float64}, popmatrix[:r])
-  end
+  # center traits at zero
+	if phenotypes
+    D = vector_add(convert( Vector{Float64}, popmatrix[:PD]),
+		               -convert(Vector{Float64}, popmatrix[ :D]))
+		r = vector_add(convert( Vector{Float64}, popmatrix[:Pr]),
+		               -convert(Vector{Float64}, popmatrix[ :r]))
+	else
+		D = vector_scalar_add(convert(Vector{Float64}, popmatrix[:D]), -M[1])
+		r = vector_scalar_add(convert(Vector{Float64}, popmatrix[:r]), -M[2])
+	end
 
 	# which patches should be analyzed?
 	if patches == "occupied"
@@ -202,7 +212,7 @@ function metrics(popmatrix, phenotypes = false, patches = "occupied")
 	elseif patches == "accordian"
 		pa = accordian_bins(x)
 	elseif patches == "edges"
-		pa  = [minimum(x), 0, maximum(x)]
+		pa  = [minimum([minimum(x), -1.0]), 0, maximum([maximum(x), 1.0])]
 	end
 
   # total number of patches
@@ -247,6 +257,16 @@ function metrics(popmatrix, phenotypes = false, patches = "occupied")
   V_D  = spd_D  ./ Nx
   V_r  = spd_r  ./ Nx
   C_Dr = spd_Dr ./ Nx
+
+	# center traits on (expected) population mean
+	if phenotypes
+		genotypes = metrics(popmatrix, M, false, patches)
+		vector_add!(Mean_D, convert(Vector{Float64}, genotypes[:Mean_D]))
+		vector_add!(Mean_r, convert(Vector{Float64}, genotypes[:Mean_r]))
+	else
+		vector_scalar_add!(Mean_D, M[1])
+		vector_scalar_add!(Mean_r, M[2])
+	end
 
 	return DataFrame(X=pa, Nx=Nx, Mean_D=Mean_D, Mean_r=Mean_r, V_D=V_D, V_r=V_r,
 	                 C_Dr=C_Dr, pID=collect(pID))
@@ -371,7 +391,7 @@ function disperse(x::Vector{Int64}, μ::Vector{Float64}, s::Float64)
 	return y
 end
 
-function repro_disp(popmatrix, V, ρ, H, K, a, s)
+function repro_disp(popmatrix, M, V, ρ, H, K, a, s, return_dx = false)
 	# Given [popmatrix(t), H, V, bw], returns [popmatrix(t+1)]
 	# popmatrix : see init_inds
   # V : vector of total phenotypic variance [VD Vr]
@@ -395,7 +415,7 @@ function repro_disp(popmatrix, V, ρ, H, K, a, s)
 	Pr = convert(Vector{Float64}, popmatrix[:Pr])
 
 	# Calculate traits through space
-  mets = metrics(popmatrix)
+  mets = metrics(popmatrix, M)
 
 	# map patch-specific metrics to individuals
   ix  = Vector{Int64}(ni)
@@ -479,13 +499,17 @@ function repro_disp(popmatrix, V, ρ, H, K, a, s)
 	# (3) Offspring dispersal ----------------------------------------------------
   ox = disperse(dx, exp(oPD), s)
 
-	return DataFrame(X=ox, D=oD, PD=oPD, r=or, Pr=oPr)
+	if return_dx
+		return DataFrame(X=ox, dX=dx, D=oD, PD=oPD, r=or, Pr=oPr)
+	else
+		return DataFrame(X=ox, D=oD, PD=oPD, r=or, Pr=oPr)
+	end
 end
 
 ### SIMULATION FUNCTIONS #######################################################
 
 # Save output ------------------------------------------------------------------
-function generate_output(popmatrix, p, r, H, ρ, i, flag = "full")
+function generate_output(popmatrix, p, r, M, H, ρ, i, flag = "full")
 	# Given [popmatrix, p, r, H, C, ρ, i, bw], generate summary stats for
 	# generation i
 	# popmatrix : see init_inds
@@ -505,43 +529,43 @@ function generate_output(popmatrix, p, r, H, ρ, i, flag = "full")
 
 	if flag == "full"
     # simulation is running as planned, get metrics
-		popsize = nrow(popmatrix)                   # population size
-	  ag = metrics(popmatrix, false, "accordian") # genotype summary metrics
-		ap = metrics(popmatrix, true,  "accordian") # phenotype summary metrics
-		eg = metrics(popmatrix, false, "edges")     # edge patches genotype summary
-		ep = metrics(popmatrix, true,  "edges")     # edge patches phenotype summary
+		ni = nrow(popmatrix)                           # population size
+	  ag = metrics(popmatrix, M, false, "accordian") # genotype summary metrics
+		ap = metrics(popmatrix, M, true,  "accordian") # phenotype summary metrics
+		eg = metrics(popmatrix, M, false, "edges")     # edge patches gen. summary
+		ep = metrics(popmatrix, M, true,  "edges")     # edge patches phen. summary
 	elseif flag == "zero"
 		# population has gone extinct, write a bunch of zeros
-		popsize = 0
+		ni = 0
 	  ag = zero_DFa
 		ap = zero_DFa
 		eg = zero_DFe
-		eg = zero_DFe
+		ep = zero_DFe
 	elseif flag == "timeout"
 		# simulation has timed out, write some nonsense-values
-		popsize = -i
+		ni = -i
 	  ag = zero_DFa
 		ap = zero_DFa
 		eg = time_DFe
-		eg = time_DFe
+		ep = time_DFe
 	end
 
 	# parameter info
-	parameters = repmat([p, r, H[1], H[2], ρ[1], ρ[2], i, popsize]', 12, 1)
+	parameters = repmat([p, r, M[1], M[2], H[1], H[2], ρ[1], ρ[2], i, ni]', 12, 1)
 
 	# reshaped summary statistics from sum_metrics and LE_sum_metrics
-	accordian = vcat(ag[:X]', ag[:Nx]',
-	                 ag[:Mean_D]', ag[:Mean_r]', ag[:V_D]', ag[:V_r]', ag[:C_Dr]',
-								   ap[:Mean_D]', ap[:Mean_r]', ap[:V_D]', ap[:V_r]', ap[:C_Dr]')
 	edges     = vcat(eg[:X]', eg[:Nx]',
 	                 eg[:Mean_D]', eg[:Mean_r]', eg[:V_D]', eg[:V_r]', eg[:C_Dr]',
 								   ep[:Mean_D]', ep[:Mean_r]', ep[:V_D]', ep[:V_r]', ep[:C_Dr]')
+	accordian = vcat(ag[:X]', ag[:Nx]',
+	                 ag[:Mean_D]', ag[:Mean_r]', ag[:V_D]', ag[:V_r]', ag[:C_Dr]',
+								   ap[:Mean_D]', ap[:Mean_r]', ap[:V_D]', ap[:V_r]', ap[:C_Dr]')
 
-	return hcat(parameters, accordian, edges)
+	return hcat(parameters, edges, accordian)
 end
 
 # Run the simulation -----------------------------------------------------------
-function runsim(popmatrix, ngens, V, ρ, H, K, a, s, p, r, bat_time)
+function runsim(popmatrix, ngens, M, V, ρ, H, K, a, s, p, r, bat_time)
 	# Given [popmatrix, n, ngens, M, V, C, H, bw, p, r, TIME, outname]
 	# returns changes in population size, extent, and genetic variance over time.
   # popmatrix : see init_inds
@@ -568,7 +592,7 @@ function runsim(popmatrix, ngens, V, ρ, H, K, a, s, p, r, bat_time)
 	#srand(Int(([1 10] .* H + (ρ + 1) * 100)[] * 10000 + 42 * p + r)) *************************
 
 	# initialize output
-	batchoutput = Array{Any}(ngens * 12, 2312)
+	batchoutput = Array{Any}(ngens * 12, 2314)
 
 	# loop over generations
   for i = 1:ngens
@@ -578,26 +602,26 @@ function runsim(popmatrix, ngens, V, ρ, H, K, a, s, p, r, bat_time)
 
 		if met_flag == "full"
 			# do reproduction and dispersal
-			popmatrix = repro_disp(popmatrix, V, ρ, H, K, a, s)
+			popmatrix = repro_disp(popmatrix, M, V, ρ, H, K, a, s)
 		end
 
 		# check if future generations should be simulated
-		if nrow(popmatrix) < 1
+		if popmatrix == []
 			# stop simulating if population went extinct
-			met_flag == "zero"
+			met_flag = "zero"
 		elseif (time() - bat_time) > 16.0 * 3600.0
 			# stop simulating if the batch has run longer than 16 hours
-			met_flag == "timeout"
-			sim_flag == "!BATCH_RUN_TIMEOUT!"
+			met_flag = "timeout"
+			sim_flag = "!BATCH_RUN_TIMEOUT!"
 		elseif (time() - sim_time) > 10.0 * 3600.0
 			# stop simulating if the simulation has run longer than 10 hours
-			met_flag == "timeout"
-			sim_flag == "!SIM_RUN_TIMEOUT!"
+			met_flag = "timeout"
+			sim_flag = "!SIM_RUN_TIMEOUT!"
 		else
 		end
 
 		# record data
-		batchoutput[ind, :] = generate_output(popmatrix, p, r, H, ρ, i, met_flag)
+		batchoutput[ind, :] = generate_output(popmatrix, p, r, M, H, ρ, i, met_flag)
 	end
 
 	# track simulation info and run times
@@ -608,7 +632,7 @@ function runsim(popmatrix, ngens, V, ρ, H, K, a, s, p, r, bat_time)
 				", ρA ",        (@sprintf "%0.3f" ρ[1]),
 				", ρE ",        (@sprintf "%0.3f" ρ[2]),
 				", time ",      (clocktime(toq())),
-				", final pop ", (@sprintf "%-6.0f" batchoutput[end, 8]),
+				", final pop ", (@sprintf "%-6.0f" batchoutput[end, 10]),
 				" | total time ", (clocktime(time() - bat_time)),
 				" | ", sim_flag, "\n")
 
