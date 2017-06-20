@@ -1,4 +1,7 @@
-
+# round to the nearest tenth ---------------------------------------------------
+function r1(A)
+	return round(A, 1)
+end
 
 # Turn seconds into a HH:MM:SS:mmm format --------------------------------------
 function clocktime(elapsed)
@@ -169,7 +172,7 @@ function map_valsi!(A::Vector{Int64}, B::Vector{Int64}, ix::Vector{Int64})
   nothing
 end
 
-# Map values of a Int64 vector to another Float64 vector ---------------------
+# Map values of a Int64 vector to another Int64 vector -------------------------
 function map_valsi(A::Vector{Int64}, ix::Vector{Int64})
 	# Given [A, ix], returns [B]
 	# A  : a vector of values
@@ -242,6 +245,44 @@ function vector_add(A::Vector{Float64}, B::Vector{Float64})
 	C = Vector{Float64}(length(A))
 	for i = 1:length(A)
 		C[i] = A[i] + B[i]
+	end
+	return C
+end
+
+# Add two vectors element-wise (without using broadcast) -----------------------
+function vector_add!(A::Vector{Float64}, B::Vector{Float64})
+	# Given [A, B], returns [A]
+	# A : a vector of the same length as B
+	# B : a vector of the same length as A
+
+	for i = 1:length(A)
+		A[i] += B[i]
+	end
+	nothing
+end
+
+# Add scalar element-wise to a vector (without using broadcast) ----------------
+function vector_scalar_add!(A::Vector{Float64}, B::Float64)
+	# Given [A, B], returns [A]
+	# A : a vector of the same length as B
+	# B : a scalar
+
+	for i = 1:length(A)
+		A[i] += B
+	end
+	nothing
+end
+
+# Add scalar element-wise to a vector (without using broadcast) ----------------
+function vector_scalar_add(A::Vector{Float64}, B::Float64)
+	# Given [A, B], returns [C]
+	# A : a vector
+	# B : a scalar
+	# C : a vector the same length as A
+
+	C = Vector{Float64}(length(A))
+	for i = 1:length(A)
+		C[i] = A[i] + B
 	end
 	return C
 end
