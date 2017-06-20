@@ -1,0 +1,14 @@
+for r in {1..10}; do
+  for p in {1..20}; do
+    #
+    echo "pop: ${p}, rep: ${r}"
+    export p r
+    #
+    sbatch -o  ${p}_${r}.out.txt \
+    -e         ${p}_${r}.out.txt \
+    --job-name=${p}_${r} \
+    run.sbatch
+    #
+    sleep 0.5
+  done
+done
