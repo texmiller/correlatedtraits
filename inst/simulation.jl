@@ -30,7 +30,6 @@ end
 if loadPackages
 	using Distributions
 	using DataFrames
-	using Base.LinAlg.BLAS
 end
 
 # Include utility functions ----------------------------------------------------
@@ -43,10 +42,8 @@ include("utilities.jl")
 ### HELPER FUNCTIONS ###########################################################
 
 # function for naming output files
-function outname(H, ρ, p, r)
-  a = Vector{Int64}(H .* 100)
-  b = Vector{Int64}(ρ .* 100)
-	return string(a[1], "_", a[2], "_", b[1], "_", b[2], "_", p, "_" , r, "_R.csv")
+function outname(p, r)
+	return string("correlated_traits_", p, "_" , r, ".csv")
 end
 
 ### GROWTH FUNCTIONS ###########################################################
@@ -64,7 +61,7 @@ function growth(N::Int64, K::Float64, r::Float64, a::Float64)
   if N == 0
     out = 0
   else
-    r_link = K / (1.0 + exp(-a * r))
+    r_link = K / (1.0 + exp.(-a * r))
     out = (K - K * (1.0 - r_link / K).^N) ./ N
   end
   return out
@@ -91,10 +88,8 @@ function init_inds(n, M, V, ρ, H)
 	# ΣA  : additive genetic covariance matrix
 	# ΣE  : environmental covariance matrix
 
-  # NOTE: set all starting locations to zero *****************************************************
+	# set all starting locations to zero
 	X = zeros(Int64, n)
-	#X  = Vector{Int64}(n)
-	#X[:] = rand(-10^4:10^4, n) #0
 
 	ΣA = VA(V, ρ[1], H)
 	ΣE = VE(V, ρ[2], H)
@@ -113,7 +108,7 @@ function VE(V, ρ, H)
 
 	# ΣE : environmental variance matrix
 
-	return sqrt((1.0 - H) .* V) * sqrt((1.0 - H) .* V)' .* [1.0 ρ; ρ 1.0]
+	return sqrt.((1.0 - H) .* V) * sqrt.((1.0 - H) .* V)' .* [1.0 ρ; ρ 1.0]
 end
 
 # Calculate additive genetic covariance matrix ---------------------------------
@@ -125,7 +120,7 @@ function VA(V, ρ, H)
 
 	# ΣA : environmental variance matrix
 
-  return sqrt(H .* V) * sqrt(H .* V)' .* [1.0 ρ; ρ 1.0]
+  return sqrt.(H .* V) * sqrt.(H .* V)' .* [1.0 ρ; ρ 1.0]
 end
 
 ### FUNCTIONS FOR PATCH-RELATED CALCULATIONS ###################################
@@ -497,7 +492,7 @@ function repro_disp(popmatrix, M, V, ρ, H, K, a, s, return_dx = false)
 	oPr = vector_add(oPDr[:, 2], or)
 
 	# (3) Offspring dispersal ----------------------------------------------------
-  ox = disperse(dx, exp(oPD), s)
+  ox = disperse(dx, exp.(oPD), s)
 
 	if return_dx
 		return DataFrame(X=ox, dX=dx, D=oD, PD=oPD, r=or, Pr=oPr)
@@ -554,6 +549,9 @@ function generate_output(popmatrix, p, r, M, H, ρ, i, flag = "full")
 	parameters = repmat([p, r, M[1], M[2], H[1], H[2], ρ[1], ρ[2], i, ni]', 12, 1)
 
 	# reshaped summary statistics from sum_metrics and LE_sum_metrics
+  row_id    = ["patch", "N",
+	             "Mean_D",  "Mean_r",  "V_D",  "V_r",  "C_Dr",
+							 "Mean_PD", "Mean_Pr", "V_PD", "V_Pr", "C_PDr"]
 	edges     = vcat(eg[:X]', eg[:Nx]',
 	                 eg[:Mean_D]', eg[:Mean_r]', eg[:V_D]', eg[:V_r]', eg[:C_Dr]',
 								   ep[:Mean_D]', ep[:Mean_r]', ep[:V_D]', ep[:V_r]', ep[:C_Dr]')
@@ -561,7 +559,7 @@ function generate_output(popmatrix, p, r, M, H, ρ, i, flag = "full")
 	                 ag[:Mean_D]', ag[:Mean_r]', ag[:V_D]', ag[:V_r]', ag[:C_Dr]',
 								   ap[:Mean_D]', ap[:Mean_r]', ap[:V_D]', ap[:V_r]', ap[:C_Dr]')
 
-	return hcat(parameters, edges, accordian)
+	return hcat(row_id, parameters, edges, accordian)
 end
 
 # Run the simulation -----------------------------------------------------------
@@ -589,10 +587,10 @@ function runsim(popmatrix, ngens, M, V, ρ, H, K, a, s, p, r, bat_time)
 	met_flag = "full"
 
 	# set a unique seed based on H, p, and r, so simulations can be repeated.
-	#srand(Int(([1 10] .* H + (ρ + 1) * 100)[] * 10000 + 42 * p + r)) *************************
+	srand(plant_seed(ρ, H, r, p))
 
 	# initialize output
-	batchoutput = Array{Any}(ngens * 12, 2314)
+	batchoutput = Array{Any}(ngens * 12, 2315)
 
 	# loop over generations
   for i = 1:ngens
@@ -627,12 +625,12 @@ function runsim(popmatrix, ngens, M, V, ρ, H, K, a, s, p, r, bat_time)
 	# track simulation info and run times
 	print(  "rep ",       (@sprintf "%2.0f" r),
 				", pop ",       (@sprintf "%2.0f" p),
-				", h²D ",       (@sprintf "%0.3f" H[1]),
-				", h²r ",       (@sprintf "%0.3f" H[2]),
-				", ρA ",        (@sprintf "%0.3f" ρ[1]),
-				", ρE ",        (@sprintf "%0.3f" ρ[2]),
+				", h²D ",       (@sprintf "%0.2f" H[1]),
+				", h²r ",       (@sprintf "%0.2f" H[2]),
+				", ρA ",        (@sprintf "%5.2f" ρ[1]),
+				", ρE ",        (@sprintf "%5.2f" ρ[2]),
 				", time ",      (clocktime(toq())),
-				", final pop ", (@sprintf "%-6.0f" batchoutput[end, 10]),
+				", final pop ", (@sprintf "%-9.0f" batchoutput[end, 11]),
 				" | total time ", (clocktime(time() - bat_time)),
 				" | ", sim_flag, "\n")
 
