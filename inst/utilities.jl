@@ -3,6 +3,18 @@ function r1(A)
 	return round(A, 1)
 end
 
+# generate unique random seed based on parameter values ------------------------
+function plant_seed(ρ, H, r, p)
+	ρ1 = round(Int64, 10^12 * (ρ[1] + 1))
+	ρ2 = round(Int64, 10^10 * (ρ[2] + 1))
+	H1 = round(Int64, 10^8  * H[1])
+	H2 = round(Int64, 10^6  * H[2])
+	R  = round(Int64, 10^2  * r)
+	P  = round(Int64, 10^0  * p)
+
+	return ρ1 + ρ2 + H1 + H2 + R + P
+end
+
 # Turn seconds into a HH:MM:SS:mmm format --------------------------------------
 function clocktime(elapsed)
 	hh   = trunc(elapsed / 3600.0)                  # hours
@@ -221,7 +233,7 @@ function pos_def_check!(A::Array{Float64, 2})
 
 	if !isposdef(A)
 		# get standard deviations
-		σ = sqrt(diag(A))
+		σ = sqrt.(diag(A))
 
 		# get correlation
 		C = cov2cor(A, σ)
