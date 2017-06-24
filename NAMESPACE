@@ -2,6 +2,7 @@
 
 export(fit_growth)
 export(pdf_doc)
+export(sim_halfsib)
 export(stan_data)
 export(test_kernel_fits)
 export(wrangle_beetle_data)
