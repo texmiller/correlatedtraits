@@ -2,7 +2,7 @@ functions {
   matrix as_matrix(vector X, int N, int M) {
     matrix[N, M] Y;
 
-    for (i in 1:N) {
+    for (i in 1:N){
       Y[i] = to_row_vector(X[((i - 1) * M + 1):(i * M)]);
     }
     return Y;
