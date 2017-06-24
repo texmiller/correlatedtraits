@@ -145,6 +145,7 @@ wrangle_beetle_data <- function(female_fd_path, female_f_path,
   # the 'f' and 'm' columns in clean data.
   clean_data$f <- clean_data$f - 1
   clean_data$m <- clean_data$m - 1
+  clean_data$t <- clean_data$t - 2
 
   return(clean_data)
 }
