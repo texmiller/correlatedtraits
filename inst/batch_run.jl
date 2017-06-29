@@ -14,14 +14,14 @@ p = Int(eval(parse(ARGS[1])))  # population number
 r = Int(eval(parse(ARGS[2])))  # replicate number
 
 # varying parameters ----------------------------------------------------
-H = [0.1, 0.5, 0.9]                        # heritabilities
-ρ = [-0.9, -0.5, -0.1, 0.0, 0.1, 0.5, 0.9] # covariances
+H = [0.1, 0.5, 0.9]                        # heritabilities                     TODO: run beetle values
+ρ = [-0.9, -0.5, -0.1, 0.0, 0.1, 0.5, 0.9] # covariances                        TODO: run beetle values
 
 # fixed parameters ------------------------------------------------------
 n = 20               # number of individuals
 M = [1.63, 2.74]     # phenotype means
-V = [0.40, 0.35]     # total phenotypic variances                        TODO: add additional fixed variances for appendix
-b = 4.05             # Beverton-Holt parameter                           TODO: add additional values for appendix
+V = [0.40, 0.35]     # total phenotypic variances                               TODO: add additional fixed variances for appendix
+b = 4.05             # Beverton-Holt parameter                                  TODO: add additional values for appendix
 ngens = 20           # number of generations to simulate
 bat_time = time()    # batch processing time
 c = 0                # loop counter
