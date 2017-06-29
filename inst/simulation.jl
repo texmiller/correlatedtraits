@@ -48,23 +48,20 @@ end
 
 ### GROWTH FUNCTIONS ###########################################################
 
-# Modified 'Skellam' (exponential) population growth ---------------------------
-function growth(N::Int64, K::Float64, r::Float64, a::Float64)
-	# Given [N, K, r] returns expected [per-capita growth rate]
+# Beverton-Holt per-capits population growth -----------------------------------
+function growth(N::Int64, r::Float64, b::Float64)
+	# Given [N, r, b] returns expected [per-capita growth rate]
   # N : number of individuals
-	# K : carrying capacity
 	# r : low-density per-capita growth rate phenotype
-	# a : steepness of logistic curve
+	# b : Beverton-Holt parameter
 
 	# use a logistic link function to map growth phenotype to a growth rate that
 	# is bounded between 0 and K.
   if N == 0
-    out = 0
+    return 0
   else
-    r_link = K / (1.0 + exp.(-a * r))
-    out = (K - K * (1.0 - r_link / K).^N) ./ N
+    return r / (1 + b .* N)
   end
-  return out
 end
 
 
@@ -213,7 +210,7 @@ function metrics(popmatrix, M, phenotypes = false, patches = "occupied")
   # total number of patches
   np = length(pa)
 
-	# make a patch ID dict to denote array indices for each patch location
+	# make a patch ID dictionary to denote array indices for each patch location
   pID = Dict{Int64, Int64}()
   sizehint!(pID, np)
   for i = 1:np
@@ -283,7 +280,7 @@ function find_mates!(m::Vector{Int64}, pai::Array{Int64, 2},
 	@inbounds for i = 1:np
 
 		# potential mates in patch i
-		pm = sx[pai[i, 1] : pai[i, 2], 2]
+		pm  = sx[pai[i, 1] : pai[i, 2], 2]
 		lpm = length(pm)
 
 		if lpm == 1
@@ -340,13 +337,12 @@ end
 
 # Reproduction and dispersal ---------------------------------------------------
 function reproduce(Nx::Vector{Int64}, r::Vector{Float64}, m::Vector{Int64},
-	                 K::Float64, a::Float64)
+	                 b::Float64)
   # Given [Nx, r, m, K, a], return [Noff]
 	# Nx   : patch density for individual i
 	# r    : growth rate for individual i
 	# m    : vector of mates
-	# K    : population carrying capacity
-	# a    : slope of the logistic function
+	# b    : Beverton-Holt parameter
 
 	# Noff : the number of offspring produced by individual i
 
@@ -355,47 +351,41 @@ function reproduce(Nx::Vector{Int64}, r::Vector{Float64}, m::Vector{Int64},
 		if m[i] == -99
 			Noff[i] = 0      # no mate, no offspring
 		else
-			Noff[i] = rand(Poisson(growth(Nx[i], K,	r[i], a)))
+			Noff[i] = rand(Poisson(growth(Nx[i], exp.(r[i]), b)))
 		end
   end
 	return Noff
 end
 
-function disperse(x::Vector{Int64}, μ::Vector{Float64}, s::Float64)
-	# Given [x, μ, s], returns [y].
+function disperse(x::Vector{Int64}, λ::Vector{Float64})
+	# Given [x, λ], returns [y].
 	# x : an integer vector of each individual's current spatial location
-	# μ : the mean of the mean-parameterized Negative Binomial distribution
-	# s : the dispersion parameter of the mean-parameterized Negative Binomial
+	# λ : the Poisson parameter
 
 	# y : an integer vector of new spatial locations for each individual
 
 	lx = length(x)
 	y = Vector{Int64}(lx)
 	n = Vector{Int64}(lx)
-	p = Vector{Float64}(lx)
 
-	# since the Negative Binomial only gives positive numbers, flip a coin to
-	# determine which direction each individual moves
+	# since the Poisson only gives positive numbers, flip a coin to determine
+	# which direction each individual moves
 	d = rand(Bernoulli(), lx)
 
 	for i = 1:lx
-		p[i] = s / (μ[i] + s)
-		n[i] = rand(NegativeBinomial(s, p[i]))
+		n[i] = rand(Poisson(λ[i]))
 		y[i] = x[i] + (d[i] * 2 - 1) * n[i]
 	end
 	return y
 end
 
-function repro_disp(popmatrix, M, V, ρ, H, K, a, s, return_dx = false)
+function repro_disp(popmatrix, M, V, ρ, H, b, return_dx = false)
 	# Given [popmatrix(t), H, V, bw], returns [popmatrix(t+1)]
 	# popmatrix : see init_inds
   # V : vector of total phenotypic variance [VD Vr]
   # ρ : vector of additive and non-additive genetic correlations between D and r
 	# H : vector of heritabilities [h²D h²r]
-	# K : population carrying capacity
-	# a : steepness of logistic function that maps an individual's r phenotype to
-	#     its growth rate.
-	# s : the dispersion parameter of the mean-parameterized Negative Binomial
+	# b : Beverton-Holt parameter
 
 	# If the population is extinct, or if there is only 1 individual, return NULL
 	ni = nrow(popmatrix)
@@ -404,7 +394,7 @@ function repro_disp(popmatrix, M, V, ρ, H, K, a, s, return_dx = false)
   end
 
 	# convert some popmatrix columns to standalone vectors
-	x  = convert(Vector{Int64}, popmatrix[:X])
+	x  = convert(Vector{Int64},   popmatrix[:X])
 	D  = convert(Vector{Float64}, popmatrix[:D])
 	r  = convert(Vector{Float64}, popmatrix[:r])
 	Pr = convert(Vector{Float64}, popmatrix[:Pr])
@@ -424,9 +414,9 @@ function repro_disp(popmatrix, M, V, ρ, H, K, a, s, return_dx = false)
 
 	# (1) Density-dependent reproduction -----------------------------------------
 
-	m    = mate(popmatrix)             # find a mate (or not) for each individual
-	Noff = reproduce(Nx, Pr, m, K, a)  # number of offspring for each parent
-	no   = sum(Noff)                   # total number of offspring
+	m    = mate(popmatrix)         # find a mate (or not) for each individual
+	Noff = reproduce(Nx, Pr, m, b) # number of offspring for each parent
+	no   = sum(Noff)               # total number of offspring
 
   # If there are no offspring, return NULL
   if no == 0
@@ -439,14 +429,14 @@ function repro_disp(popmatrix, M, V, ρ, H, K, a, s, return_dx = false)
 	did   = rep_eachi(collect(1:ni), Noff)  # 'dam' ids
 	sid   = rep_eachi(m, Noff)              # 'sire' ids
 	dx    = map_valsi(x, did)               # dam location
-	dD    = map_vals(D, did)                # dam dispersal genotype
-	sD    = map_vals(D, sid)                # sire dispersal genotypes
-	dr    = map_vals(r, did)                # dam growth genotype
-	sr    = map_vals(r, sid)                # sire growth genotype
+	dD    = map_vals(D,  did)               # dam dispersal genotype
+	sD    = map_vals(D,  sid)               # sire dispersal genotypes
+	dr    = map_vals(r,  did)               # dam growth genotype
+	sr    = map_vals(r,  sid)               # sire growth genotype
 
 	# get patch-level additive genetic covariance matrix elements for offspring
-	oV_D  = rep_each(V_D, Noff)             # patch-level variance in D
-	oV_r  = rep_each(V_r, Noff)             # patch-level variance in r
+	oV_D  = rep_each(V_D,  Noff)            # patch-level variance in D
+	oV_r  = rep_each(V_r,  Noff)            # patch-level variance in r
 	oC_Dr = rep_each(C_Dr, Noff)            # patch-level covariance in D and r
 
 	# multiply elements of additive genetic covariance matrix by 0.5; this is the
@@ -463,7 +453,7 @@ function repro_disp(popmatrix, M, V, ρ, H, K, a, s, return_dx = false)
 
 	# initiate some variables
 	ΣE   = VE(V, ρ[2], H)        # non-additive (environmental) covariance
-	ΣA   = Array{Float64}(2, 2)  # additive genetic covariance (placeholder)
+	ΣA   = Array{Float64}(2,  2) # additive genetic covariance (placeholder)
 	oDr  = Array{Float64}(no, 2) # genotype deviates from mean
 	oPDr = Array{Float64}(no, 2) # phenotype deviates from mean
 
@@ -492,7 +482,7 @@ function repro_disp(popmatrix, M, V, ρ, H, K, a, s, return_dx = false)
 	oPr = vector_add(oPDr[:, 2], or)
 
 	# (3) Offspring dispersal ----------------------------------------------------
-  ox = disperse(dx, exp.(oPD), s)
+  ox = disperse(dx, exp.(oPD))
 
 	if return_dx
 		return DataFrame(X=ox, dX=dx, D=oD, PD=oPD, r=or, Pr=oPr)
@@ -563,8 +553,8 @@ function generate_output(popmatrix, p, r, M, H, ρ, i, flag = "full")
 end
 
 # Run the simulation -----------------------------------------------------------
-function runsim(popmatrix, ngens, M, V, ρ, H, K, a, s, p, r, bat_time)
-	# Given [popmatrix, n, ngens, M, V, C, H, bw, p, r, TIME, outname]
+function runsim(popmatrix, ngens, M, V, ρ, H, b, p, r, bat_time)
+	# Given [popmatrix, ngens, M, V, ρ, H, b, p, r, bat_time]
 	# returns changes in population size, extent, and genetic variance over time.
   # popmatrix : see init_inds
 	# n  	      : initial number of starting individuals
@@ -572,13 +562,12 @@ function runsim(popmatrix, ngens, M, V, ρ, H, K, a, s, p, r, bat_time)
 	# ngens     : number of generations to simulate
 	# M         : vector of mean phenotypes [μD μK μr]
 	# V         : vector of total phenotypic variance [VD VK Vr]
-	# C         : vector of covariances [C_DK C_Dr C_Kr]
-	# H         : vector of heritabilities [h²D h²K h²r]
-	# bw        : bin width
+	# ρ         : vector of correlations [ρA ρE]
+	# H         : vector of heritabilities [h²D h²r]
+	# b         : Beverton-Holt parameter
 	# p         : population number for this generation
 	# r         : replicate number for this simulation
-	# TIME      : processing time
-	# outname   : the output name for this simulation
+	# bat_time  : time that the current batch process started
 
 	# start timers
 	tic()
@@ -600,7 +589,7 @@ function runsim(popmatrix, ngens, M, V, ρ, H, K, a, s, p, r, bat_time)
 
 		if met_flag == "full"
 			# do reproduction and dispersal
-			popmatrix = repro_disp(popmatrix, M, V, ρ, H, K, a, s)
+			popmatrix = repro_disp(popmatrix, M, V, ρ, H, b)
 		end
 
 		# check if future generations should be simulated

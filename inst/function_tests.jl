@@ -4,17 +4,15 @@ cd("D:\\GIT\\correlatedtraits\\inst")
 using Base.Test
 
 # set some parameters for testing
-n = 20                 # number of individuals
-M = [log(6.1), -0.97]  # phenotype means
-V = [0.2, 1.9]         # total phenotypic variances
-ρ = [0.9, 0.0]         # additive and environmental covariances
-H = [0.8, 0.8]         # trait heritabilities
-K = 40.0               # patch carrying capacity
-a = 1.0                # slope of logistic function
-s = 2.2                # negative binomial scale parameter
-p = 3                  # population number
-r = 5                  # replicate number
-ngens = 20             # number of generations to simulate
+n = 20               # number of individuals
+M = [1.60, 2.70]     # phenotype means
+V = [0.40, 0.30]     # total phenotypic variances
+b = 4.05             # Beverton-Holt parameter
+ρ = [0.9, 0.0]       # additive and environmental covariances
+H = [0.8, 0.8]       # trait heritabilities
+p = 3                # population number
+r = 5                # replicate number
+ngens = 20           # number of generations to simulate
 
 srand(42)
 # ------------------------------------------------------------------------------
@@ -76,12 +74,12 @@ sortrowsi!(A); @test A == [1 2; 2 3; 2 4; 3 1; 4 5]
 B = Array{Int64}(4, 2)
 group_index!(B, A, collect(1:4), 4, 5); @test B == [1 1; 2 3; 4 4; 5 5]
 
-# Et cetera ####################################################################
+# Et cetera #################################################################### ?r2
 @test clocktime(4242.676) == "01:10:42:676"
 
-@test r1(pi) == 3.1
+@test r1(pi)  ==  3.1
 @test r1(-pi) == -3.1
-@test r1(0) == 0
+@test r1(0)   ==  0
 
 # test random seed generator
 seed_test = Vector{Int64}(21 * 21 * 11 * 11 * 10 * 20)
@@ -110,18 +108,18 @@ end
 @test outname(p, r) == "correlated_traits_3_5.csv"
 
 # growth functions #############################################################
-@test growth(0, K, M[2], a) == 0
-@test growth(3, K, M[2], a)  ≈ 8.24977881
-@test growth(10, K, M[2], a) ≈ 3.83924821
-@test growth(50, K, M[2], a) ≈ 0.79999992
+@test growth(0,  exp.(M[2]), b) == 0
+@test growth(3,  exp.(M[2]), b) ≈ 1.1315385342
+@test growth(10, exp.(M[2]), b) ≈ 0.3585477524
+@test growth(50, exp.(M[2]), b) ≈ 0.0731190748
 
 # genetic variance functions ###################################################
 
 # test the popmatrix function --------------------------------------------------
-pmx = init_inds(10^6, M, V, ρ, H)
+pmx = init_inds(10^7, M, V, ρ, H)
 
 # check basic qualities of the data frame
-@test nrow(pmx) == 10^6
+@test nrow(pmx) == 10^7
 @test ncol(pmx) == 5
 @test unique(pmx[:X]) == [0]
 
@@ -145,12 +143,12 @@ pmx = init_inds(10^6, M, V, ρ, H)
 @test    VE(V, 0, [1, 1]) == zeros(Float64, 2, 2)
 @test    VE(V, 1, [1, 1]) == zeros(Float64, 2, 2)
 @test    VE(V, 0, [0, 0])  ≈ [V[1]   0; 0   V[2]]
-@test r1(VE(V, 1, [0, 0])) ≈ [V[1] 0.6; 0.6 V[2]]
+@test r1(VE(V, 1, [0, 0])) ≈ [V[1] 0.3; 0.3 V[2]]
 
 @test    VA(V, 0, [0, 0]) == zeros(Float64, 2, 2)
 @test    VA(V, 1, [0, 0]) == zeros(Float64, 2, 2)
 @test    VA(V, 0, [1, 1])  ≈  [V[1]   0; 0   V[2]]
-@test r1(VA(V, 1, [1, 1])) == [V[1] 0.6; 0.6 V[2]]
+@test r1(VA(V, 1, [1, 1])) == [V[1] 0.3; 0.3 V[2]]
 
 # accordian_bins ###############################################################
 @test length(accordian_bins(collect(-2000:2000))) == 2301
@@ -245,34 +243,34 @@ pmx[:X] = [3, 1, 2, 2, 4]
 # reproduction -----------------------------------------------------------------
 Nx = ones(Int64, 5)
 r  = zeros(Float64, 5)
-@test reproduce(Nx, r, m, K, a)[[1, 2, 5]] == [0, 0, 0]
+@test reproduce(Nx, r, m, b)[[1, 2, 5]] == [0, 0, 0]
 
-Nx = ones(Int64, 10^6)
-r = zeros(Float64, 10^6)
-m = ones(Int64, 10^6)
-@test r1(mean(reproduce(Nx, r, m, K, a))) ≈ r1(K ./ 2)
-@test r1( var(reproduce(Nx, r, m, K, a))) ≈ r1(K ./ 2)
-
-Nx = rep_eachi([2], [10^6])
+Nx = rep_eachi([2],  [10^6])
 r  = rep_each([M[2]], [10^6])
 m  = ones(Int64, 10^6)
-@test r1(mean(reproduce(Nx, r, m, K, a))) ≈ 9.5
-@test r1( var(reproduce(Nx, r, m, K, a))) ≈ 9.5
+@test r1(mean(reproduce(Nx, r, m, b))) ≈ 1.6
+@test r1( var(reproduce(Nx, r, m, b))) ≈ 1.6
+
+Nx = rep_eachi( [3],  [10^6])
+r  = rep_each([M[2]], [10^6])
+m  = ones(Int64, 10^6)
+@test r1(mean(reproduce(Nx, r, m, b))) ≈ 1.1
+@test r1( var(reproduce(Nx, r, m, b))) ≈ 1.1
 
 # dispersal --------------------------------------------------------------------
 # this requires fairly large sample sizes for the variance to work out correctly
 x = zeros(Int64, 10^7)
-μ = rep_each([exp.(M[1])], [10^7])
-@test r1(mean(    disperse(x, μ, s)))  == 0
-@test r1(mean(abs(disperse(x, μ, s)))) == r1(exp.(M[1]))
-@test r1( var(abs(disperse(x, μ, s)))) == r1(exp.(M[1]) + exp.(M[1])^2 / s)
+λ = rep_each([exp.(M[1])], [10^7])
+@test r1(mean(    disperse(x, λ)))  == 0
+@test r1(mean(abs(disperse(x, λ)))) == r1(exp.(M[1]))
+@test r1( var(abs(disperse(x, λ)))) == r1(exp.(M[1]))
 
-@test abs(minimum(disperse(x, μ, s))) < 75
-@test abs(maximum(disperse(x, μ, s))) < 75
+@test abs(minimum(disperse(x, λ))) < 75
+@test abs(maximum(disperse(x, λ))) < 75
 
 x = floor(Int64, vcat(1:(10^6)/2, 1:(10^6)/2))
 μ = rep_each([exp.(M[1])], [10^6])
-@test r1(mean(abs(disperse(x, μ, s)  .- x))) == r1(exp.(M[1]))
+@test r1(mean(abs(disperse(x, λ)  .- x))) == r1(exp.(M[1]))
 
 # combined reproduction and dispersal ------------------------------------------
 
@@ -283,7 +281,7 @@ H1 = [0.01,   0.01]
 pmx = init_inds(10^6, M, V1, ρ1, H1)
 # ensure 2 individuals/patch so matings are successful
 pmx[:X] = vcat(1:(nrow(pmx)/2), 1:(nrow(pmx)/2))
-pmx1 = repro_disp(pmx, M, V1, ρ1, H1, K, a, s, true)
+pmx1 = repro_disp(pmx, M, V1, ρ1, H1, b, true)
 
 # test traits
 @test r1(mean(pmx1[:PD])) == r1(mean(pmx[:PD]))
@@ -292,18 +290,18 @@ pmx1 = repro_disp(pmx, M, V1, ρ1, H1, K, a, s, true)
 @test r1(mean(pmx1[:r]))  == r1(mean(pmx[:r]))
 
 # test reproduction
-@test r1(nrow(pmx1) / nrow(pmx)) ≈ 9.5
+@test r1(nrow(pmx1) / nrow(pmx)) ≈ 1.6
 
 # test dispersal
 @test r1(mean(abs(pmx1[:X] - pmx1[:dX]))) ≈ r1(exp.(M[1]))
-@test r1( var(abs(pmx1[:X] - pmx1[:dX]))) ≈ r1(exp.(M[1]) + exp.(M[1])^2 / s)
+@test r1( var(abs(pmx1[:X] - pmx1[:dX]))) ≈ r1(exp.(M[1]))
 @test abs(maximum(pmx1[:X]) -  maximum(pmx[:X])) < 75
 @test abs(minimum(pmx1[:X]) -  minimum(pmx[:X])) < 75
 
 # more detailed test of traits using the usual parameters
 pmx = init_inds(40*10000, M, V, ρ, H)
 pmx[:X] = rep_eachi(vcat(1:10000), rep_eachi([40], [10000]))
-pmx1 = repro_disp(pmx, M, V, ρ, H, K, a, s)
+pmx1 = repro_disp(pmx, M, V, ρ, H, b)
 
 # test (co)variances
 CA = cov(hcat(convert(Vector{Float64}, pmx1[:D]),
@@ -352,12 +350,12 @@ p = r = 2
 pmx = init_inds(20, M, V, ρ, H)
 pars = [p, r, M[1], M[2], H[1], H[2], ρ[1], ρ[2]]
 
-A = runsim(pmx, 5, M, V, ρ, H, K, a, s, p, r, time())
+A = runsim(pmx, 5, M, V, ρ, H, b, p, r, time())
 @test size(A)          == (60, 2315)
 @test A[1:12:60, 2:9]  == repmat(pars', 5, 1)
 @test A[1:12:60, 10]   == vcat(1.0:5.0)
 
-A = runsim(pmx, 5, M, V, ρ, H, K, a, s, p, r, time() - 3600*40)
+A = runsim(pmx, 5, M, V, ρ, H, b, p, r, time() - 3600*40)
 @test size(A)          == (60, 2315)
 @test A[1:12:60, 2:9]  == repmat(pars', 5, 1)
 @test A[1:12:60, 10]   == vcat(1.0:5.0)
@@ -366,7 +364,7 @@ A = runsim(pmx, 5, M, V, ρ, H, K, a, s, p, r, time() - 3600*40)
 @test A[2, 12:14]      == [-999, -999, -999]
 
 pmx = init_inds(0, M, V, ρ, H)
-A = runsim(pmx, 5, M, V, ρ, H, K, a, s, p, r, time())
+A = runsim(pmx, 5, M, V, ρ, H, b, p, r, time())
 @test size(A)          == (60, 2315)
 @test A[1:12:60, 2:9]  == repmat(pars', 5, 1)
 @test A[1:12:60, 10]   == vcat(1.0:5.0)
