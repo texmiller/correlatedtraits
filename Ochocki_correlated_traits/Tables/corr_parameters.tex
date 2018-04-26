@@ -1,0 +1,24 @@
+{\renewcommand{\arraystretch}{1.4}%
+\begin{table}[!p]
+\centering
+\label{Parameter values and definitions}
+\caption[Parameter values and definitions]{\textbf{Parameter values and definitions.} Descriptions of key parameters in the simulation. \tom{[We probably do not need this table since it is largely redundant with Table 1.]}}\label{corr:params}\vspace{0.1in}
+\begin{tabularx}{0.95\linewidth}{llX}
+\toprule
+Parameter    & Value(s)                               & Definition                                        \\ \midrule
+$N_{0}$      & 20                                     & Initial population size                           \\
+$\mu_{d}$    & 1.63                                   & Initial mean dispersal phenotype ($\bm{z}_{d}$)   \\ 
+$\mu_{r}$    & 2.74                                   & Initial mean fertility phenotype ($\bm{z}_{r}$) \\ 
+$V_{P,d}$    & 0.40                                   & Initial total phenotypic variance in $\bm{z}_{d}$ \\ 
+$V_{P,r}$    & 0.35                                   & Initial total phenotypic variance in $\bm{z}_{r}$ \\ 
+$h^{2}_{d}$  & 0.54                                   & Heritability of dispersal ($z_d$)                 \\
+$h^{2}_{r}$  & 0.16                                   & Heritability of fertility ($z_r$)               \\
+$\rho_{G}$   & [-0.9, -0.5, -0.37, -0.16, -0.1,       & Additive genetic correlation in $\bm{z}$          \\
+             & \phantom{$[-$}0.0, 0.1, 0.5, 0.9]      &                                                   \\
+$\rho_{E}$   & [-0.9, -0.5, -0.37, -0.16, -0.1,       & Environmental correlation in $\bm{z}$             \\
+             & \phantom{$[-$}0.0, 0.1, 0.5, 0.9]      &                                                   \\
+$K$          & 3.81                                   & Patch carrying capacity                           \\
+Generations  & 20                                     & Number of generations of invasion                 \\
+Replicates   & 1000                                   & Number of simulation replicates                   \\ \bottomrule
+\end{tabularx}
+\end{table}}

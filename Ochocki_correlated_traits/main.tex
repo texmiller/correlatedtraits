@@ -1,0 +1,49 @@
+\newcommand{\papertitle}{Demography-dispersal trait correlations modify the eco-evolutionary dynamics of range expansion}
+%%%EDITING COMMANDS
+\newcommand{\tom}[1]{{\color{red} {#1}}}
+
+\input{sections/preamble}
+
+\lhead{}
+\rhead{\papertitle}
+
+% Document --------------
+\begin{document}
+
+% Cover page
+\input{sections/coverpage} % coverpage
+\thispagestyle{empty}      % with no page style
+\title{\papertitle}        % paper title
+
+% Article
+
+% Article title
+\title{\vspace{-15mm}\fontsize{21pt}{10pt}\selectfont\textbf{\papertitle}}
+
+% Authors and Affiliations
+\author{\large Brad M. Ochocki}
+\author{\large Julia B. Saltz}
+\author{\large Tom E.X. Miller}
+\affil{\normalsize Department of Biosciences, Program in Ecology and Evolutionary Biology, Rice University}
+\renewcommand\Authands{ and }
+\maketitle
+
+% Start running line numbers
+\linenumbers
+\setlength\linenumbersep{15pt}
+\renewcommand\linenumberfont{\normalfont\footnotesize\sffamily\color{gray}}
+\modulolinenumbers[1]
+
+% Content
+\input{sections/content}
+
+% References ------------
+%TC:ignore
+\newpage
+\singlespacing
+\bibliographystyle{references/amnat}
+\bibliography{references/biblio}
+
+
+
+\end{document}
