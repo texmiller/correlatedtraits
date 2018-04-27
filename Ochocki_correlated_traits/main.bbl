@@ -1,4 +1,4 @@
-\begin{thebibliography}{56}
+\begin{thebibliography}{57}
 \providecommand{\natexlab}[1]{#1}
 
 \bibitem[{Bellows(1982)}]{bellows_analytical_1982}
@@ -54,6 +54,13 @@ Comte, L., and J.~D. Olden. 2018.
 Conner, J.~K., and D.~L. Hartl. 2004.
 \newblock A primer of ecological genetics.
 \newblock Sinauer Associates, Sunderland, Massachusetts.
+
+\bibitem[{de~Villemereuil et~al.(2016)de~Villemereuil, Schielzeth, Nakagawa,
+  and Morrissey}]{de2016general}
+de~Villemereuil, P., H.~Schielzeth, S.~Nakagawa, and M.~Morrissey. 2016.
+\newblock General methods for evolutionary quantitative genetic inference from
+  generalized mixed models.
+\newblock Genetics 204:1281--1294.
 
 \bibitem[{Downey et~al.(2015)Downey, Searle, Bellur, Geiger, Maitner, Ohm,
   Tuda, and Miller}]{downey_comparative_2015}
