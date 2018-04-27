@@ -52,77 +52,56 @@ Since the density-dependent competition described here is among full siblings, i
 
 \subsubsection{Statistical analysis}
 \paragraph{Overview: estimating trait values, variances, and covariances with the `animal model'}
-We used the animal model to estimate genetic and environmental variances and covariances of dispersal and demography traits \citep{lynch_genetics_1998,kruuk_estimating_2004,wilson_ecologists_2010}. The animal model is hierarchical linear mized model that partitions genetic variance in quantitative traits based on associations between kinship and trait values of offspring, even if trait values of parents are not known (as in our study). Because dispersal and fertility were measured as counts (patches moved and number of offspring, respectively) we used a generalization of the animal model for non-Gaussian traits \citep{de2016general}. This distinction is important because, in the generalized animal model, genetic variation in traits manifests at two scales: the scale of the observations and a `latent' scale that corresponds more directly to the trait values expected due to kinship but that can only be studied through random realizations (the observations) \citep{de2016general}. As we describe in the next sections, we focus throughout on genetic variace, covariance, and heritability of dispersal and demography traits on their latent scales.
+We used the animal model to estimate genetic and environmental variances and covariances of dispersal and demography traits \citep{lynch_genetics_1998,kruuk_estimating_2004,wilson_ecologists_2010}. The animal model is hierarchical linear mized model that partitions genetic variance in quantitative traits based on associations between kinship and trait values of offspring, even if trait values of parents are not known (as in our study). Because dispersal and fertility were measured as counts (patches moved and number of offspring, respectively) we used a generalization of the animal model for non-Gaussian traits \citep{de2016general}. This distinction is important because, in the generalized animal model, genetic variation in traits manifests at two scales: the scale of the observations and a `latent' scale that corresponds more directly to the trait values expected due to kinship but that can only be studied through random realizations (the observations) \citep{de2016general}. As we describe in the next sections, we focus throughout on genetic variace, covariance, and heritability of dispersal and demography traits on their latent scales. While the animal model framework is able to accommodate additional random effects associated with maternal environmental (i.e., maternal effects), our model failed to converge when we attempted this, indicating that our data were not sufficient to estimate maternal effects in addition to other sources of variance and covariance. Any maternal effects are therefore implicitly incorporated into kinship, which may positively bias estimates of additive genetic variance and narrow-sense heritability. 
 
-Males and females in \textit{C. maculatus} are known to differ in dispersal \citep{miller_sex_2013,ochocki_rapid_2017}. Since we could only measure density-dependent fertility in females, we focused our analysis exclusively on data collected from females and the the simulation model that follows is correspondingly female-dominant.
+Males and females in \textit{C. maculatus} are known to differ in dispersal \citep{miller_sex_2013,ochocki_rapid_2017}. Since we could only measure density-dependent fertility in females, we focused our analysis exclusively on data collected from females and the the simulation model that follows is correspondingly female-dominant. 
 
 \paragraph{Dispersal}
-Previous studies estimating \textit{C. maculatus} dispersal kernels have found negative binomial or Poisson Inverse Gaussian kernels to provide the best fit to dispersal data \citep{miller_sex_2013,wagner_genetic_2016,ochocki_rapid_2017}. While this was also the case in the present study when data were aggregated across families, a Poisson kernel provided the best fit to family-level dispersal data. This is likely due to the fact that, while the Poisson mean is a family-specific trait, variance in the mean among families results in overdispersion, resulting in an aggregate response that was negative-binomially distributed. We thus modeled the dispersal distance $d$ of individual $i$ from sire $j$ and dam $k$ as:
+Previous studies estimating \textit{C. maculatus} dispersal kernels have found negative binomial or Poisson Inverse Gaussian kernels to provide the best fit to dispersal data \citep{miller_sex_2013,wagner_genetic_2016,ochocki_rapid_2017}. While this was also the case in the present study when data were aggregated across families, a Poisson kernel provided the best fit to family-level dispersal data. This is likely due to the fact that, variance in the mean among families generates an aggregate response that is negative-binomially distributed. We thus modeled the dispersal distance $d$ of individual $i$ from sire $j$ and dam $k$ as:
 %
-\begin{equation}\label{corr:dispersal}
-  d_{i} \sim \mathit{Poisson}(\lambda_{ijk})
+\begin{equation}\label{corr:dispersal_random}
+  d_{ijk} \sim \mathit{Poisson}(\lambda_{ijk})
 \end{equation}
 %
-where $\lambda_{ijk}$ is the mean and variance of the Poisson distribution. \tom{[I am concerned/confused here because pedigree should be represented symbolically, i.e., $d_{ijk}$ is the dispersal distance of beetle $i$ from mom $j$ and dad $k$. We will also need to think about ways to structure this material so that the $z$ phenotypes are not so confusing.]}
+where $\lambda_{ijk}$ is the mean and variance of the Poisson distribution. The expected value for dispersal distance is defined by a linear model that includes a grand mean ($\mu^{d}$) and accounts for parentage ($a^{d}_jk$) and residual deviation of observation $i$ ($e^{d}_i$):
+%
+\begin{equation} \label{corr:dispersal_linmod}
+  log(\lambda_{ijk}) = \mu^{d} + a^{d}_{jk} + e^{d}_{i}
+\end{equation}
+%
+The genetic ($a^{d}_{jk}$) and environmental ($e^{d}_i$) random variables for dispersal distance are further defined below in relation to fertility. 
 
-
-For the purpose of analysis, we expressed population density as the ratio of individuals (females) to beans and fit a Beverton-Holt model of population growth:
+\paragraph{Fertility}
+Unlike dispersal, fertility was measured with respect to density. We imposed density dependence by manipulating the resources available to an individual female rather than density \textit{per se}. We analyzed the data using the framework of the Beverton-Holt model of population growth, modified so that population density is expressed as the ratio of females to beans:
 %
 \begin{equation}\label{corr:BevHoltFull}
-  \frac{N_{i, t+1}}{B} = \frac{r_{i}(\frac{N_{i, t}}{B})}{1 + \frac{r_{i}}{K}\frac{N_{i, t}}{B}}
+  \frac{N_{t+1}}{B} = \frac{r(\frac{N_{t}}{B})}{1 + \frac{r}{K}\frac{N_{t}}{B}}
 \end{equation}
 %
-Here, $N$ is the population density experienced by individual $i$ at time $t$ \tom{[I find this confusing. Shouldn't $N_{i,t}$ always equal $1$ since every trial has $1$ female? Also, is $N_{i,t+1}$ the number of offspring of female $i$?]}, $B$ is the resource density (number of beans) that a female has access to \tom{[Should this be $B_i$?]}, $K$ is the carrying capacity of the environment when $B$ = 1 \tom{[I am confused by this statement and I am not even sure how to express that confusion. If $K$ is eqm population size it should not be conditional on $B$. Is it eqm population size or eqm ration of $\frac{N}{B}$?]}, and $r_{i}$ is an individual's density-independent fertility (determined by its fertility phenotype $z_{r,i}$, see below). Because $K$ is unlikely to be important for dynamics at the invasion front \citep{burton_trade-offs_2010}, and because there is a well-documented covariance between statistical estimates of $r$ and $K$ in density-dependent population models \citep{hilborn_quantitative_1992}, we chose not to model both $r$ and $K$ as heritable traits. Instead, we assume a fixed value of $K$ for all individuals in the population, and allow $r_{i}$ to vary among individuals according to a quantitative genetic model of inheritance. Dividing both sides by $N_{t}/B$ gives us the equivalent per-capita population growth model:
+Dividing both sides by $N_{t}/B$ and setting $N_{t}=1$ gives the expected offspring production of single females in variable bean environments:
 %
-\begin{equation}\label{corr:BevHolt}
-  \frac{N_{i, t+1}}{N_{i, t}} = \frac{r_{i}}{1 + \frac{r_{i}}{K}\frac{N_{i, t}}{B}}
+\begin{equation}\label{corr:BevHoltPercap}
+  \hat{N}_{t+1} = \frac{r}{1 + \frac{r}{KB}}
 \end{equation}
 %
-\tom{[Now I understand why K is eqm density when B=1. But I think a better way to describe this is that K is the carrying capacity \textit{per bean}.]}We accounted for the fact that reproduction is a stochastic process by sampling the number of offspring produced by each female from a Poisson distribution with mean equal to $\frac{N_{i, t+1}}{N_{i, t}}$:
+Here, $B$ is the number of beans available, $r$ is low-density fertility, and $K$ is the carrying capacity per-bean (i.e., the number of beetles that one bean could support).  Our aim was to identify variation in $r$ that was attributable to pedigree and covariance with dispersal. There is a well-documented covariance between statistical estimates of $r$ and $K$ in density-dependent population models \citep{hilborn_quantitative_1992}, and this prevented us from modeling both $r$ and $K$ as heritable traits. Instead, we assume a fixed value of $K$ and allow $r$ to vary among individuals according to a quantitative genetic model of inheritance. 
+
+We treat the number of offspring produced by female $i$ from sire $j$ and dam $k$ ($N_{ijk}$) as a Poisson random variable, with the expected value given by \ref{corr:BevHoltPercap}.
+% - Not sure it is worth showing this.
 %
-\begin{equation}\label{corr:growth}
-  N_{\mathit{off}, i} \sim \mathit{Poisson} \Big( \frac{N_{i, t+1}}{N_{i, t}} \Big)
+\begin{equation}\label{corr:Noff_ran}
+  N_{ijk} \sim \mathit{Poisson}\Big(\frac{r_{ijk}} {1 + \frac{r_{ijk}}{KB_{ijk} }}\Big)
 \end{equation}
 %
-where $N_{\mathit{off}, i}$ is the discrete number of offspring produced by individual $i$. \tom{[Here again I am confused because I thought that $N_{\mathit{off}, i} = N_{i,t}$.]} We used Equation (\ref{corr:growth}) to estimate the number of females produced at each females-per-bean density in our fertility trials. \tom{[I think Brad and I will need to talk through this section. It will probably work better to keep the preceding section all about lab methods and move all modeling details to this next section.]}
-
-\subsection{\textit{Estimating genetic and environmental variances and covariances using the animal model}}
-
-We used the animal model to estimate trait values for the female beetles in our experiment \citep{lynch_genetics_1998,kruuk_estimating_2004,wilson_ecologists_2010}. Males and females in \textit{C. maculatus} are known to differ in dispersal \citep{miller_sex_2013,ochocki_rapid_2017}; since we could only measure density-dependent fertility in females, and our study focuses on correlations between dispersal and density-dependent population growth, we focused our analysis exclusively on data collected from females \tom{[Equivalently, I think we can just say that the population model is female-dominant and not sound defensive about it.]}. The animal model expresses a vector of phenotypes $\bm{z}_{i}$ for an individual $i$ as a linear model with random effects generated by additive genetic and environmental components:
+As in \ref{corr:dispersal_linmod}, low-density fertility is described by a linear model that includes a grand mean ($\mu^{r}$) and accounts for parentage ($a^{r}_jk$) and residual deviation of observation $i$ ($e^{r}_i$):
 %
-\begin{equation} \label{corr:animalmodel}
-  \bm{z}_{i} = \bm{\mu} + \bm{a}_{i} + \bm{e}_{i}
+\begin{equation} \label{corr:fert_linmod}
+  log(r_{ijk}) = \mu^{f} + a^{r}_{jk} + e^{r}_{i}
 \end{equation}
 %
-where $\bm{\mu}$ is a vector of phenotype means corresponding to each element in $\bm{z}_{i}$, $\bm{e}_{i}$ is a vector of random deviates based on environmental covariance matrix $\bm{E}$, and $\bm{a}_{i}$ is a vector of the individual's ``breeding values'' (additive genetic effects), based on the breeding values of its parents and an additive genetic covariance matrix $\bm{G}$.
 
-For our study, the phenotypes in $\bm{z_{i}}$ were $z_{d,i}$ and $z_{r,i}$, which corresponded to latent phenotypic traits that determined dispersal ability and low-density reproductive ability, respectively. These traits are `latent' in the sense that they cannot be measured directly, but can be estimated using a hierarchical statistical model that links their values to observable phenomena \tom{[I understand what you are getting at but this is likely to confuse readers because you have not defined a relationship between the z phenotypes and the dispersal and fertility observations defined above]}. While the phenotypes $z_{d,i}$ and $z_{r,i}$ can take any value, the parameters $\lambda_{i}$ (for dispersal) and $r_{i}$ (for fertility) in Equations (\ref{corr:dispersal}) and (\ref{corr:growth}) must take positive values. We mapped phenotypes to their respective trait values via logarithmic link functions:
-%
-\begin{gather} \label{corr:linkFunctions}
-  log(\lambda_{i}) = z_{d,i} \\
-  log(r_{i}) = z_{r,i}
-\end{gather}
-%
-\tom{[I have several questions here. I am not sure of the point of defining both the z values and the lambda and r values, given that they relate to each other simply by a log link. Also, I am still waiting for well defined notation for parentage. As I am reading, it seems to me that your $i$ index in the animal model should really be indexing a full sibling family: offspring $i$ from mom $j$ and dad $k$. I will keep reading, perhaps this is clarified below.]}
-The mean values of the phenotypes, given by the vector $\bm{\mu}$, were assumed to be fixed effects for the entire population.
-
-\tom{[My general comment going into this paragraph is that you have not given readers enough context to understand whay `environmental variance' means for an experiment in which all individuals were observed in identical and tightly controlled environments. Presumably maternal effects contribute to this variance component? Also, it may be better to lead with the genetic deviates before the environmental deviates.]}The random deviates $\bm{e}_{i}$ %in Equation (\ref{corr:animalmodel}) represent an individual-level random effect on each of an individual's phenotypes ($z_{d,i}$ and $z_{r,i}$). These
-are drawn from a multivariate normal distribution, centered at zero, with environmental covariance matrix $\bm{E}$:
-%
-\begin{gather} \label{corr:env}
-  \bm{e}_{i} \sim \mathit{MVN} (0, \bm{E}) \\[5pt]
-  \bm{E} =
-  \begin{bmatrix}
-    \begin{array}{ll}
-      V_{E,d} &C_{E}   \\
-      C_{E}   &V_{E,r} \\
-    \end{array}
-  \end{bmatrix}
-\end{gather}
-%
-where $V_{E,d}$ is the environmental variance in $\bm{z}_{d}$ across all individuals, $V_{E,r}$ is the environmental variance in $\bm{z}_{r}$ across all individuals, and $C_{E}$ is the environmental covariance between $\bm{z}_{d}$ and $\bm{z}_{r}$ across all individuals. From an ecological perspective, the random deviates that we model correspond to the response to some environmental factor that affects each individual's phenotype independently \tom{[I don't follow the significance of `independently' in this context]}(i.e., no group effects due to family, natal location, population density, etc \tom{[I have a hard time following this parenthetical statement, what you mean by listing these examples, and whether the `no' applies to all items in the list]}). In the bean beetle system, microsite variation in larval environment is a good candidate for this variation, as host beans may vary in, for example, nutrient content, water content, geometry, age, etc. \tom{[This is helpful and I think you should move this sentence much earlier. I am still wondering about maternal effects. More generally, is it safe the equate the `environmental variance' with \textit{any} source of variance that is NOT attributable to additive genetic effects? Perhaps we can call this `non-genetic' variance?]}
-
-The breeding values $\bm{a}_{i}$ in Equation (\ref{corr:animalmodel}) are a function of the breeding values of both parents and the additive genetic covariance between the traits, given by covariance matrix $\bm{G}$. Breeding values were drawn from a multivariate normal distribution centered on the average of the breeding values for both parents (i.e., the 'midparent value') and covariance $\bm{G}/2$:
+\paragraph{Linking dispersal and fertility}
+Finally, to model genetic and environmental variances and covariances, we link the corresponding random deviates. The vector $\bm{a}_{jk}$ contains the random deviates (also known as `breeding values') for dispersal ($a^{d}_{jk}$) and fertility ($a^{r}_{jk}$) associated with kinship and is distributed according to a multivariate normal distribution centered on the average of the breeding values for both parents (the 'midparent value') with variance-covariance matrix $\bm{G}/2$:
 %
 \begin{gather} \label{corr:gen}
   \bm{a}_{i} \sim \mathit{MVN} \Big( \frac{\bm{a}_{j} + \bm{a}_{k}}{2}, \frac{\bm{G}}{2} \Big) \\[10pt]
@@ -135,15 +114,30 @@ The breeding values $\bm{a}_{i}$ in Equation (\ref{corr:animalmodel}) are a func
   \end{bmatrix}
 \end{gather}
 %
-where $V_{G,d}$ is the additive genetic variance in $\bm{z}_{d}$ across all individuals, $V_{G,r}$ is the additive genetic variance in $\bm{z}_{r}$ across all individuals, and $C_{G}$ is the additive genetic covariance between $\bm{z}_{d}$ and $\bm{z}_{r}$ across all individuals. In Equation (\ref{corr:gen}), dividing $\bm{G}$ by $2$ accounts for the expected additive genetic variance among full siblings compared with the population as a whole \citep{roughgarden_theory_1979} \tom{[I trust that you know what you are talking about, but I do not follow the logic of this statement.]}. In practice neither an individual's breeding value nor the breeding values of its parents are known, but both can be estimated using statistical methods \citep{wilson_ecologists_2010} \tom{[Not sure that this sentence is necessary.]}.
+Here, $V_{G,d}$ and $V_{G,r}$ are the additive genetic variances in the 'latent' trait values for dispersal and fertility and $C_{G}$ is the additive genetic covariance between between the latent trait values. In Equation (\ref{corr:gen}), dividing $\bm{G}$ by $2$ accounts for the expected additive genetic variance among full siblings compared with the population as a whole \citep{roughgarden_theory_1979} 
 
-Assuming that genetic and environmental effects are not correlated with each other, the total phenotypic variances and covariances in these traits can be described by a covariance matrix $\bm{P}$, which is simply $\bm{P} = \bm{G} + \bm{E}$. Calculating $\bm{P}$ enables us to calculate the narrow-sense heritability for each trait, which reflects the proportion of variance in the phenotype attributable to additive genetic variance:
+The environmental deviates -- individual-to-individual variation that is not explained by pedigree, also known as `overdispersion' \citep{de2016general} -- are treated similarly, where the vector $\bm{e}_{i}$ contains elements $e^{d}_{i}$ and $e^{r}_{i}$ from \ref{corr:dispersal_linmod} and \ref{corr:fert_linmod}, respectively, and is distributed as follows:
+%
+\begin{gather} \label{corr:env}
+  \bm{e}_{i} \sim \mathit{MVN} (0, \bm{E}) \\[5pt]
+  \bm{E} =
+  \begin{bmatrix}
+    \begin{array}{ll}
+      V_{E,d} &C_{E}   \\
+      C_{E}   &V_{E,r} \\
+    \end{array}
+  \end{bmatrix}
+\end{gather}
+%
+In the bean beetle system, microsite variation in larval environment is a good candidate for the environmental variation $\bm{E}$, as host beans may vary in, for example, nutrient content, water content, geometry, age, etc. For both covariances, genetic and environmental correlations were derived as $\rho = \frac{C}{\sqrt{V_{d}}\sqrt{V_{r}}}$. 
+
+Assuming that genetic and environmental effects are not correlated with each other, the total phenotypic variances and covariances in these traits can be described by a covariance matrix $\bm{P}$, which is simply $\bm{P} = \bm{G} + \bm{E}$. Calculating $\bm{P}$ enables us to calculate the narrow-sense heritability of each trait, which reflects the proportion of variance in the phenotype (on the latent scale) attributable to additive genetic factors. For dispersal,
 %
 \begin{equation}\label{corr:heritability}
-  h^{2}_x = \frac{V_{G,x}}{V_{P,x}}
+  h^{2}_d = \frac{V_{G,d}}{V_{P,d}}
 \end{equation}
 %
-where $h^{2}_x$ is the narrow-sense heritability of some trait $x$, here either dispersal ($d$) or the fertility ($r$). All analyses were performed in R 3.4.0 \citep{r_core_team_r:_2015} using \code{rstan} \citep{stan_development_team_rstan:_2015}.
+and likewise for heritability of fertility ($h^{2}_r$). All analyses in this section were performed in R 3.4.0 \citep{r_core_team_r:_2015} using \code{rstan} \citep{stan_development_team_rstan:_2015}. Because models were fit in a Bayseian framework, we can quantify parameter uncertainty through their posterior distributions. Code for these analyses may be found at \url{https://github.com/bochocki/correlatedtraits}. 
 
 \subsection{\textit{Simulating invasions with correlated traits}}
 
