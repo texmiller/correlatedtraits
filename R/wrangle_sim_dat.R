@@ -36,14 +36,33 @@ for(i in 1:length(h2_trts)){
       #We are just skipping over this when it happens. It means final sample sizes will actually be <1000
       if(inherits(sim_out, "error")) next
 
-      names(sim_out)[c(8,9,10,14,1)] <- c("rho_G","rho_E","gen","rightmost_dat","dat_names")
+      names(sim_out)[c(8,9,10,13,16,14,1)] <- c("rho_G","rho_E","gen","center_dat","rightmost_2_dat","rightmost_1_dat","dat_names")
 
-      hold <- sim_out %>%
+      hold_center <- sim_out %>%
         filter(gen==1 | gen==20) %>%
-        select(rho_G,rho_E,gen,dat_names,rightmost_dat) %>%
-        spread(key = dat_names, value = rightmost_dat) %>%
+        select(rho_G,rho_E,gen,dat_names,center_dat) %>%
+        spread(key = dat_names, value = center_dat) %>%
         mutate(h2 = h2_trts[i],
-               P_var = var_trts[j])
+               P_var = var_trts[j],
+               location = "center")
+
+      hold_right_2 <- sim_out %>%
+        filter(gen==1 | gen==20) %>%
+        select(rho_G,rho_E,gen,dat_names,rightmost_2_dat) %>%
+        spread(key = dat_names, value = rightmost_2_dat) %>%
+        mutate(h2 = h2_trts[i],
+               P_var = var_trts[j],
+               location = "rightmost2")
+
+      hold_right_1 <- sim_out %>%
+        filter(gen==1 | gen==20) %>%
+        select(rho_G,rho_E,gen,dat_names,rightmost_1_dat) %>%
+        spread(key = dat_names, value = rightmost_1_dat) %>%
+        mutate(h2 = h2_trts[i],
+               P_var = var_trts[j],
+               location = "rightmost1")
+
+      hold <- bind_rows(hold_center,hold_right_2,hold_right_1)
 
       sim_dat = bind_rows(sim_dat,hold)
 

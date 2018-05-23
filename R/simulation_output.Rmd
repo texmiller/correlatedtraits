@@ -1,0 +1,181 @@
+---
+title: "Trait Correlation simulation output"
+author: "Tom"
+date: "May 18, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, message = F, error = F)
+dat <- read.csv("D:/Dropbox/Manuscripts/Brad demography dispersal correlation/ct_sim_out_tidy.csv")
+library(tidyverse)
+library(data.table) 
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+```
+This document summarizes the output of Brad's simulation study. The output is gathered and tidied in a separate script ('wrangle_sim_dat.R'). This script imports the tidied data frame (from Tom's dropbox folder), generates graphics, and provides some interpretation. 
+
+The first thing I want to check is the simulation sample sizes. The target was 1000 but there were several missing files in the sequence 1:1000. I think Brad ran extras when this occurred so that the sample size is always in fact 1000 but I did not import these into my tidy summary (the loop only ran to 1000). So let's see what we ended up with:
+```{r sample sizes}
+dat %>% 
+  group_by(gen,location,P_var,h2,rho_G,rho_E) %>% 
+  summarise(count = n()) %>% 
+  ggplot()+geom_histogram(aes(x=count))
+```
+For all treatments there are at least 950 reps. Apparently there are two groups, not sure why. Regardless, I think these are sufficient sample sizes to proceed. 1000 is an arbitrary sample size anyway.
+
+#Speed / Extent
+Now let's calculate the mean and CV of invasion extent in generation 20 across treatments.
+```{r extent mean CV, echo=T}
+extent_dat <- dat %>%
+  filter(gen == 20) %>% 
+  group_by(P_var,h2,rho_G,rho_E) %>%  
+  summarise(mean_extent = mean(patch),
+            CV_extent = var(patch) / mean(patch))
+```
+
+Here I will try to re-create the figures from Brad's thesis (beetle-specific h2 and V values).
+```{r extent beetle params 1}
+extent_dat_beetle <- extent_dat %>% 
+  filter(h2 == "default"| h2 == "none", P_var == "default") 
+
+A <- ggplot(data =  filter(extent_dat_beetle,rho_E==-0.9 | rho_E==0 | rho_E==0.9))+
+  geom_line(aes(x=rho_G,y=mean_extent,linetype=h2,color=as.factor(rho_E)))
+
+B <- ggplot(data =  filter(extent_dat_beetle,rho_G==-0.9 | rho_G==0 | rho_G==0.9))+
+  geom_line(aes(x=rho_E,y=mean_extent,linetype=h2,color=as.factor(rho_G)))
+
+C <- ggplot(data =  filter(extent_dat_beetle,rho_E==-0.9 | rho_E==0 | rho_E==0.9))+
+  geom_line(aes(x=rho_G,y=CV_extent,linetype=h2,color=as.factor(rho_E)))
+
+D <- ggplot(data =  filter(extent_dat_beetle,rho_G==-0.9 | rho_G==0 | rho_G==0.9))+
+  geom_line(aes(x=rho_E,y=CV_extent,linetype=h2,color=as.factor(rho_G)))
+
+multiplot(A,B,C,D,cols=2)
+```
+
+Yes, this looks like a good correspondence to Brad's original thesis figure. Let's see if I can find a cleaner way to present the data. For the beetle parameters, genetic correlations had a stronger accelerating effect than environmental correlations, and I would like to emphasize that result visually, while keeping emphasis on the fact that evolving invasions were always faster than non-evolving ones, even with very strong negative correlations. 
+```{r extent beetle params 2}
+A <- ggplot()+
+  geom_line(data =  filter(extent_dat_beetle,rho_E==-0.16),
+            aes(x=rho_G,y=mean_extent,linetype=h2))+
+  geom_line(data =  filter(extent_dat_beetle,rho_G==-0.37),
+            aes(x=rho_E,y=mean_extent,linetype=h2,col="E"))+
+  geom_vline(xintercept = c(-0.37,-0.16))
+B <- ggplot()+
+  geom_line(data =  filter(extent_dat_beetle,rho_E==-0.16),
+            aes(x=rho_G,y=CV_extent,linetype=h2))+
+  geom_line(data =  filter(extent_dat_beetle,rho_G==-0.37),
+            aes(x=rho_E,y=CV_extent,linetype=h2,col="blue"))
+
+multiplot(A,B,cols=2)
+```
+
+## Generalizing beyond beetles
+This is the full set of treatments for extent. On a quick inspection, a few things stand out. First, the qualitative trend from the beetle system seems to hold: genetic correlations speed up invasions and evolving invasions are just about always faster than non-evolving ones, even with very strong negative correlations. There seems to be one exception to this: equally high trait heritabilities with double the phenotypic variance. In this case, the strongest negative correlation goes slower than the no-evolution case, presumably because this increases the efficiency of selection against high fertility (I am assuming it is ferrtility that loses out at the expense of dispersal, but we can test this with the trait data). There is a potentially interesting result in the swap treatment: invasions are generally slower than the default treatment. Recall that 'swap' means that fertility has higher heritability than dispersal. So a few lines of evidence are pointing to the idea that evolution of dispersal is a more important accelerating force than evolution of fertility. 
+```{r generalizing extent}
+ggplot(data =  filter(extent_dat, rho_E==-0.9 | rho_E==0 | rho_E==0.9))+
+  geom_line(aes(x=rho_G,y=mean_extent,color=as.factor(rho_E)))+
+  facet_grid(P_var ~ h2)
+```
+
+And here are the same plots but for CV instead. This looks the way that I expected it should. No effects of E correlations on variance, greater evolutionary potential, greater increase in variance. Again, there is an interesting asymmetry in default vs swap treatments. One problem here is that we did not control for trait differences in phenotypic variance. They are fairly similar in magnitude (dispersal: 0.41, fertility: 0.35) but the direction of difference could possibly explain why the default invasions (greater heritability of the trait with more phenotypic variance) go faster than the swap invasions (greater heritability of the trait with less phenotypic variance.)
+```{r generalizing CV}
+ggplot(data =  filter(extent_dat, rho_E==-0.9 | rho_E==0 | rho_E==0.9))+
+  geom_line(aes(x=rho_G,y=CV_extent,color=as.factor(rho_E)))+
+  facet_grid(P_var ~ h2)
+```
+
+
+# Traits
+Moving on to trait evolution. Here I need to contrast the generation 1 / generation 20 phenotype values. 
+```{r traits beetle params}
+trait_dat <- dat %>%
+  group_by(P_var,h2,rho_G,rho_E,gen) %>% 
+  select(P_var,h2,rho_G,rho_E,gen,Mean_PD,Mean_Pr) %>% 
+  summarise(mean_PD = mean(exp(Mean_PD)),
+            mean_Pr = mean(exp(Mean_Pr)))
+  ## note: phenotypes are on log scale. Need to decide whether fold change should be on log scale or not
+
+  trait_change <- dcast(setDT(trait_dat), P_var+h2+rho_G+rho_E ~ gen,value.var = c("mean_PD", "mean_Pr")) %>% 
+  mutate(foldchange_dispersal = mean_PD_20/mean_PD_1,
+         foldchange_fertility = mean_Pr_20/mean_Pr_1)
+
+#beetle traits
+trait_change %>% 
+  filter(h2 == "default" | h2 == "none", P_var == "double",rho_E == -0.16) %>% 
+  ggplot()+
+  geom_line(aes(x = rho_G, y=foldchange_dispersal, linetype=h2))+
+  geom_line(aes(x = rho_G, y=foldchange_fertility, linetype=h2),color="red")+
+  geom_vline(xintercept = -0.37)
+  
+
+```
+
+First thing to note is that this is not 'trait evolution', this is just final trait values. Second, the trait values are sampled often from just one individual, the farthest one, so that could be a source of noise. Brad's output included a sample of the wave behind the very edge (though I am currently not sure exactly where) - so that may be useful to work with. Third, I *think* am plot trait values on the observed scale (realized dispersal distance and realized fecundity) but it occurs to me that the dispersal distances are too far for beetles. Perhaps I should not be exponentiating the values? Check with Brad. 
+
+These results are odd to me. The dispersal results mostly make sense but the fertility results are surprising: strong effects of environmental correlations. This could perhaps just be explained by the fact that the leading edge disperser will always have a high dispersal value, so any environmental correlation with fertility should appear there. Need to think more about this, but I think re-querying the output for trait *change* rather than trait values is a better way to go. 
+
+```{r}
+
+A <- ggplot(data =  filter(trait_dat_beetle,rho_E==-0.9 | rho_E==0 | rho_E==0.9))+
+  geom_line(aes(x=rho_G,y=foldchange_dispersal,linetype=h2,color=as.factor(rho_E)))
+
+B <- ggplot(data =  filter(trait_dat_beetle,rho_G==-0.9 | rho_G==0 | rho_G==0.9))+
+  geom_line(aes(x=rho_E,y=foldchange_dispersal,linetype=h2,color=as.factor(rho_G)))
+
+C <- ggplot(data =  filter(trait_dat_beetle,rho_E==-0.9 | rho_E==0 | rho_E==0.9))+
+  geom_line(aes(x=rho_G,y=foldchange_fertility,linetype=h2,color=as.factor(rho_E)))
+
+D <- ggplot(data =  filter(trait_dat_beetle,rho_G==-0.9 | rho_G==0 | rho_G==0.9))+
+  geom_line(aes(x=rho_E,y=foldchange_fertility,linetype=h2,color=as.factor(rho_G)))
+
+multiplot(A,B,C,D,cols=2)
+```
+
+```{r}
+ggplot(data =  filter(trait_change, rho_E==-0.9 | rho_E==0 | rho_E==0.9))+
+  geom_line(aes(x=rho_G,y=foldchange_dispersal,color=as.factor(rho_E)))+
+  facet_grid(P_var ~ h2)+
+  geom_hline(yintercept = 1)
+
+ggplot(data =  filter(trait_change, rho_E==-0.9 | rho_E==0 | rho_E==0.9))+
+  geom_line(aes(x=rho_G,y=foldchange_fertility,color=as.factor(rho_E)))+
+  facet_grid(P_var ~ h2)+
+  geom_hline(yintercept = 1)
+
+```
+
