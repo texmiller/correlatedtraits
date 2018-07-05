@@ -14,11 +14,26 @@
 
 % other elements not in template
 \usepackage[dvipsnames]{xcolor}
-\usepackage{wasysym}
+\usepackage[nointegrals]{wasysym}
 \usepackage{gensymb}
 \newcommand{\tom}[1]{{\textit{\color{WildStrawberry}{[#1]}}}}
-
-
+\def\code#1{\texttt{#1}}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{longtable}
+\newcommand{\sym}[1]{\rlap{#1}}
+\usepackage{tabularx}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+\usepackage{relsize}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{printlen}
+\usepackage[section]{placeins}
+\usepackage{afterpage}
 %%%%%%%%%%%%%%%%%%%%%
 % Line numbering
 %%%%%%%%%%%%%%%%%%%%%
@@ -41,8 +56,8 @@
 % will need to add this information back in to your final files after
 % acceptance.
 
-\author{Brad M. Ochocki \\ 
-Julia B. Saltz \\ 
+\author{Brad M. Ochocki \\
+Julia B. Saltz \\
 Tom E.X. Miller$^{\ast}$}
 
 \date{}
@@ -65,7 +80,7 @@ Tom E.X. Miller$^{\ast}$}
 
 \bigskip
 
-\textit{Manuscript type}: Article. 
+\textit{Manuscript type}: Article.
 
 \bigskip
 
@@ -79,173 +94,173 @@ Tom E.X. Miller$^{\ast}$}
 % Abstract -------------
 \section*{Abstract}
 
-\tom{Abstract not updated yet.} Recent evidence has shown that spatial allele sorting during invasions can increase invasion speed, as well as variability in invasion speed, by generating selection on dispersal distance and the low-density population growth rate. Most studies assume that selection acts on each of these traits independently, and do not consider that traits may instead be correlated. However, it is well-established that correlations between traits play an important role in evolutionary dynamics. Here, we estimate additive genetic correlations and environmental correlations between dispersal distance and the low-density population growth rate in the beetle \textit{Callosobruchus maculatus}, a model system that has been previously used to investigate experimental invasion dynamics. We find that, for both additive genetic and environmental correlations, dispersal distance and low-density growth rate are negatively correlated in \textit{C. maculatus}. Furthermore, we use these estimates from the \textit{C. maculatus} system to parameterize simulations of invasions that explore the full spectrum of possible trait correlations. We find that strong positive correlations between dispersal and the low-density growth rate increase the speed and variability of invasions relative to strong negative correlations, and that both positive and negative correlations generate qualitatively different outcomes compared to invasions without trait correlations. We suggest that incorporating estimates of trait correlations is likely to be important for modeling the range of potential outcomes for invading populations. 
+\tom{Abstract not updated yet.} Recent evidence has shown that spatial allele sorting during invasions can increase invasion speed, as well as variability in invasion speed, by generating selection on dispersal distance and the low-density population growth rate. Most studies assume that selection acts on each of these traits independently, and do not consider that traits may instead be correlated. However, it is well-established that correlations between traits play an important role in evolutionary dynamics. Here, we estimate additive genetic correlations and environmental correlations between dispersal distance and the low-density population growth rate in the beetle \textit{Callosobruchus maculatus}, a model system that has been previously used to investigate experimental invasion dynamics. We find that, for both additive genetic and environmental correlations, dispersal distance and low-density growth rate are negatively correlated in \textit{C. maculatus}. Furthermore, we use these estimates from the \textit{C. maculatus} system to parameterize simulations of invasions that explore the full spectrum of possible trait correlations. We find that strong positive correlations between dispersal and the low-density growth rate increase the speed and variability of invasions relative to strong negative correlations, and that both positive and negative correlations generate qualitatively different outcomes compared to invasions without trait correlations. We suggest that incorporating estimates of trait correlations is likely to be important for modeling the range of potential outcomes for invading populations.
 
 \newpage{}
 
 % Introduction -------------
 \section*{Introduction}
-Understanding the factors that govern the rate of spatial expansion is a long-standing problem in population biology and takes on urgency in the context of two key dimensions of contemporary global change: range expansion by invasive species and climate change migration by native species. 
-Classic ecological theory tells us that the dynamics of range expansion are driven by the combined forces of local birth/death processes (`demography') and individual movement (`dispersal') \citep{skellam_random_1951,okubo_diffusion_1980,kot_discrete-time_1986,kot_dispersal_1996}. 
+Understanding the factors that govern the rate of spatial expansion is a long-standing problem in population biology and takes on urgency in the context of two key dimensions of contemporary global change: range expansion by invasive species and climate change migration by native species.
+Classic ecological theory tells us that the dynamics of range expansion are driven by the combined forces of local birth/death processes (`demography') and individual movement (`dispersal') \citep{skellam_random_1951,okubo_diffusion_1980,kot_discrete-time_1986,kot_dispersal_1996}.
 Recently, ecologists have begun to examine the consequences of individual variation, especially heritable variation, in demography and dispersal traits and how eco-evolutionary feedbacks can modify the dynamics of range expansion.
 
-Individuals that vary in dispersal ability are expected to become sorted along an expanding population front \citep{shine_evolutionary_2011}. 
-Spatial sorting generates an over-representation of highly dispersive phenotypes at the invasion vanguard. 
-If dispersal is heritable, non-random mating among highly dispersive individuals may lead to rapid evolution of increased dispersal ability at the leading edge. 
-Furthermore, if density-dependent demography generates a fitness advantage at the low-density invasion front, highly dispersive alleles may be favored by `spatial selection' \citep{phillips_life-history_2010, perkins_evolution_2013}. 
-Increased fitness in the vanguard can also result in natural selection for increased low-density reproductive rates (`\textit{r}-selection’) \citep{phillips_life-history_2010}. 
-Because invasion speed is determined by dispersal and low-density reproductive rate, the combined action of these evolutionary processes is expected increase the speed of invasions \citep{phillips_evolutionary_2015} and a surge of recent experimental work supports this theoretical prediction \citep{williams_rapid_2016, ochocki_rapid_2017, weiss-lehman_rapid_2017,van2018kin}. 
-Several studies also show more variation in speed -- how far the invasion spreads over time -- than would be expected in the absence of evolution \citep{phillips_evolutionary_2015, ochocki_rapid_2017, weiss-lehman_rapid_2017}. 
+Individuals that vary in dispersal ability are expected to become sorted along an expanding population front \citep{shine_evolutionary_2011}.
+Spatial sorting generates an over-representation of highly dispersive phenotypes at the invasion vanguard.
+If dispersal is heritable, non-random mating among highly dispersive individuals may lead to rapid evolution of increased dispersal ability at the leading edge.
+Furthermore, if density-dependent demography generates a fitness advantage at the low-density invasion front, highly dispersive alleles may be favored by `spatial selection' \citep{phillips_life-history_2010, perkins_evolution_2013}.
+Increased fitness in the vanguard can also result in natural selection for increased low-density reproductive rates (`\textit{r}-selection’) \citep{phillips_life-history_2010}.
+Because invasion speed is determined by dispersal and low-density reproductive rate, the combined action of these evolutionary processes is expected increase the speed of invasions \citep{phillips_evolutionary_2015} and a surge of recent experimental work supports this theoretical prediction \citep{williams_rapid_2016, ochocki_rapid_2017, weiss-lehman_rapid_2017,van2018kin}.
+Several studies also show more variation in speed -- how far the invasion spreads over time -- than would be expected in the absence of evolution \citep{phillips_evolutionary_2015, ochocki_rapid_2017, weiss-lehman_rapid_2017}.
 Increased variability is likely due to the stochastic fixation of alleles at the leading edge, which is a consequence of the serial founder events that characterize invasive spread -- a spatial analogue of genetic drift called `gene surfing' \citep{edmonds_mutations_2004,klopfstein_fate_2006,excoffier_surfing_2008,peischl_expansion_2015,phillips_evolutionary_2015, ochocki_rapid_2017, weiss-lehman_rapid_2017}.
 
-Most theoretical models of the eco-evolutionary dynamics of range expansion assume that dispersal and low-density reproductive rate (hereafter `fertility') evolve independently. 
-If, however, these traits are genetically correlated then it impossible to predict the outcome of selection without knowing both the magnitude and sign of the correlation \citep{lande_measurement_1983,chenoweth2010contribution}. 
-Quantitative genetics offers a convenient framework to explore sources of (co)variation in ecologically important traits. 
-In the simplest case, total phenotypic variation in a single quantitative trait can be partitioned into two types of variance: additive genetic variance (the variance that can be explained by the inheritance of genes from parents to offspring) and environmental variance (any residual, non-heritable variance caused by extrinsic factors) \citep{lynch_genetics_1998,kruuk_estimating_2004,wilson_ecologists_2010}. 
-This framework can be extended to account for multiple traits and the correlations between them. 
-Genetic correlations are expected to arise through pleiotropy (a subset of genes influencing multiple traits) and/or physical linkage (association of alleles on chromosomes) \citep{roff_evolutionary_1997} while environmental correlations arise from plastic responses to the environment that are non-independent across traits. 
+Most theoretical models of the eco-evolutionary dynamics of range expansion assume that dispersal and low-density reproductive rate (hereafter `fertility') evolve independently.
+If, however, these traits are genetically correlated then it impossible to predict the outcome of selection without knowing both the magnitude and sign of the correlation \citep{lande_measurement_1983,chenoweth2010contribution}.
+Quantitative genetics offers a convenient framework to explore sources of (co)variation in ecologically important traits.
+In the simplest case, total phenotypic variation in a single quantitative trait can be partitioned into two types of variance: additive genetic variance (the variance that can be explained by the inheritance of genes from parents to offspring) and environmental variance (any residual, non-heritable variance caused by extrinsic factors) \citep{lynch_genetics_1998,kruuk_estimating_2004,wilson_ecologists_2010}.
+This framework can be extended to account for multiple traits and the correlations between them.
+Genetic correlations are expected to arise through pleiotropy (a subset of genes influencing multiple traits) and/or physical linkage (association of alleles on chromosomes) \citep{roff_evolutionary_1997} while environmental correlations arise from plastic responses to the environment that are non-independent across traits.
 There are, then, many ways for dispersal and fertility to interact via trait correlations; the correlations can be positive or negative, and can be due to genetic effects, environmental effects, or both.
 
-Due to the energetic cost of dispersal, it is often assumed that negative correlations in the form of trade-offs between dispersal and life-history traits should be important drivers of invasion dynamics \citep{hanski_dispersal-related_2006,chuang_expanding_2016}. 
-However, it it is not clear that we should expect to see such bivariate trade-offs in nature \citep{saltz_trait_2017}, or even that trade-offs should necessarily result in negative genetic correlations \citep{houle_genetic_1991}. 
-In the Glanville fritillary butterfly (\textit{Melitaea cinxia}), variation tightly linked to a single gene (\textit{Pgi}) generates a positive genetic correlation between dispersal propensity and clutch size \citep{hanski_dispersal-related_2006,bonte_dispersal_2012}. 
-Conversely, speckled wood butterflies (\textit{Pararge aegeria}) at range margins demonstrate a heritable negative correlation between dispersal propensity and clutch size \citep{hughes_evolutionary_2003}, while the damselfly \textit{Coenagrion scitulum} exhibits no genetic correlation between dispersal and clutch size \citep{therry_higher_2014}. 
-Environmental correlations, on the other hand, may arise through any number of extrinsic, non-heritable factors that generate plastic phenotypic responses. 
-Female blue tits (\textit{Parus caeruleus}) show a positive environmental correlation between dispersal and future fertility that is related to current brood size: females that were experimentally assigned to rear small broods in one year dispersed farther and had increased fertility in the following year relative to females assigned large broods \citep{nur_consequences_1988}. 
-Negative environmental correlations between dispersal and fertility have been demonstrated in the green-veined white butterfly (\textit{Pieris napi}), where individuals exposed to a controlled temperature/photoperiod regime that mimicked summertime conditions had higher dispersal and lower fertility than individuals exposed to a springtime regime \citep{karlsson_seasonal_2008}. 
-Indeed, widespread evidence for dispersal `syndromes' -- the covariation of dispersal with other life history and behavioral traits within \citep{clobert2009informed} or between \citep{comte2018evidence} species -- suggests that the classical assumption of demography and dispersal rates as independent parameters may break down for eco-evolutionary models that incorporate trait heterogeneity. 
+Due to the energetic cost of dispersal, it is often assumed that negative correlations in the form of trade-offs between dispersal and life-history traits should be important drivers of invasion dynamics \citep{hanski_dispersal-related_2006,chuang_expanding_2016}.
+However, it it is not clear that we should expect to see such bivariate trade-offs in nature \citep{saltz_trait_2017}, or even that trade-offs should necessarily result in negative genetic correlations \citep{houle_genetic_1991}.
+In the Glanville fritillary butterfly (\textit{Melitaea cinxia}), variation tightly linked to a single gene (\textit{Pgi}) generates a positive genetic correlation between dispersal propensity and clutch size \citep{hanski_dispersal-related_2006,bonte_dispersal_2012}.
+Conversely, speckled wood butterflies (\textit{Pararge aegeria}) at range margins demonstrate a heritable negative correlation between dispersal propensity and clutch size \citep{hughes_evolutionary_2003}, while the damselfly \textit{Coenagrion scitulum} exhibits no genetic correlation between dispersal and clutch size \citep{therry_higher_2014}.
+Environmental correlations, on the other hand, may arise through any number of extrinsic, non-heritable factors that generate plastic phenotypic responses.
+Female blue tits (\textit{Parus caeruleus}) show a positive environmental correlation between dispersal and future fertility that is related to current brood size: females that were experimentally assigned to rear small broods in one year dispersed farther and had increased fertility in the following year relative to females assigned large broods \citep{nur_consequences_1988}.
+Negative environmental correlations between dispersal and fertility have been demonstrated in the green-veined white butterfly (\textit{Pieris napi}), where individuals exposed to a controlled temperature/photoperiod regime that mimicked summertime conditions had higher dispersal and lower fertility than individuals exposed to a springtime regime \citep{karlsson_seasonal_2008}.
+Indeed, widespread evidence for dispersal `syndromes' -- the covariation of dispersal with other life history and behavioral traits within \citep{clobert2009informed} or between \citep{comte2018evidence} species -- suggests that the classical assumption of demography and dispersal rates as independent parameters may break down for eco-evolutionary models that incorporate trait heterogeneity.
 How, then, should we expect the magnitude and sign of demography-dispersal covariance to alter predictions about range expansion?
 
-Only two previous studies to our knowledge, both simulation-based, have explored eco-evolutionary dynamics of spread under trade-offs (negative correlation) between life history traits, focusing on the trade-off axis of \textit{r}/\textit{K} selection \citep{burton_trade-offs_2010,perkins_after_2016}. 
-These studies suggest that, for populations invading empty space, traits that promote fertility and dispersal should be maintained at the invasion front at the expense of competitive ability \citep{burton_trade-offs_2010,perkins_after_2016}. 
-However, because they imposed a particular type of trade-off, these studies do not reveal how variation in the sign and magnitude of genetic and/or environmental trait correlations modify spread dynamics. 
+Only two previous studies to our knowledge, both simulation-based, have explored eco-evolutionary dynamics of spread under trade-offs (negative correlation) between life history traits, focusing on the trade-off axis of \textit{r}/\textit{K} selection \citep{burton_trade-offs_2010,perkins_after_2016}.
+These studies suggest that, for populations invading empty space, traits that promote fertility and dispersal should be maintained at the invasion front at the expense of competitive ability \citep{burton_trade-offs_2010,perkins_after_2016}.
+However, because they imposed a particular type of trade-off, these studies do not reveal how variation in the sign and magnitude of genetic and/or environmental trait correlations modify spread dynamics.
 We hypothesize that negative genetic correlation between dispersal and fertility may constrain evolutionary acceleration of spread, relative to invasions with independent trait evolution, because high-dispersal / high-fertility phenotypes may be inaccessible to selection. %\tom{[It is not clear in the case of negative correlation whether dispersal or fertility would increase at front, if both cannot. Might be worth adding.]}
-Alternatively, positive correlation may align the direction of selection with the main axis of phenotypic covariation, causing greater evolutionary responses than would be expected for uncorrelated traits. 
-We further hypothesize that environmental correlations, positive or negative, should have little impact on evolutionary dynamics of invasion; since environmental correlations modify traits in a way that is not heritable, they may contribute little more than noise at the invasion front. 
-Finally, although there is an expectation that evolutionary processes can make invasions more variable \citep{phillips_evolutionary_2015,ochocki_rapid_2017,weiss-lehman_rapid_2017}, it is not clear how genetic and/or environmental correlations will interact with other evolutionary processes to influence variability in invasion outcomes. 
+Alternatively, positive correlation may align the direction of selection with the main axis of phenotypic covariation, causing greater evolutionary responses than would be expected for uncorrelated traits.
+We further hypothesize that environmental correlations, positive or negative, should have little impact on evolutionary dynamics of invasion; since environmental correlations modify traits in a way that is not heritable, they may contribute little more than noise at the invasion front.
+Finally, although there is an expectation that evolutionary processes can make invasions more variable \citep{phillips_evolutionary_2015,ochocki_rapid_2017,weiss-lehman_rapid_2017}, it is not clear how genetic and/or environmental correlations will interact with other evolutionary processes to influence variability in invasion outcomes.
 Understanding the factors that drive invasion variability is essential for making useful predictions about the range of possible trajectories for spreading populations.
 %\tom{[I have the hypothesis that environmental correlations should increase variance, but only in variable abiotic environments. If the spatial environment is constant then there is no way for this correlation to manifest. If the spatial environment is itself variable then there should be wider fluctuations in trait values at the front (if E correlation is positive). Worth testing/adding? How?]}-- add to discussion
 
-In this study, we used a combination of laboratory experiments, classical quantitative genetics, and individual-based models to explore how demography-dispersal trait correlations, arising from genetics and/or environment, influence trait evolution during range expansion and the ecological dynamics of spread. 
-We explore this question first in a specific empirical context, building upon a model system for the evolutionary acceleration of range expansion, and then more generally. 
-In a previous study, we showed that rapid evolution accelerated the expansion of bean beetles (\textit{Callosobruchus maculatus} (Chrysomelidae)) spreading through laboratory mesocosms and also elevated replicate-to-replicate variability in invasion speed, a result that we attributed to the stochasticity-generating effects of 'gene surfing' \citep{ochocki_rapid_2017}. 
-Surprisingly, evolutionary acceleration was due entirely to rapid evolution of dispersal distance; there was no evidence that fertility evolved during range expansion despite predictions that it should \citep{ochocki_rapid_2017}. 
-Here we focused on the architecture of these traits, including their genetic and environmental variances and correlations. 
-We then integrated experimental trait estimation with a spatially explicit individual-based model that combines population genetics and density dynamics. 
-The model allowed us to retrospectively evaluate whether and how trait correlations contributed to the evolutionary effects on traits (increased dispersal, no change in fertility) and range expansion (increased mean and variance of invasion speed) that we observed in our previous study. 
+In this study, we used a combination of laboratory experiments, classical quantitative genetics, and individual-based models to explore how demography-dispersal trait correlations, arising from genetics and/or environment, influence trait evolution during range expansion and the ecological dynamics of spread.
+We explore this question first in a specific empirical context, building upon a model system for the evolutionary acceleration of range expansion, and then more generally.
+In a previous study, we showed that rapid evolution accelerated the expansion of bean beetles (\textit{Callosobruchus maculatus} (Chrysomelidae)) spreading through laboratory mesocosms and also elevated replicate-to-replicate variability in invasion speed, a result that we attributed to the stochasticity-generating effects of 'gene surfing' \citep{ochocki_rapid_2017}.
+Surprisingly, evolutionary acceleration was due entirely to rapid evolution of dispersal distance; there was no evidence that fertility evolved during range expansion despite predictions that it should \citep{ochocki_rapid_2017}.
+Here we focused on the architecture of these traits, including their genetic and environmental variances and correlations.
+We then integrated experimental trait estimation with a spatially explicit individual-based model that combines population genetics and density dynamics.
+The model allowed us to retrospectively evaluate whether and how trait correlations contributed to the evolutionary effects on traits (increased dispersal, no change in fertility) and range expansion (increased mean and variance of invasion speed) that we observed in our previous study.
 Lastly, we used the system-specific parameters as a starting point to ask, more generallyacross parameter space, how the full range of possible demography-dispersal trait correlations influence the eco-evolutionary dynamics of spread.
 
 % Methods -------------
-\section{Materials and Methods}
+\section*{Materials and Methods}
 
-We conducted this study in three parts. 
-First, we measured dispersal and density-dependent fertility from individuals with known pedigree. 
-This enabled us to infer the genetic and environmental variances and covariances (and thus correlations) between dispersal and fertility using hierarchical Bayesian estimation of a quantitative genetics model. 
-Second, we used estimates from this statistical model to parameterize a stochastic simulation of bean beetle range expansion. 
-The model allowed us to generate system-specific predictions for evolved trait changes and spread dynamicsy. 
+We conducted this study in three parts.
+First, we measured dispersal and density-dependent fertility from individuals with known pedigree.
+This enabled us to infer the genetic and environmental variances and covariances (and thus correlations) between dispersal and fertility using hierarchical Bayesian estimation of a quantitative genetics model.
+Second, we used estimates from this statistical model to parameterize a stochastic simulation of bean beetle range expansion.
+The model allowed us to generate system-specific predictions for evolved trait changes and spread dynamicsy.
 Lastly, we varied the genetic and environmental (co)variances of dispersal and fertility, beyond the particular values of the beetle system, to more generally evaluate how trait correlations influence invasion dynamics.
 
-\subsection{Bean beetle experiment}
+\subsection*{Bean beetle experiment}
 
-\subsubsection{Study system}
+\subsubsection*{Study system}
 
-The bean beetle \textit{Callosobruchus maculatus} is a stored-grain pest that feeds on legumes, spending its entire developmental life inside a single bean \citep{fujii_behavioral_1990}. 
-Adult beetles, which requires neither food nor water, emerge after ca. 28 days of development. 
-Adults live ca. 10 days, during which they disperse, mate, and reproduce. 
+The bean beetle \textit{Callosobruchus maculatus} is a stored-grain pest that feeds on legumes, spending its entire developmental life inside a single bean \citep{fujii_behavioral_1990}.
+Adult beetles, which requires neither food nor water, emerge after ca. 28 days of development.
+Adults live ca. 10 days, during which they disperse, mate, and reproduce.
 The short generation time and convenient rearing conditions make this species is a popular model system in population biology, including previous studies of life-history traits, population dynamics, and range expansion \citep{bellows_analytical_1982,fujii_behavioral_1990,miller_confronting_2011,miller_sex_2013,wagner_genetic_2016,ochocki_rapid_2017}.
 
-Laboratory populations of \textit{C. maculatus} are typically highly inbred, often for dozens or hundreds of generations. 
-We created a genetically diverse population that was founded with 54 beetles (\female:\mars $\approx$ 1:1) haphazardly chosen from each of 18 laboratory lines (960 beetles in total), each line having been originally isolated from different parts of the species’ global distribution \citep{downey_comparative_2015}. 
-This was the same genetic make-up of the populations used in our previous range expansion experiments \citep{ochocki_rapid_2017}. 
-Individuals in this mixed population interbred in a resource-unlimited environment for seven generations before the start of the experiment, to allow for sufficient genetic mixing and to reduce linkage disequilibrium \citep{roughgarden_theory_1979,ochocki_rapid_2017}. 
-Beetles were maintained in a climate-controlled growth chamber on a 16:8 photoperiod at 28$^{\circ}$C throughout the experiment. 
+Laboratory populations of \textit{C. maculatus} are typically highly inbred, often for dozens or hundreds of generations.
+We created a genetically diverse population that was founded with 54 beetles (\female:\mars $\approx$ 1:1) haphazardly chosen from each of 18 laboratory lines (960 beetles in total), each line having been originally isolated from different parts of the species’ global distribution \citep{downey_comparative_2015}.
+This was the same genetic make-up of the populations used in our previous range expansion experiments \citep{ochocki_rapid_2017}.
+Individuals in this mixed population interbred in a resource-unlimited environment for seven generations before the start of the experiment, to allow for sufficient genetic mixing and to reduce linkage disequilibrium \citep{roughgarden_theory_1979,ochocki_rapid_2017}.
+Beetles were maintained in a climate-controlled growth chamber on a 16:8 photoperiod at 28$^{\circ}$C throughout the experiment.
 The beetles used in this experiment were reared on black-eyed peas (\textit{Vigna unguiculata} (Fabaceae)). %Beetles from different laboratory lines readily interbreed and produce fertile offspring \citep{fox_complex_2004,fox_genetic_2004,ochocki_rapid_2017}.
 
-\subsubsection{Trait measurement}
+\subsubsection*{Trait measurement}
 \paragraph{Dispersal}
-We used a nested full-sib/half-sib breeding design to measure genetic and environmental variances and covariances in our laboratory-reared populations of \textit{C. maculatus}. 
-This design is appropriate because it allows the estimation of these variances from a single generation of trait measurement and does not require information on the parental genotypes or phenotypes \citep{falconer_introduction_1996,conner_primer_2004,wilson_ecologists_2010}. 
-We created half-sib families by mating a single sire to three virgin dams, and replicated this process 50 times to get 150 unique full-sib families, each nested within one of 50 half-sib families. 
-After a 48-hour mating period, each dam was transferred to an individual Petri dish for oviposition. 
-Petri dishes contained 50g black-eyed peas, essentially unlimited resources for a single female, and dams were permitted to oviposit \textit{ad libitum} until senescence. 
+We used a nested full-sib/half-sib breeding design to measure genetic and environmental variances and covariances in our laboratory-reared populations of \textit{C. maculatus}.
+This design is appropriate because it allows the estimation of these variances from a single generation of trait measurement and does not require information on the parental genotypes or phenotypes \citep{falconer_introduction_1996,conner_primer_2004,wilson_ecologists_2010}.
+We created half-sib families by mating a single sire to three virgin dams, and replicated this process 50 times to get 150 unique full-sib families, each nested within one of 50 half-sib families.
+After a 48-hour mating period, each dam was transferred to an individual Petri dish for oviposition.
+Petri dishes contained 50g black-eyed peas, essentially unlimited resources for a single female, and dams were permitted to oviposit \textit{ad libitum} until senescence.
 After 28 days of development, we measured dispersal and density-dependent fertility in the adult offspring.
 
-Within 48 hours of eclosion, we measured dispersal ability by allowing beetles to disperse for two hours across one-dimensional arrays of 60mm Petri dish `patches'. 
-Each patch in these arrays was interconnected by 1/8" plastic tubing and contained seven black-eyed peas, the same dispersal environment as in our range expansion experiments \citep{ochocki_rapid_2017}. 
-Dispersal trials began with 16 full-siblings (8 females and 8 males) in a starting patch, with a sufficient number of patches to the left and right so that beetles could disperse in either direction without encountering the edge of the environment. 
-We chose to use 16 beetles because that was the largest number of individuals that we could reliably obtain from our full-sibling families while maintaining a 1:1 sex ratio among the dispersing individuals. 
+Within 48 hours of eclosion, we measured dispersal ability by allowing beetles to disperse for two hours across one-dimensional arrays of 60mm Petri dish `patches'.
+Each patch in these arrays was interconnected by 1/8" plastic tubing and contained seven black-eyed peas, the same dispersal environment as in our range expansion experiments \citep{ochocki_rapid_2017}.
+Dispersal trials began with 16 full-siblings (8 females and 8 males) in a starting patch, with a sufficient number of patches to the left and right so that beetles could disperse in either direction without encountering the edge of the environment.
+We chose to use 16 beetles because that was the largest number of individuals that we could reliably obtain from our full-sibling families while maintaining a 1:1 sex ratio among the dispersing individuals.
 After two hours of dispersal, we counted the number of patches that each beetle dispersed, which allowed us to estimate a dispersal kernel for each full-sibling family.
 
 \paragraph{Fertility}
-After dispersal, we gathered female beetles from the dispersal array and transfered each of them to an isolated Petri dish where they could oviposit; after 28 days we counted the number of offspring that emerged to estimate a fertility for each female. 
-While our main focus was low-density fertility in leading-edge environments, we additionally quantified density dependence in fertility so that our simulations could include realistic population dynamics behind the advancing front. 
-To induce density-dependence in fertility, each oviposition dish contained a resource density of either 1, 3, 5, or 10 black-eyed peas, and a non-sibling male beetle. 
-Given the opportunity, females will attempt to distribute their eggs approximately uniformly among available beans \citep{fujii_behavioral_1990} so that the number of eggs per bean is inversely proportional to the number of beans available. 
-Larval competition within a bean has a strong negative effect on larval survival to adulthood, so that any larva's survival probability decreases with the number of eggs per bean \citep{giga_intraspecific_1991}. 
-It is therefore possible to vary the strength of larval competition that offspring experience simply by varying the number of beans available to females for oviposition. 
-Thus, dishes containing one black-eyed pea were expected to yield high egg densities, resulting in high-competition larval environments; dishes containing 10 black-eyed peas were expected to yeild low egg densities, resulting in low-competition larval environments. 
-Post-dispersal females were haphazardly assigned to one of the four oviposition densities. 
-Due to the relatively low number of female dispersers in each full-sibling family, we opportunistically supplemented fertility trials with full-sibling females that were not included in the dispersal trial. 
+After dispersal, we gathered female beetles from the dispersal array and transfered each of them to an isolated Petri dish where they could oviposit; after 28 days we counted the number of offspring that emerged to estimate a fertility for each female.
+While our main focus was low-density fertility in leading-edge environments, we additionally quantified density dependence in fertility so that our simulations could include realistic population dynamics behind the advancing front.
+To induce density-dependence in fertility, each oviposition dish contained a resource density of either 1, 3, 5, or 10 black-eyed peas, and a non-sibling male beetle.
+Given the opportunity, females will attempt to distribute their eggs approximately uniformly among available beans \citep{fujii_behavioral_1990} so that the number of eggs per bean is inversely proportional to the number of beans available.
+Larval competition within a bean has a strong negative effect on larval survival to adulthood, so that any larva's survival probability decreases with the number of eggs per bean \citep{giga_intraspecific_1991}.
+It is therefore possible to vary the strength of larval competition that offspring experience simply by varying the number of beans available to females for oviposition.
+Thus, dishes containing one black-eyed pea were expected to yield high egg densities, resulting in high-competition larval environments; dishes containing 10 black-eyed peas were expected to yeild low egg densities, resulting in low-competition larval environments.
+Post-dispersal females were haphazardly assigned to one of the four oviposition densities.
+Due to the relatively low number of female dispersers in each full-sibling family, we opportunistically supplemented fertility trials with full-sibling females that were not included in the dispersal trial.
 We attempted to replicate each bean density at least three times per full-sib family; we made note of fertility trials using un-dispersed females, and preliminary analyses did not reveal any differences in fertility between dispersed and un-dispersed individuals.
 
-Since the density-dependent competition described here is among full siblings, it is important to consider whether competition among full siblings might be different than competition among unrelated individuals. 
-Conveniently, experimental evidence shows that the strength of competition among developing larvae of \textit{C. maculatus} does not vary with relatedness \citep{smallegange_local_2008}. 
+Since the density-dependent competition described here is among full siblings, it is important to consider whether competition among full siblings might be different than competition among unrelated individuals.
+Conveniently, experimental evidence shows that the strength of competition among developing larvae of \textit{C. maculatus} does not vary with relatedness \citep{smallegange_local_2008}.
 Thus, changes in fertility in response to changing resource availability under this design likely reflect true measures of intraspecific competitive ability, and are likely not influenced by reduced competition due to kinship.
 
 
-\subsubsection{Statistical analysis}
+\subsubsection*{Statistical analysis}
 \paragraph{Overview}
-We used the animal model to estimate genetic and environmental variances and covariances of dispersal and demography traits \citep{lynch_genetics_1998,kruuk_estimating_2004,wilson_ecologists_2010}. 
-The animal model is hierarchical linear mixed model that partitions genetic variance in quantitative traits based on associations between kinship and trait values of offspring, even if trait values of parents are not known (as in our study). 
-Because dispersal and fertility were measured as counts (patches moved and number of offspring, respectively) we used a generalization of the animal model for non-Gaussian traits \citep{de2016general}. 
-This distinction is important because, in the generalized animal model, genetic variation in traits manifests at two scales: the scale of the observations and a `latent' scale that corresponds more directly to the trait values expected due to kinship but that can only be studied through random realizations \citep{de2016general}. 
-As we describe in the next sections, we focus throughout on genetic variace, covariance, and heritability of dispersal and demography traits on their latent scales. 
+We used the animal model to estimate genetic and environmental variances and covariances of dispersal and demography traits \citep{lynch_genetics_1998,kruuk_estimating_2004,wilson_ecologists_2010}.
+The animal model is hierarchical linear mixed model that partitions genetic variance in quantitative traits based on associations between kinship and trait values of offspring, even if trait values of parents are not known (as in our study).
+Because dispersal and fertility were measured as counts (patches moved and number of offspring, respectively) we used a generalization of the animal model for non-Gaussian traits \citep{de2016general}.
+This distinction is important because, in the generalized animal model, genetic variation in traits manifests at two scales: the scale of the observations and a `latent' scale that corresponds more directly to the trait values expected due to kinship but that can only be studied through random realizations \citep{de2016general}.
+As we describe in the next sections, we focus throughout on genetic variace, covariance, and heritability of dispersal and demography traits on their latent scales.
 
-While the animal model framework is able to accommodate additional random effects associated with maternal environmental (i.e., maternal effects), our model failed to converge when we attempted this, indicating that our data were not sufficient to estimate maternal effects in addition to other sources of variance and covariance. 
-Any maternal effects are therefore implicitly incorporated into kinship, which may positively bias estimates of additive genetic variance and narrow-sense heritability. 
+While the animal model framework is able to accommodate additional random effects associated with maternal environmental (i.e., maternal effects), our model failed to converge when we attempted this, indicating that our data were not sufficient to estimate maternal effects in addition to other sources of variance and covariance.
+Any maternal effects are therefore implicitly incorporated into kinship, which may positively bias estimates of additive genetic variance and narrow-sense heritability.
 
-Males and females in \textit{C. maculatus} are known to differ in dispersal \citep{miller_sex_2013,ochocki_rapid_2017}. 
-Since we could only measure density-dependent fertility in females, we focused our analysis exclusively on data collected from females and the the simulation model that follows is correspondingly female-dominant. 
+Males and females in \textit{C. maculatus} are known to differ in dispersal \citep{miller_sex_2013,ochocki_rapid_2017}.
+Since we could only measure density-dependent fertility in females, we focused our analysis exclusively on data collected from females and the the simulation model that follows is correspondingly female-dominant.
 
 \paragraph{Dispersal}
-Previous studies estimating \textit{C. maculatus} dispersal kernels have found negative binomial or Poisson Inverse Gaussian kernels to provide the best fit to dispersal data \citep{miller_sex_2013,wagner_genetic_2016,ochocki_rapid_2017}. 
-While this was also the case in the present study when data were aggregated across families, a Poisson kernel provided the best fit to family-level dispersal data. 
-This is likely due to the fact that, variance in the mean among families generates an aggregate response that is negative-binomially distributed. 
+Previous studies estimating \textit{C. maculatus} dispersal kernels have found negative binomial or Poisson Inverse Gaussian kernels to provide the best fit to dispersal data \citep{miller_sex_2013,wagner_genetic_2016,ochocki_rapid_2017}.
+While this was also the case in the present study when data were aggregated across families, a Poisson kernel provided the best fit to family-level dispersal data.
+This is likely due to the fact that, variance in the mean among families generates an aggregate response that is negative-binomially distributed.
 We thus modeled the dispersal distance $d$ of individual $i$ from sire $j$ and dam $k$ as:
 %
 \begin{equation}\label{corr:dispersal_random}
   d_{ijk} \sim \mathit{Poisson}(\lambda_{ijk})
 \end{equation}
 %
-where $\lambda_{ijk}$ is the mean and variance of the Poisson distribution. 
+where $\lambda_{ijk}$ is the mean and variance of the Poisson distribution.
 The expected value for dispersal distance is defined by a linear model that includes a grand mean ($\mu^{d}$) and accounts for parentage ($a^{d}_jk$) and residual deviation of observation $i$ ($e^{d}_i$):
 %
 \begin{equation} \label{corr:dispersal_linmod}
   log(\lambda_{ijk}) = \mu^{d} + a^{d}_{jk} + e^{d}_{i}
 \end{equation}
 %
-The genetic ($a^{d}_{jk}$) and environmental ($e^{d}_i$) random variables for dispersal distance are further defined below in relation to fertility. 
+The genetic ($a^{d}_{jk}$) and environmental ($e^{d}_i$) random variables for dispersal distance are further defined below in relation to fertility.
 
 \paragraph{Fertility}
-Unlike dispersal, fertility was measured with respect to density. 
-We imposed density dependence by manipulating the resources available to an individual female rather than density \textit{per se}. 
+Unlike dispersal, fertility was measured with respect to density.
+We imposed density dependence by manipulating the resources available to an individual female rather than density \textit{per se}.
 We analyzed the data using the framework of the Beverton-Holt model of population growth, modified so that population density is expressed as the ratio of females to beans:
 %
 \begin{equation}\label{corr:BevHoltFull}
   \frac{N_{t+1}}{B} = \frac{r(\frac{N_{t}}{B})}{1 + \frac{r}{K}\frac{N_{t}}{B}}
 \end{equation}
 %
-\tom{I think there is an error in this equation, should be $\frac{r-1}{K}\frac{N_{t}}{B}$ in the denominator}
+\tom{I think there is an error in this equation, should be $\frac{r-1}{K}\frac{N_{t}}{B}$ in the denominator. I tried checking Brad's code to see what he was actually fitting, but the stan code fits the B-H model with DD parameter b, not breaking out K. From the data and code available to me, I don't know where Brad's K estimates come from.}
 Dividing both sides by $N_{t}/B$ and setting $N_{t}=1$ gives the expected offspring production of single females in variable bean environments:
 %
 \begin{equation}\label{corr:BevHoltPercap}
   \hat{N}_{t+1} = \frac{r}{1 + \frac{r}{KB}}
 \end{equation}
 %
-Here, $B$ is the number of beans available, $r$ is low-density fertility, and $K$ is the carrying capacity per-bean (i.e., the number of beetles that one bean could support).  
-Our aim was to identify variation in $r$ that was attributable to pedigree and covariance with dispersal. 
-There is a well-documented covariance between statistical estimates of $r$ and $K$ in density-dependent population models \citep{hilborn_quantitative_1992}, and this prevented us from modeling both $r$ and $K$ as heritable traits. 
-Instead, we assume a fixed value of $K$ and allow $r$ to vary among individuals according to a quantitative genetic model of inheritance. 
+Here, $B$ is the number of beans available, $r$ is low-density fertility, and $K$ is the carrying capacity per-bean (i.e., the number of beetles that one bean could support).
+Our aim was to identify variation in $r$ that was attributable to pedigree and covariance with dispersal.
+There is a well-documented covariance between statistical estimates of $r$ and $K$ in density-dependent population models \citep{hilborn_quantitative_1992}, and this prevented us from modeling both $r$ and $K$ as heritable traits.
+Instead, we assume a fixed value of $K$ and allow $r$ to vary among individuals according to a quantitative genetic model of inheritance.
 
 We treat the number of offspring produced by female $i$ from sire $j$ and dam $k$ ($N_{ijk}$) as a Poisson random variable, with the expected value given by \ref{corr:BevHoltPercap}.
 % - Not sure it is worth showing this.
@@ -262,18 +277,203 @@ As in \ref{corr:dispersal_linmod}, low-density fertility is described by a linea
 %
 
 \paragraph{Linking dispersal and fertility}
-Finally, to model genetic and environmental variances and covariances, we link the corresponding random deviates. 
+Finally, to model genetic and environmental variances and covariances, we link the corresponding random deviates.
+The vector $\bm{a}_{jk}$ contains the random deviates (also known as `breeding values') for dispersal ($a^{d}_{jk}$) and fertility ($a^{r}_{jk}$) associated with kinship and is distributed according to a multivariate normal distribution centered on the average of the breeding values for both parents (the `midparent value') with variance-covariance matrix $\bm{G}/2$:
+%
+\begin{gather} \label{corr:gen}
+  \bm{a}_{jk} \sim \mathit{MVN} \Big( \frac{\bm{a}_{j} + \bm{a}_{k}}{2}, \frac{\bm{G}}{2} \Big) \\[10pt]
+  \bm{G} =
+  \begin{bmatrix}
+    \begin{array}{ll}
+      V_{G,d} &C_{G}   \\
+      C_{G}   &V_{G,r} \\
+    \end{array}
+  \end{bmatrix}
+\end{gather}
+%
+Here, $V_{G,d}$ and $V_{G,r}$ are the additive genetic variances in the `latent' trait values for dispersal and fertility and $C_{G}$ is the additive genetic covariance between between the latent trait values.
+In Equation (\ref{corr:gen}), dividing $\bm{G}$ by $2$ accounts for the expected additive genetic variance among full siblings compared with the population as a whole \citep{roughgarden_theory_1979}
+
+The environmental deviates -- individual-to-individual variation that is not explained by pedigree, also known as `overdispersion' \citep{de2016general} -- are treated similarly, where the vector $\bm{e}_{i}$ contains elements $e^{d}_{i}$ and $e^{r}_{i}$ from \ref{corr:dispersal_linmod} and \ref{corr:fert_linmod}, respectively, and is distributed as follows:
+%
+\begin{gather} \label{corr:env}
+  \bm{e}_{i} \sim \mathit{MVN} (0, \bm{E}) \\[5pt]
+  \bm{E} =
+  \begin{bmatrix}
+    \begin{array}{ll}
+      V_{E,d} &C_{E}   \\
+      C_{E}   &V_{E,r} \\
+    \end{array}
+  \end{bmatrix}
+\end{gather}
+%
+In the bean beetle system, microsite variation in larval environment is a good candidate for the environmental variation $\bm{E}$, as host beans may vary in, for example, nutrient content, water content, geometry, age, etc.
+For both covariances, genetic and environmental correlations were derived as $\rho = \frac{C}{\sqrt{V_{d}}\sqrt{V_{r}}}$. \tom{Check with Brad. I assume this is where the heritabilities in Figure \ref{corr:posteriors} come from.}
+
+Assuming that genetic and environmental effects are not correlated with each other, the total phenotypic variances and covariances in these traits can be described by a covariance matrix $\bm{P}$, which is simply $\bm{P} = \bm{G} + \bm{E}$.
+Calculating $\bm{P}$ enables us to calculate the narrow-sense heritability of each trait, which reflects the proportion of variance in the phenotype (on the latent scale) attributable to additive genetic factors.
+For dispersal,
+%
+\begin{equation}\label{corr:heritability}
+  h^{2}_d = \frac{V_{G,d}}{V_{P,d}}
+\end{equation}
+%
+and likewise for heritability of fertility ($h^{2}_r$).
+All analyses in this section were performed in R 3.4.0 \citep{r_core_team_r:_2015} using \code{rstan} \citep{stan_development_team_rstan:_2015}.
+Because models were fit in a Bayseian framework, we can quantify parameter uncertainty through their posterior distributions.
+Code for these analyses may be found at \url{https://github.com/bochocki/correlatedtraits}.
+
+\subsection*{Simulating invasions with correlated traits}
+We simulated sexually-reproducing populations spreading across a one-dimensional landscape in discrete time and discrete space, based on our empirical estimates for \textit{C. maculatus} the system.
+Although \textit{C. maculatus} has two sexes, we simulated hermaphroditic populations for the purpose of tractability.
+Each simulation began with 20 individuals in a single starting patch; we modeled each of these individuals as expressing dispersal and fertility phenotypes following the statistical model defined above. The additive genetic ($\bm{a}_{jk}$) and environmental deviates ($\bm{e}_i$) for each individual were drawn at random given covariance matrices $\bm{E}$ and $\bm{G}$, respectively (Equations (\ref{corr:env}) and (\ref{corr:gen})).
+The initial conditions of the simulation mimic a small founding population being introduced to a novel landscape from some genetically well-mixed source population.
+
+We defined an invasion's extent in each generation as the location of the individual farthest to the right of the starting patch.
+Since dispersal direction was unbiased, both the left- and right-moving wave fronts should exhibit similar dynamics, but we restricted our analysis to the right-moving fronts to avoid pseudo-replication.
+To understand how trait variation and covariation altered simulated invasion outcomes, we compared mean invasion extent after 20 generations and the coefficient of variation (CV) in extent as a measure of variability.
+Additional details of the simulations are provided in Online Appendix A.
+
+We first ran the simulated invasions with parameter values estimated from the \textit{C. maculatus} laboratory experiments (Table \ref{corr:estimates}).
+We then generalized the simulation study by exploring realistic variation in trait correlations and heritability.
+To test the role of variation in the sign and magnitude or trait correlations and contrast the effects of genetic vs. environmental correlations, we varied $\rho_{E}$ and $\rho_{G}$ in a fully factorial design, so that each correlation coefficient took the following values: -0.9, -0.5, -0.1, 0, 0.1, 0.5, and 0.9.
+We further replicated the variation in trait correlations across five cases corresponding to variation in the heritability of dispersal and fertility:
+\begin{itemize}
+  \item $h^{2}_d = h^{2}_r = 0$. This is the `no evolution' scenario, which serves as a baseline and internal control.
+  \item $h^{2}_d > h^{2}_r$. Heritability of dispersal is greater than that of fertility.
+  \item $h^{2}_d < h^{2}_r$. Heritability of fertility is greater than that of dispersal.
+  \item $h^{2}_d = h^{2}_r$. Equally high heritability of dispersal and fertility.
+  \item $h^{2}_d = h^{2}_r$. Equally low (but non-zero) heritability of dispersal and fertility.
+\end{itemize}
+Lastly, we repeated all of the above for two levels of total phenotypic variance: $V_{G,d}$ and $V_{G,r}$ from the beetle system and $2V_{G,d}$ and $2V_{G,r}$.
+This allowed us to assess whether changing heritabilities (proportions of variance) has qualitatively consistent effects for different absolute amounts of variance.
+We replicated each combination 1000 times.
+
+\renewcommand{\thetable}{\arabic{table}}
+\setcounter{table}{0}
+
+\newpage{}
+\begin{table}[h]
+\centering
+\label{Estimates of key parameters from the beetle experiment}
+\caption[Estimates of key parameters from the beetle experiment]{\textbf{Estimates of key parameters from the beetle experiment.} Parameter estimates are grouped by the demographic process that they correspond to: dispersal, fertility, or both. Percentages show parameter estimates in the 95\% credible interval and the median (50\%) parameter estimate.}\label{corr:estimates}\vspace{0.1in}
+\begin{tabularx}{0.95\linewidth}{lXrrrrr}
+\toprule
+Parameter   & Description                               & Mean & SD   & 2.5\% & 50\% & 97.5\% \\ \midrule
+$\mu_{d}$   & Mean dispersal phenotype (log(patches)) & 1.63 & 0.07 & 1.49   & 1.63 & 1.76   \\
+$h^{2}_{d}$ & Dispersal heritability              & 0.55 & 0.17 & 0.22   & 0.54 & 0.91   \\
+$V_{P,d}$   & Phenotypic variance in dispersal & 0.41 & 0.05 & 0.32   & 0.40 & 0.52   \\
+$V_{G,d}$   & Additive genetic variance in dispersal & 0.23 & 0.09 & 0.08   & 0.21 & 0.45   \\
+$V_{E,d}$   & Environmental variance in dispersal    & 0.18 & 0.06 & 0.04   & 0.18 & 0.30   \\ \midrule
+$\mu_{r}$   & Mean fertility phenotype (log(offspring) & 2.74 & 0.07 & 2.61   & 2.74 & 2.87   \\
+$h^{2}_{r}$ & Fertility heritability              & 0.17 & 0.07 & 0.05   & 0.16 & 0.31   \\
+$V_{P,r}$   & Phenotypic variance in fertility & 0.35 & 0.02 & 0.30   & 0.35 & 0.40   \\
+$V_{G,r}$   & Additive genetic variance in fertility & 0.06 & 0.03 & 0.02   & 0.06 & 0.12   \\
+$V_{E,r}$   & Environmental variance in fertility    & 0.29 & 0.03 & 0.24   & 0.29 & 0.35   \\
+$K$         & Carrying capacity per bean              & 3.82 & 2.59 & 3.34   & 3.81 & 4.36   \\ \midrule
+$C_{P}$     & Total phenotypic covariance    &-0.08 & 0.02 &-0.13   &-0.08 &-0.03   \\
+$C_{G}$     & Additive genetic covariance &-0.04 & 0.03 &-0.11   &-0.04 & 0.01   \\
+$C_{E}$     & Environmental covariance   &-0.04 & 0.03 &-0.09   &-0.04 & 0.02   \\
+$\rho_{G}$  & Additive genetic correlation  &-0.36 & 0.24 &-0.79   &-0.37 & 0.15   \\
+$\rho_{E}$  & Environmental correlation     &-0.16 & 0.13 &-0.43   &-0.16 & 0.09   \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% Results -------------
+\section*{Results}
+
+\subsection*{\textit{Genetic architecture of \textup{C. maculatus} demography and dispersal traits}}
+We found that \textit{C. maculatus} exhibited similar total phenotypic variance in the latent traits corresponding to dispersal and fertility ($V_{P,d}$  = 0.40, $V_{P,r}$  = 0.35; Figure \ref{corr:posteriors}, Table \ref{corr:estimates}).
+Furthermore, dispersal and fertility both exhibited additive genetic variance, suggesting that both traits are heritable from parents to offspring.
+However, the absolute amount of genetic variance and therefore the proportion of heritable variation differed between the traits.
+Dispersal had a median narrow-sense heritability ($h^{2}_{d}$) of 0.54 and the 95\% credible interval in the estimate spanned a wide range (0.22 to 0.91), suggesting moderate to strong inheritance of this trait.
+The median narrow-sense heritability for fertility ($h^{2}_{r}$) was 0.16 and the 95\% credible interval spanned a lower and narrower range (0.05 to 0.31), reflecting less genetic variation in this trait compared to dispersal.
+
+We found evidence of negative correlations between dispersal and fertility for both additive genetic (median $\rho_{G}$: -0.37) and environmental effects (median $\rho_{E}$: -0.16).
+While posterior distributions for both correlations included zero, the majority of both posterior densities were negative (Figure \ref{corr:posteriors}, center panel), suggesting that, given estimation uncertainty, the correlations are xx-xx times more likely to be negative than positive.
+\tom{[My though here is that we can quantify how much of the posterior is negative vs positive, and this gives us a sense of confidence in the conclusion that correlations are negative.]}
+The estimated additive genetic correlation had a 95\% credible interval that was notably wider than the estimated environmental correlation ($\rho_{G}$: -0.79 to 0.15; $\rho_{E}$: -0.43 to 0.09).
+This occurs even though the credible intervals for the covariance estimates are similar to each other ($C_{G}$: -0.11 to 0.01; $C_{E}$: -0.09 to 0.02; Figure \ref{corr:posteriors}).
+This discrepancy is likely due to the relatively wide credible interval in the additive genetic variance in the dispersal trait ($V_{G,d}$: 0.08 to 0.45), which would necessarily result in a relatively wide credible interval in the additive genetic correlation.
+\tom{[I don't think this is super important but I actually do not follow this argument. I think part of my confusion is that I am not sure where the correlation estimates come from (comment above where you say they were ``calculated'').
+For related reasons, I think the covariances can be dropped from this figure, since they simply integrate the variances and correlations.]}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.9\linewidth]{Figures/corr_posteriors.pdf}
+\caption[Posteriors of parameter estimates]
+{\textbf{Posteriors of parameter estimates.} Posterior densities of variance- and covariance-related parameter estimates from the animal model. Subscripts identify whether parameters relate to the genetic ($G$) or environmental ($E$) covariance matrices, and whether they describe the dispersal ($d$) or fertility ($r$) trait. Dispersal-related parameters are shown in dark gray, fertility parameters are shown in white, and covariances/correlations between the two traits are shown in light gray. Panels show: trait variances ($V$) and covariances ($C$) (left); trait correlations ($\rho$) (center); and trait heritabilities ($h^{2}$) (right). Note the different x-axis scales.}\label{corr:posteriors}
+\end{figure}
+
+\newpage{}
+\section*{Online Appendix A: Additional Simulation Methods}
+Each generation of the simulation, individuals in the population mated, reproduced, died, and their offspring dispersed; this is similar to the laboratory-imposed life-cycle in \textit{C. maculatus} invasion experiments \citep{miller_sex_2013,wagner_genetic_2016,ochocki_rapid_2017}.
+Because the landscape was modeled as an array of discrete patches, local interactions -- including mate finding, reproduction, and density-dependent population growth -- took place at the patch-level.
+%Thus, the population density in any patch was simply the total number of individuals in that patch.
+For mating, each individual selected one other individual in the same patch, at random (and with replacement), and received genetic information from that individual.
+Because individuals were modeled as hermaphrodites, all individuals were capable of acting as both male and female during reproduction.
+Under this mating system, each individual had the capacity to contribute genetic information to multiple unique individuals, but could only receive genetic information from one individual.
+Individuals could not self-fertilize; all offspring were thus the product of two unique parents.
+In instances where a patch contained only one individual, that individual did not reproduce.
+Our model therefore includes a mate-finding Allee effect for singly-occupied patches.
+
+Offspring inherited breeding values from their parents $\bm{a}_{jk}$ , which were drawn from a multivariate normal distribution according to Equation (\ref{corr:gen}).
+The expressed phenotype was also dependent on the environmental deviates $\bm{e}_{i}$, drawn according to Equation (\ref{corr:env}), and the population mean phenotypes $\mu^{d}$ and $\mu^{r}$.
+As in similarly structured models of evolution during invasions, additive genetic variance is expected to decrease as the variance in breeding values among individuals decreases \citep{phillips_evolutionary_2015}.
+Each generation, we calculated the additive genetic covariance matrix $\bm{G}$ in each patch by calculating the variances and covariance among all breeding values in that patch.
+Offspring breeding values were then assigned according to Equation (\ref{corr:gen}), using the patch-estimated $\bm{G}$ matrix.
+
+After mating, each individual reproduced following the density-dependent Beverton-Holt model of population growth described in Equations (\ref{corr:BevHoltFull}) to (\ref{corr:growth}).
+We modeled invasions across a homogeneous landscape, assuming a fixed resource density of 10 beans in all patches. The carrying capacity $K$ was therefore fixed across the landscape, but per-capita population growth varied among individuals according to \ref{corr:fert_linmod}.
+
+After reproduction, parents senesced, marking the end of the generation; at the start of the next generation, their offspring dispersed.
+Thus, we modeled populations that were characterized by discrete, non-overlaping generations.
+Offspring dispersed from their natal patch according to their latent dispersal phenotype $\lambda_{ijk}$, and dispersal distance was Poisson distributed, as in Equation (\ref{corr:dispersal}).
+While the Poisson distribution only generates positive values, individuals in the simulation could disperse either to the left or right. We simulated bi-directional dispersal by randomly multiplying an individual's Poisson distance by -1 (for leftward dispersal) or +1 (for rightward dispersal), with equal probability for each direction.
+After dispersal, individuals mated with an individual in the patch that they dispersed to, they reproduced, and they senesced.
+We simulated this process for 20 generations, on par with similar timescales of eco-evolutionary dynamics in empirical systems \citep{williams_rapid_2016,ochocki_rapid_2017,weiss-lehman_rapid_2017}.
+
+Parameter values and definitions are provided in Table \ref{corr:params}. All simulations were conducted using Julia 0.5.0 \citep{bezanson_julia:_2017}, and all analyses were conducted using R 3.4.0 \citep{r_core_team_r:_2015}.
+All code for the simulation and analyses is publicly available at \url{https://github.com/bochocki/correlatedtraits}.
+
+\renewcommand{\thetable}{A\arabic{table}}
+\setcounter{table}{0}
+\begin{table}[h]
+\centering
+\label{Parameter values and definitions}
+\caption[Parameter values and definitions]{\textbf{Parameter values and definitions.} Descriptions of key parameters in the simulation. \tom{Need to update notation in this table.}}\label{corr:params}\vspace{0.1in}
+\begin{tabularx}{0.95\linewidth}{llX}
+\toprule
+Parameter    & Value(s)                               & Definition                                        \\ \midrule
+$N_{0}$      & 20                                     & Initial population size                           \\
+$\mu_{d}$    & 1.63                                   & Initial mean dispersal phenotype ($\bm{z}_{d}$)   \\
+$\mu_{r}$    & 2.74                                   & Initial mean fertility phenotype ($\bm{z}_{r}$) \\
+$V_{P,d}$    & 0.40                                   & Initial total phenotypic variance in $\bm{z}_{d}$ \\
+$V_{P,r}$    & 0.35                                   & Initial total phenotypic variance in $\bm{z}_{r}$ \\
+$h^{2}_{d}$  & 0.54                                   & Heritability of dispersal ($z_d$)                 \\
+$h^{2}_{r}$  & 0.16                                   & Heritability of fertility ($z_r$)               \\
+$\rho_{G}$   & [-0.9, -0.5, -0.37, -0.16, -0.1,       & Additive genetic correlation in $\bm{z}$          \\
+             & \phantom{$[-$}0.0, 0.1, 0.5, 0.9]      &                                                   \\
+$\rho_{E}$   & [-0.9, -0.5, -0.37, -0.16, -0.1,       & Environmental correlation in $\bm{z}$             \\
+             & \phantom{$[-$}0.0, 0.1, 0.5, 0.9]      &                                                   \\
+$K$          & 3.81                                   & Patch carrying capacity                           \\
+Generations  & 20                                     & Number of generations of invasion                 \\
+Replicates   & 1000                                   & Number of simulation replicates                   \\ \bottomrule
+\end{tabularx}
+\end{table}
 
 %%%%%%%%%%%%%%%%%%%%%
 % Bibliography
 %%%%%%%%%%%%%%%%%%%%%
 \newpage{}
-%\begin{thebibliography}{}
-
 \bibliographystyle{references/amnat}
 \bibliography{references/biblio}
 
-%\end{thebibliography}
 
+%%%%%%%%%%%%%%%%%%%%%
+% Tables
+%%%%%%%%%%%%%%%%%%%%%
+%\section*{Tables}
 
 \end{document}
