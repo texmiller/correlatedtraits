@@ -68,7 +68,7 @@ extent_dat <- dat %>%
          location == "rightmost1") %>% 
   group_by(P_var,h2,rho_G,rho_E) %>%  
   summarise(mean_extent = mean(patch),
-            CV_extent = var(patch) / mean(patch))
+            CV_extent = sd(patch) / mean(patch))
 ```
 
 Here I will try to re-create the figures from Brad's thesis (beetle-specific h2 and V values).
