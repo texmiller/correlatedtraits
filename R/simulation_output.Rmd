@@ -159,15 +159,6 @@ B<-ggplot(data =  CV_fold_change)+
 multiplot(A,B,cols=2)
 ```
 
-# Final figures for invasion dynamics
-```{r Figure 2:beetle invasions}
-
-     
-
-
-
-```
-
 
 # Generalizing beyond beetles
 This is the full set of treatments for extent. On a quick inspection, a few things stand out. First, the qualitative trend from the beetle system seems to hold: genetic correlations speed up invasions and evolving invasions are just about always faster than non-evolving ones, even with very strong negative correlations. There seems to be one exception to this: equally high trait heritabilities with double the phenotypic variance. In this case, the strongest negative correlation goes slower than the no-evolution case, presumably because this increases the efficiency of selection against high fertility (I am assuming it is ferrtility that loses out at the expense of dispersal, but we can test this with the trait data). There is a potentially interesting result in the swap treatment: invasions are generally slower than the default treatment. Recall that 'swap' means that fertility has higher heritability than dispersal. So a few lines of evidence are pointing to the idea that evolution of dispersal is a more important accelerating force than evolution of fertility. 
@@ -213,61 +204,163 @@ extent_dat %>%
 
 
 # Traits
-Moving on to trait evolution. Here I need to contrast the generation 1 / generation 20 phenotype values. 
+Moving on to trait evolution. Here I need to contrast the generation 1 / generation 20 phenotype values. Here I am calculating the fold-change in trait values, where the hard-coded numbers are the initial trait values of the simulations. I can calculate this fold change for each replicate, then take the average and CV across reps.
+
+```{r}
+dat %>% 
+  group_by(location,P_var,h2,rho_G,rho_E,gen)
+```
+
+
+
 ```{r traits beetle params}
-trait_dat <- dat %>%
+trait_dat <- dat %>% 
+  mutate(fold_change_D = Mean_D / 1.63,
+            fold_change_r = Mean_r / 2.74)%>%
   group_by(location,P_var,h2,rho_G,rho_E,gen) %>% 
-  select(location,P_var,h2,rho_G,rho_E,gen,Mean_PD,Mean_Pr) %>% 
-  summarise(mean_PD = mean((Mean_PD)),
-            mean_Pr = mean((Mean_Pr)))
+  select(location,P_var,h2,rho_G,rho_E,gen,Mean_D,Mean_r,fold_change_D,fold_change_r)  %>% 
+  summarise(log_patches = mean(Mean_D),
+            log_kids = mean(Mean_r),
+            CV_patches = sd(Mean_D)/log_patches,
+            CV_kids = sd(Mean_r)/log_kids,
+            mean_change_D = mean(fold_change_D),
+            mean_change_r = mean(fold_change_r))
   ## note: phenotypes are on log scale. Need to decide whether fold change should be on log scale or not
 
-trait_dat %>% 
-  filter(h2 == "default" | h2 == "none", 
-         P_var == "default",
-         rho_E == -.16,
-         gen==20) %>% 
-  ggplot()+
-  geom_line(aes(x = rho_G, y=mean_PD, linetype=h2))+
-  #geom_vline(xintercept = -0.37)+
-  geom_hline(yintercept = 1.63)+
-  facet_wrap(~location)
+both_traits_mean_change <- trait_dat %>% filter(gen==20,location=="rightmost1") %>%   select(P_var,location,h2,rho_G,mean_change_D,mean_change_r) %>% 
+  gather(mean_change_D,mean_change_r,key="trait",value="fold_change")
 
-trait_dat %>% 
-  filter(h2 == "default" | h2 == "none", 
-         P_var == "default",
-         rho_E == -.16,
-         gen==20) %>% 
+both_traits_mean_change %>%  
   ggplot()+
-  geom_line(aes(x = rho_G, y=mean_Pr, linetype=h2))+
-  #geom_vline(xintercept = -0.37)+
-  geom_hline(yintercept = 2.74)+
-  facet_wrap(~location)
+  geom_line(aes(x=rho_G,y=log(fold_change),color=as.factor(rho_E),linetype=P_var))+
+  geom_hline(yintercept = 0)+
+  facet_grid(trait~h2)
+  
 
-trait_dat %>% 
-  filter(location == "rightmost2",
-         rho_E == 0,
-         gen==20) %>% 
+
+both_traits_CV <- trait_dat %>% filter(gen==20,P_var=="default",location=="rightmost1") %>%   select(P_var,location,h2,rho_G,CV_patches,CV_kids) %>% 
+  gather(CV_patches,CV_kids,key="trait",value="CV")
+  
+  both_traits_CV %>% 
   ggplot()+
-  geom_line(aes(x = rho_G, y=mean_Pr, linetype=h2))+
-  #geom_vline(xintercept = -0.37)+
-  geom_hline(yintercept = 2.74)+
-  facet_grid(P_var~h2)
+  geom_line(aes(x=rho_G,y=CV,color=as.factor(rho_E)))+
+  geom_hline(yintercept = 0)+
+  facet_grid(trait~h2)
 
-trait_dat %>% 
-  filter(location == "rightmost2",
-         rho_E == 0,
-         gen==20) %>% 
+  dist_mean %>% 
   ggplot()+
-  geom_line(aes(x = rho_G, y=mean_PD, linetype=h2))+
-  #geom_vline(xintercept = -0.37)+
-  geom_hline(yintercept = 1.63)+
-  facet_grid(P_var~h2)
+  geom_line(aes(x=rho_G,y=(log_patches),linetype=P_var))+
+  facet_grid(location~h2)
+  
+```
 
+```{r}
+trait_dat <- dat %>% 
+  mutate(fold_change_D = Mean_D / 1.63,
+            fold_change_r = Mean_r / 2.74)%>%
+  group_by(location,P_var,h2,rho_G,rho_E,gen) %>% 
+  select(location,P_var,h2,rho_G,rho_E,gen,Mean_D,Mean_r,fold_change_D,fold_change_r)  %>% 
+  summarise(log_patches = mean(Mean_D),
+            log_kids = mean(Mean_r),
+            CV_patches = sd(Mean_D)/log_patches,
+            CV_kids = sd(Mean_r)/log_kids,
+            mean_change_D = mean(fold_change_D),
+            mean_change_r = mean(fold_change_r))
+```
+
+
+Here I am taking a different approach. Instead of comparing final to initial trait values, I am comparing trait values to 'control' treatments with h2 = 0. Since this is how I estimated effects on invasion dynamics, that may also be the right way to analyze traits to make them comparable. 
+
+```{r}
+
+trait_dat_trt_contrast <- dat %>% 
+  group_by(location,P_var,h2,rho_G,rho_E,gen) %>% 
+  summarise(log_patches = mean(Mean_D),
+            log_kids = mean(Mean_r),
+            CV_patches = sd(Mean_D)/log_patches,
+            CV_kids = sd(Mean_r)/log_kids)
+
+mean_dist_contrast <- trait_dat_trt_contrast %>% 
+  select(-log_kids,-CV_patches,-CV_kids) %>% 
+  filter(gen==20) %>% 
+  spread(key = h2, value = log_patches)%>% 
+  mutate(fold_change_default = default / none,
+         fold_change_swap = swap / none,
+         fold_change_eqhi = eqhi / none,
+         fold_change_eqlo = eqlo / none) %>% 
+  select(-default,-eqhi,-eqlo,-none,-swap)%>% 
+  gather(fold_change_default,fold_change_swap,fold_change_eqhi,fold_change_eqlo, key = h2, value = fold_change_mean_dist)
+
+mean_dist_contrast %>% filter(P_var=="default",location=="rightmost1") %>%   
+ggplot()+
+  geom_line(aes(x=rho_G,y=log(fold_change_mean_dist),color=as.factor(rho_E)))+
+  geom_hline(yintercept = 0)+
+  facet_grid(.~h2)
+
+
+mean_fert_contrast <- trait_dat_trt_contrast %>% 
+  select(-log_patches,-CV_patches,-CV_kids) %>% 
+  filter(gen==20) %>% 
+  spread(key = h2, value = log_kids)%>% 
+  mutate(fold_change_default = default / none,
+         fold_change_swap = swap / none,
+         fold_change_eqhi = eqhi / none,
+         fold_change_eqlo = eqlo / none) %>% 
+  select(-default,-eqhi,-eqlo,-none,-swap)%>% 
+  gather(fold_change_default,fold_change_swap,fold_change_eqhi,fold_change_eqlo, key = h2, value = fold_change_mean_fert)
+
+mean_fert_contrast %>% filter(rho_E==0.0) %>%   
+ggplot()+
+  geom_line(aes(x=rho_G,y=fold_change_mean_fert,linetype=P_var))+
+  geom_hline(yintercept = 1)+
+  facet_grid(location~h2)
 ```
 
 
 ```{r trait change}
+trait_dat %>% 
+  filter(h2 == "default" | h2 == "none", 
+         P_var == "default",
+         rho_E == -.16,
+         gen==20) %>% 
+  ggplot()+
+  geom_line(aes(x = rho_G, y=mean_PD, linetype=h2))+
+  #geom_vline(xintercept = -0.37)+
+  geom_hline(yintercept = 1.63)+
+  facet_wrap(~location)
+
+trait_dat %>% 
+  filter(h2 == "default" | h2 == "none", 
+         P_var == "default",
+         rho_E == -.16,
+         gen==20) %>% 
+  ggplot()+
+  geom_line(aes(x = rho_G, y=mean_Pr, linetype=h2))+
+  #geom_vline(xintercept = -0.37)+
+  geom_hline(yintercept = 2.74)+
+  facet_wrap(~location)
+
+trait_dat %>% 
+  filter(location == "rightmost2",
+         rho_E == 0,
+         gen==20) %>% 
+  ggplot()+
+  geom_line(aes(x = rho_G, y=mean_Pr, linetype=h2))+
+  #geom_vline(xintercept = -0.37)+
+  geom_hline(yintercept = 2.74)+
+  facet_grid(P_var~h2)
+
+trait_dat %>% 
+  filter(location == "rightmost2",
+         rho_E == 0,
+         gen==20) %>% 
+  ggplot()+
+  geom_line(aes(x = rho_G, y=mean_PD, linetype=h2))+
+  #geom_vline(xintercept = -0.37)+
+  geom_hline(yintercept = 1.63)+
+  facet_grid(P_var~h2)
+
+
 trait_change <- dcast(setDT(trait_dat), P_var+h2+rho_G+rho_E ~ gen,value.var = c("mean_PD", "mean_Pr")) %>% 
 mutate(foldchange_dispersal = mean_PD_20/mean_PD_1,
          foldchange_fertility = mean_Pr_20/mean_Pr_1)
@@ -314,6 +407,31 @@ ggplot(data =  filter(trait_change, rho_E==-0.9 | rho_E==0 | rho_E==0.9))+
   geom_line(aes(x=rho_G,y=foldchange_fertility,color=as.factor(rho_E)))+
   facet_grid(P_var ~ h2)+
   geom_hline(yintercept = 1)
+
+```
+
+
+I would like to make a figure summarizing fold-change in invasion metrics and traits, and maybe even comparing it to observed values in invasion experiment. 
+```{r}
+beetles <- dat %>%
+  filter(gen == 20,
+         location == "rightmost1",
+         rho_G == -0.37,
+         rho_E == -0.16,
+         h2 == "default" | h2 == "none",
+         P_var == "default") %>%
+  group_by(h2) %>% 
+  summarise(mean_extent = mean(patch),
+            CV_extent = sd(patch) / mean(patch),
+            log_patches = mean(Mean_D),
+            log_kids = mean(Mean_r)) 
+
+beetles_change <- log(beetles[1,2:5]/beetles[2,2:5]) %>% gather(key=measurement,value=value)
+
+ggplot(beetles_change)+
+  geom_bar(stat = "identity", aes(x=measurement,y=value))
+
+barplot(beetles_change$value,names.arg = beetles_change$measurement,ylim=c(-.5,2));abline(h=0)
 
 ```
 

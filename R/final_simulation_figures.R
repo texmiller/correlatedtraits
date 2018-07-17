@@ -206,6 +206,170 @@ with(CV_dat_plot %>% filter(P_var == "default"),{
 })
 
 
+# 4-panel option ----------------------------------------------------------
+
+win.graph()
+par(mfrow=c(2,2),mar=c(4,4,1,1))
+with(extent_dat_beetle,{
+  plot(rho_G,mean_extent,type="n",cex.lab=1.2,
+       xlab=expression(paste("Genetic correlation (",rho[G],")")),
+       ylab="Final invasion extent")
+  for(i in 1:9){
+    lines(rho_G[rho_E == correlations[i] & h2 == "default"],
+          mean_extent[rho_E == correlations[i] & h2 == "default"],
+          lwd=2,col=alpha(col_ramp[i],.8))
+    lines(rho_G[rho_E == correlations[i] & h2 == "none"],
+          mean_extent[rho_E == correlations[i] & h2 == "none"],
+          lwd=2,lty=2,col=alpha(col_ramp[i],.8))
+  }
+  lines(rho_G[rho_E == -.16 & h2 == "default"],
+        mean_extent[rho_E == -.16 & h2 == "default"],
+        lwd=2)
+  lines(rho_G[rho_E == -.16 & h2 == "none"],
+        mean_extent[rho_E == -.16 & h2 == "none"],
+        lwd=2,lty=2)
+  points(c(-.37,-.37),beetle_lines$mean_extent,pch=21,bg=c("black","white"),lwd=2,cex=1.8)
+  #arrows(-1.1,beetle_lines$mean_extent,-.37,beetle_lines$mean_extent,length=0)
+  #arrows(-.37,0,-.37,beetle_lines$mean_extent,length=0)
+  title("A",adj=0)
+})
+
+  with(extent_dat_plot %>% filter(P_var == "default"),{
+    plot(rho_G,log(fold_change),type="n",ylim=c(-0.1,0.5),cex.lab=1.2,
+         xlab=expression(paste("Genetic correlation (",rho[G],")")),
+         ylab="log Fold-change in final extent")
+    for(i in 1:9){
+      lines(rho_G[rho_E == correlations[i] & h2 == "fold_change_default"],
+            log(fold_change[rho_E == correlations[i] & h2 == "fold_change_default"]),
+            lwd=2,col=alpha(col_ramp[i],.8))
+    }
+    lines(rho_G[rho_E == -.16 & h2 == "fold_change_default"],
+          log(fold_change[rho_E == -.16 & h2 == "fold_change_default"]),
+          lwd=2)
+    points(-.37,beetle_mean_fold_change,pch=21,bg=c("black","white"),lwd=2,cex=1.8)
+    title("B",adj=0)
+    abline(h=0,col="darkgray")
+  })
+  
+  with(extent_dat_beetle,{
+    plot(rho_G,CV_extent,type="n",cex.lab=1.2,
+       xlab=expression(paste("Genetic correlation (",rho[G],")")),
+       ylab="CV of invasion extent")
+  for(i in 1:9){
+    lines(rho_G[rho_E == correlations[i] & h2 == "default"],
+          CV_extent[rho_E == correlations[i] & h2 == "default"],
+          lwd=2,col=col_ramp[i])
+    lines(rho_G[rho_E == correlations[i] & h2 == "none"],
+          CV_extent[rho_E == correlations[i] & h2 == "none"],
+          lwd=2,lty=2,col=col_ramp[i])
+  }
+  lines(rho_G[rho_E == -.16 & h2 == "default"],
+        CV_extent[rho_E == -.16 & h2 == "default"],
+        lwd=2)
+  lines(rho_G[rho_E == -.16 & h2 == "none"],
+        CV_extent[rho_E == -.16 & h2 == "none"],
+        lwd=2,lty=2)
+  points(c(-.37,-.37),beetle_lines$CV_extent,pch=21,bg=c("black","white"),lwd=2,cex=1.8)
+  title("C",adj=0)
+  legend.gradient(pnts = cbind(x =c(0.2,0.5,0.2,0.5), y =c(0.2,0.2,0.1,0.1)),
+                  cols = col_ramp, limits = c(-0.9, 0.9),
+                  title = expression(paste("Environmental\ncorrelation (",rho[E],")")),cex=0.8)
+})
+
+with(CV_dat_plot %>% filter(P_var == "default"),{
+  plot(rho_G,log(fold_change),type="n",ylim=c(-.1,2.5),cex.lab=1.2,
+       xlab=expression(paste("Genetic correlation (",rho[G],")")),
+       ylab="log Fold-change in CV of extent")
+  for(i in 1:9){
+    lines(rho_G[rho_E == correlations[i] & h2 == "fold_change_default"],
+          log(fold_change[rho_E == correlations[i] & h2 == "fold_change_default"]),
+          lwd=2,col=alpha(col_ramp[i],.8))
+  }
+  lines(rho_G[rho_E == -.16 & h2 == "fold_change_default"],
+        log(fold_change[rho_E == -.16 & h2 == "fold_change_default"]),
+        lwd=2)
+  points(-.37,beetle_CV_fold_change,pch=21,bg=c("black","white"),lwd=2,cex=1.8)
+  title("D",adj=0)
+  abline(h=0,col="darkgray")
+})
+
+
+# Barplot for beetle system -----------------------------------------------
+
+beetle_bars <- dat %>%
+  filter(gen == 20,
+         location == "rightmost1",
+         rho_G == -0.37,
+         rho_E == -0.16,
+         h2 == "default" | h2 == "none",
+         P_var == "default") %>%
+  group_by(h2) %>% 
+  summarise(log_kids = mean(Mean_r),
+            log_patches = mean(Mean_D),
+            CV_extent = sd(patch) / mean(patch),
+            mean_extent = mean(patch)) 
+
+beetles_change <- log(beetle_bars[1,2:5]/beetle_bars[2,2:5]) %>% gather(key=measurement,value=value)
+beetle_names<-c("Invasion extent", "CV of extent", "Dispersal", "Fertility")
+
+par(mar=c(4,8,1,1))
+barplot(beetles_change$value,names.arg = rev(beetle_names),xlim=c(-.5,2),horiz=T,col=rep(c("black","white"),each=2),
+        xlab="log Fold-change",las=2);abline(v=0)
+
+
+# Trait evolution ---------------------------------------------------------
+trait_dat_figure <- dat %>% 
+  mutate(fold_change_D = Mean_D / 1.63,
+         fold_change_r = Mean_r / 2.74)%>%
+  group_by(location,P_var,h2,rho_G,rho_E,gen) %>% 
+  select(location,P_var,h2,rho_G,rho_E,gen,Mean_D,Mean_r,fold_change_D,fold_change_r)  %>% 
+  summarise(log_patches = mean(Mean_D),
+            log_kids = mean(Mean_r),
+            CV_patches = sd(Mean_D)/log_patches,
+            CV_kids = sd(Mean_r)/log_kids,
+            mean_change_D = mean(fold_change_D),
+            mean_change_r = mean(fold_change_r))%>% 
+  filter(gen==20,location=="rightmost1")
+
+beetle_traits <- trait_dat_figure %>% filter(h2=="default",P_var=="default",
+                            rho_G==-0.37, rho_E==-0.16)
+
+win.graph()
+par(mar=c(4,4,1,1))
+with(trait_dat_figure %>% filter(h2=="default",P_var=="default"),{
+  plot(rho_G,log(mean_change_D),type="n",ylim=c(-0.1,0.4),cex.lab=1.2,
+       xlab=expression(paste("Genetic correlation (",rho[G],")")),
+       ylab="log Fold-change in trait value")
+  abline(h=0,col="darkgray")
+  #legend.gradient(pnts = cbind(x =c(-0.4,-0.8,-0.4,-0.8), y =c(0.15,0.15,0.05,0.05)),
+  #                cols = col_ramp, limits = c(-0.9, 0.9),
+  #                title = expression(paste("Environmental\ncorrelation (",rho[E],")")),cex=0.8)
+  
+  for(i in 1:9){
+    lines(rho_G[rho_E == correlations[i]],
+          log(mean_change_D[rho_E == correlations[i]]),
+          lwd=2,col=alpha(col_ramp[i],.8))
+  }
+  lines(rho_G[rho_E == -.16],
+        log(mean_change_D[rho_E == -.16]),
+        lwd=2)
+  points(beetle_traits$rho_G,log(beetle_traits$mean_change_D),
+         pch=21,bg=c("black","white"),lwd=2,cex=1.4)
+
+  for(i in 1:9){
+    lines(rho_G[rho_E == correlations[i]],
+          log(mean_change_r[rho_E == correlations[i]]),
+          lwd=2,col=alpha(col_ramp[i],.8))
+  }
+  lines(rho_G[rho_E == -.16],
+        log(mean_change_r[rho_E == -.16]),
+        lwd=2)
+  points(beetle_traits$rho_G,log(beetle_traits$mean_change_r),
+         pch=21,bg=c("black","white"),lwd=2,cex=1.4)
+  text(-.9,.35,"Dispersal",adj=0,font=3)
+  text(-.9,-.025,"Fertility",adj=0,font=3)
+})
+
 # Appendix Figure ---------------------------------------------------------
 win.graph()
 par(mfrow=c(2,4),mar=c(4,4,2,1))
