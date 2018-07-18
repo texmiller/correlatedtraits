@@ -238,12 +238,12 @@ both_traits_mean_change %>%
   
 
 
-both_traits_CV <- trait_dat %>% filter(gen==20,P_var=="default",location=="rightmost1") %>%   select(P_var,location,h2,rho_G,CV_patches,CV_kids) %>% 
+both_traits_CV <- trait_dat %>% filter(gen==20,location=="rightmost1") %>%   select(P_var,location,h2,rho_G,CV_patches,CV_kids) %>% 
   gather(CV_patches,CV_kids,key="trait",value="CV")
   
   both_traits_CV %>% 
   ggplot()+
-  geom_line(aes(x=rho_G,y=CV,color=as.factor(rho_E)))+
+  geom_line(aes(x=rho_G,y=CV,color=as.factor(rho_E),linetype=P_var))+
   geom_hline(yintercept = 0)+
   facet_grid(trait~h2)
 
