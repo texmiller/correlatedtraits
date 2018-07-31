@@ -250,7 +250,7 @@ with(extent_dat_beetle,{
     title("B",adj=0)
     abline(h=0,col="darkgray")
   })
-  
+
   with(extent_dat_beetle,{
     plot(rho_G,CV_extent,type="n",cex.lab=1.2,
        xlab=expression(paste("Genetic correlation (",rho[G],")")),
@@ -303,11 +303,11 @@ beetle_bars <- dat %>%
          rho_E == -0.16,
          h2 == "default" | h2 == "none",
          P_var == "default") %>%
-  group_by(h2) %>% 
+  group_by(h2) %>%
   summarise(log_kids = mean(Mean_r),
             log_patches = mean(Mean_D),
             CV_extent = sd(patch) / mean(patch),
-            mean_extent = mean(patch)) 
+            mean_extent = mean(patch))
 
 beetles_change <- log(beetle_bars[1,2:5]/beetle_bars[2,2:5]) %>% gather(key=measurement,value=value)
 beetle_names<-c("Invasion extent", "CV of extent", "Dispersal", "Fertility")
@@ -318,17 +318,17 @@ barplot(beetles_change$value,names.arg = rev(beetle_names),xlim=c(-.5,2),horiz=T
 
 
 # Trait evolution ---------------------------------------------------------
-trait_dat_figure <- dat %>% 
+trait_dat_figure <- dat %>%
   mutate(fold_change_D = Mean_D / 1.63,
          fold_change_r = Mean_r / 2.74)%>%
-  group_by(location,P_var,h2,rho_G,rho_E,gen) %>% 
-  select(location,P_var,h2,rho_G,rho_E,gen,Mean_D,Mean_r,fold_change_D,fold_change_r)  %>% 
+  group_by(location,P_var,h2,rho_G,rho_E,gen) %>%
+  select(location,P_var,h2,rho_G,rho_E,gen,Mean_D,Mean_r,fold_change_D,fold_change_r)  %>%
   summarise(log_patches = mean(Mean_D),
             log_kids = mean(Mean_r),
             CV_patches = sd(Mean_D)/log_patches,
             CV_kids = sd(Mean_r)/log_kids,
             mean_change_D = mean(fold_change_D),
-            mean_change_r = mean(fold_change_r))%>% 
+            mean_change_r = mean(fold_change_r))%>%
   filter(gen==20,location=="rightmost1")
 
 beetle_traits <- trait_dat_figure %>% filter(h2=="default",P_var=="default",
@@ -344,7 +344,7 @@ with(trait_dat_figure %>% filter(h2=="default",P_var=="default"),{
   #legend.gradient(pnts = cbind(x =c(-0.4,-0.8,-0.4,-0.8), y =c(0.15,0.15,0.05,0.05)),
   #                cols = col_ramp, limits = c(-0.9, 0.9),
   #                title = expression(paste("Environmental\ncorrelation (",rho[E],")")),cex=0.8)
-  
+
   for(i in 1:9){
     lines(rho_G[rho_E == correlations[i]],
           log(mean_change_D[rho_E == correlations[i]]),
@@ -497,4 +497,137 @@ with(CV_dat_plot,{
   abline(h=0,col="darkgray")
 
 })
+
+
+# Appendix figure for trait change ----------------------------------------
+
+win.graph()
+par(mfrow=c(2,4),mar=c(4,4,2,0.5))
+
+with(trait_dat_figure,{
+  plot(rho_G,log(mean_change_D),type="n",ylim=c(-0.2,0.5),cex.lab=1.2,
+       xlab=expression(paste("Genetic correlation (",rho[G],")")),
+       ylab="log Fold-change in dispersal")
+  abline(h=0,col="darkgray")
+  for(i in 1:9){
+    lines(rho_G[rho_E == correlations[i] & h2=="default" & P_var=="default"],
+          log(mean_change_D[rho_E == correlations[i] & h2=="default" & P_var=="default"]),
+          lwd=2,col=alpha(col_ramp[i],.8))
+    lines(rho_G[rho_E == correlations[i] & h2=="default" & P_var=="double"],
+          log(mean_change_D[rho_E == correlations[i] & h2=="default" & P_var=="double"]),
+          lty=2,lwd=2,col=alpha(col_ramp[i],.8))
+    }
+  points(beetle_traits$rho_G,log(beetle_traits$mean_change_D),
+         pch=21,bg=c("black","white"),lwd=2,cex=1.4)
+  title("A",adj=0)
+  title(expression(paste(h[d]^2 > h[r]^2)))
+
+  plot(rho_G,log(mean_change_D),type="n",ylim=c(-0.2,0.5),cex.lab=1.2,
+       xlab=expression(paste("Genetic correlation (",rho[G],")")),
+       ylab=" ")
+  abline(h=0,col="darkgray")
+  for(i in 1:9){
+    lines(rho_G[rho_E == correlations[i] & h2=="swap" & P_var=="default"],
+          log(mean_change_D[rho_E == correlations[i] & h2=="swap" & P_var=="default"]),
+          lwd=2,col=alpha(col_ramp[i],.8))
+    lines(rho_G[rho_E == correlations[i] & h2=="swap" & P_var=="double"],
+          log(mean_change_D[rho_E == correlations[i] & h2=="swap" & P_var=="double"]),
+          lty=2,lwd=2,col=alpha(col_ramp[i],.8))
+  }
+  title("B",adj=0)
+  title(expression(paste(h[d]^2 < h[r]^2)))
+
+  plot(rho_G,log(mean_change_D),type="n",ylim=c(-0.2,0.5),cex.lab=1.2,
+       xlab=expression(paste("Genetic correlation (",rho[G],")")),
+       ylab=" ")
+  abline(h=0,col="darkgray")
+  for(i in 1:9){
+    lines(rho_G[rho_E == correlations[i] & h2=="eqhi" & P_var=="default"],
+          log(mean_change_D[rho_E == correlations[i] & h2=="eqhi" & P_var=="default"]),
+          lwd=2,col=alpha(col_ramp[i],.8))
+    lines(rho_G[rho_E == correlations[i] & h2=="eqhi" & P_var=="double"],
+          log(mean_change_D[rho_E == correlations[i] & h2=="eqhi" & P_var=="double"]),
+          lty=2,lwd=2,col=alpha(col_ramp[i],.8))
+  }
+  title("C",adj=0)
+  title(expression(paste(h[d]^2 ,"=", h[r]^2, " (high)")))
+
+  plot(rho_G,log(mean_change_D),type="n",ylim=c(-0.2,0.5),cex.lab=1.2,
+       xlab=expression(paste("Genetic correlation (",rho[G],")")),
+       ylab=" ")
+  abline(h=0,col="darkgray")
+  for(i in 1:9){
+    lines(rho_G[rho_E == correlations[i] & h2=="eqlo" & P_var=="default"],
+          log(mean_change_D[rho_E == correlations[i] & h2=="eqlo" & P_var=="default"]),
+          lwd=2,col=alpha(col_ramp[i],.8))
+    lines(rho_G[rho_E == correlations[i] & h2=="eqlo" & P_var=="double"],
+          log(mean_change_D[rho_E == correlations[i] & h2=="eqlo" & P_var=="double"]),
+          lty=2,lwd=2,col=alpha(col_ramp[i],.8))
+  }
+  title("D",adj=0)
+  title(expression(paste(h[d]^2 ,"=", h[r]^2, " (low)")))
+
+  plot(rho_G,log(mean_change_r),type="n",ylim=c(-0.2,0.5),cex.lab=1.2,
+       xlab=expression(paste("Genetic correlation (",rho[G],")")),
+       ylab="log Fold-change in fertility")
+  abline(h=0,col="darkgray")
+  for(i in 1:9){
+    lines(rho_G[rho_E == correlations[i] & h2=="default" & P_var=="default"],
+          log(mean_change_r[rho_E == correlations[i] & h2=="default" & P_var=="default"]),
+          lwd=2,col=alpha(col_ramp[i],.8))
+    lines(rho_G[rho_E == correlations[i] & h2=="default" & P_var=="double"],
+          log(mean_change_r[rho_E == correlations[i] & h2=="default" & P_var=="double"]),
+          lty=2,lwd=2,col=alpha(col_ramp[i],.8))
+  }
+  points(beetle_traits$rho_G,log(beetle_traits$mean_change_r),
+         pch=21,bg=c("black","white"),lwd=2,cex=1.4)
+  legend.gradient(pnts = cbind(x =c(-.4,-.8,-.4,-.8), y =c(0.35,0.35,0.1,0.1)),
+                  cols = col_ramp, limits = c(-0.9, 0.9),
+                  title = expression(paste("Environmental\ncorrelation (",rho[E],")")),cex=0.8)
+  title("E",adj=0)
+
+  plot(rho_G,log(mean_change_r),type="n",ylim=c(-0.2,0.5),cex.lab=1.2,
+       xlab=expression(paste("Genetic correlation (",rho[G],")")),
+       ylab=" ")
+  abline(h=0,col="darkgray")
+  for(i in 1:9){
+    lines(rho_G[rho_E == correlations[i] & h2=="swap" & P_var=="default"],
+          log(mean_change_r[rho_E == correlations[i] & h2=="swap" & P_var=="default"]),
+          lwd=2,col=alpha(col_ramp[i],.8))
+    lines(rho_G[rho_E == correlations[i] & h2=="swap" & P_var=="double"],
+          log(mean_change_r[rho_E == correlations[i] & h2=="swap" & P_var=="double"]),
+          lty=2,lwd=2,col=alpha(col_ramp[i],.8))
+  }
+  title("F",adj=0)
+
+  plot(rho_G,log(mean_change_r),type="n",ylim=c(-0.2,0.5),cex.lab=1.2,
+       xlab=expression(paste("Genetic correlation (",rho[G],")")),
+       ylab=" ")
+  abline(h=0,col="darkgray")
+  for(i in 1:9){
+    lines(rho_G[rho_E == correlations[i] & h2=="eqhi" & P_var=="default"],
+          log(mean_change_r[rho_E == correlations[i] & h2=="eqhi" & P_var=="default"]),
+          lwd=2,col=alpha(col_ramp[i],.8))
+    lines(rho_G[rho_E == correlations[i] & h2=="eqhi" & P_var=="double"],
+          log(mean_change_r[rho_E == correlations[i] & h2=="eqhi" & P_var=="double"]),
+          lty=2,lwd=2,col=alpha(col_ramp[i],.8))
+  }
+  title("G",adj=0)
+
+  plot(rho_G,log(mean_change_r),type="n",ylim=c(-0.2,0.5),cex.lab=1.2,
+       xlab=expression(paste("Genetic correlation (",rho[G],")")),
+       ylab=" ")
+  abline(h=0,col="darkgray")
+  for(i in 1:9){
+    lines(rho_G[rho_E == correlations[i] & h2=="eqlo" & P_var=="default"],
+          log(mean_change_r[rho_E == correlations[i] & h2=="eqlo" & P_var=="default"]),
+          lwd=2,col=alpha(col_ramp[i],.8))
+    lines(rho_G[rho_E == correlations[i] & h2=="eqlo" & P_var=="double"],
+          log(mean_change_r[rho_E == correlations[i] & h2=="eqlo" & P_var=="double"]),
+          lty=2,lwd=2,col=alpha(col_ramp[i],.8))
+  }
+  title("H",adj=0)
+})
+
+
 
