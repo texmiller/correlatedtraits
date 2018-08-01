@@ -341,10 +341,9 @@ with(trait_dat_figure %>% filter(h2=="default",P_var=="default"),{
        xlab=expression(paste("Genetic correlation (",rho[G],")")),
        ylab="log Fold-change in trait value")
   abline(h=0,col="darkgray")
-  #legend.gradient(pnts = cbind(x =c(-0.4,-0.8,-0.4,-0.8), y =c(0.15,0.15,0.05,0.05)),
-  #                cols = col_ramp, limits = c(-0.9, 0.9),
-  #                title = expression(paste("Environmental\ncorrelation (",rho[E],")")),cex=0.8)
-
+  legend.gradient(pnts = cbind(x =c(-0.5,-0.8,-0.5,-0.8), y =c(0.15,0.15,0.05,0.05)),
+                  cols = col_ramp, limits = c(-0.9, 0.9),
+                  title = expression(paste("Environmental\ncorrelation (",rho[E],")")),cex=0.8)
   for(i in 1:9){
     lines(rho_G[rho_E == correlations[i]],
           log(mean_change_D[rho_E == correlations[i]]),
