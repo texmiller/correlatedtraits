@@ -95,8 +95,9 @@ Tom E.X. Miller$^{\ast}$}
 \newpage{}
 
 % Abstract -------------
-\section*{Abstract\footnote{\tom{7 words too long}}}
-Spreading populations are subject to evolutionary processes acting on dispersal and reproduction that can increase the speed and variability of invasion. It is typically assumed that dispersal and demography traits evolve independently but abundant evidence points to correlations between them that may be positive or negative, genetic or environmental. We sought to understand how demography-dispersal correlations modify the eco-evolutionary dynamics of range expansion. We first explored this question with the beetle \textit{Callosobruchus maculatus}, a laboratory model in which evolutionary acceleration of invasion has been demonstrated. We then built a simulation model to explore the role of trait correlations in this system and more generally. We found that positive correlations amplify the positive influence of evolution on speed and variability, while negative correlations (such as we found empirically) constrain that influence. Strong negative genetic correlations can even cause evolution to decelerate invasion. Heritable and environmental correlations had similar effects on some measures of invasion but different effects on others. Model results allowed us to retrospectively explain invasion dynamics and trait evolution in \textit{C. maculatus}, and may similarly aid in the interpretation of other field and laboratory studies. Non-independence of demography and dispersal is an important consideration for understanding and predicting outcomes of biological invasion and climate change migration.
+\section*{Abstract}
+Spreading populations are subject to evolutionary processes acting on dispersal and reproduction that can increase invasion speed and variability. It is typically assumed that dispersal and demography traits evolve independently, but abundant evidence points to correlations between them that may be positive or negative, genetic or environmental. We sought to understand how demography-dispersal correlations modify the eco-evolutionary dynamics of range expansion. We first explored this question with the beetle \textit{Callosobruchus maculatus}, a laboratory model in which evolutionary acceleration of invasion has been demonstrated. We then built a simulation model to explore the role of trait correlations in this system and more generally. We found that positive correlations amplify the positive influence of evolution on speed and variability, while negative correlations (such as we found empirically) constrain that influence. Strong negative genetic correlations can even cause evolution to decelerate invasion. Heritable and environmental correlations had similar effects on some measures of invasion but different effects on others. Model results enabled us to retrospectively explain invasion dynamics and trait evolution in \textit{C. maculatus}, and may similarly aid the interpretation of other field and laboratory studies. Non-independence of demography and dispersal is an important consideration for understanding and predicting outcomes of range expansion.
+
 
 \newpage{}
 
@@ -246,19 +247,19 @@ The expected value for dispersal distance is defined by a linear model that incl
 The genetic ($a^{d}_{jk}$) and environmental ($e^{d}_i$) random variables for dispersal distance are further defined below in relation to fertility.
 
 \paragraph{Fertility}
-\footnote{\tom{I think there is an error in these equations. Given the B-H model $N_{t+1}=\frac{rN_{t}}{1+bN_{t}}$, $b$ is derived as $\frac{r-1}{K}$. So that means Eq. \ref{corr:BevHoltFull} should be 
-$\frac{N_{t+1}}{B} = \frac{r(\frac{N_{t}}{B})}{1 + \frac{r-1}{K}\frac{N_{t}}{B}}$
-and corredponding changes to subsequent equations. 
-I am not sure if this is an error just in the manuscript, or if there was also an error in the fitted model.
-I tried checking Brad's code to see what he was actually fitting, but the stan code I found on github fits the B-H model with the original parameterization, not breaking out K. 
-So I don't think this was the final version of the analysis. 
-I will need Brad's help to figure this out.}}
+%\footnote{\tom{I think there is an error in these equations. Given the B-H model $N_{t+1}=\frac{rN_{t}}{1+bN_{t}}$, $b$ is derived as $\frac{r-1}{K}$. So that means Eq. \ref{corr:BevHoltFull} should be 
+%$\frac{N_{t+1}}{B} = \frac{r(\frac{N_{t}}{B})}{1 + \frac{r-1}{K}\frac{N_{t}}{B}}$
+%and corredponding changes to subsequent equations. 
+%I am not sure if this is an error just in the manuscript, or if there was also an error in the fitted model.
+%I tried checking Brad's code to see what he was actually fitting, but the stan code I found on github fits the B-H model with the original parameterization, not breaking out K. 
+%So I don't think this was the final version of the analysis. 
+%I will need Brad's help to figure this out.}}
 Unlike dispersal, fertility was measured with respect to density.
 We imposed density dependence by manipulating the resources available to an individual female rather than density \textit{per se}.
 We analyzed the data using the framework of the Beverton-Holt model of population growth, modified so that population density is expressed as the ratio of females to beans:
 %
 \begin{equation}\label{corr:BevHoltFull}
-  \frac{N_{t+1}}{B} = \frac{r(\frac{N_{t}}{B})}{1 + \frac{r}{K}\frac{N_{t}}{B}}
+  \frac{N_{t+1}}{B} = \frac{r(\frac{N_{t}}{B})}{1 + \frac{r-1}{K}\frac{N_{t}}{B}}
 \end{equation}
 %
 
