@@ -1,0 +1,15 @@
+To the editorial board:
+
+We are pleased to submit our manuscript for your consideration. In it, we explore how correlations between reproductive and movement traits can influence the eco-evolutionary dynamics of expanding populations. 
+
+Long-standing theory tells us that the dynamics of spreading populations are driven by two indidvidual level processes: demography (births/deaths) and dispersal. There is currently widespread interest in how individual heterogeneity in these processes, especially heritable variable, can modify the speed of invasion. Yet, nearly all theory assumes uncorrelated variation in demography and dispersal traits. Motivated by abundant empirical evidence suggesting that this assumption is often violated, we asked, for the first time, how variation in the sign, magnitude, and type (genetically or environmentally based) of demography-dispersal trait correlation can influence invasion dynamimcs. Our integrative empirical-theoretical approach blends laboratory experiments on an insect model system with quantitative genetics and individual-based simulations. We use our experimental case study, where we specifically diagnose the role of trait correlations in spread dynamics, as a starting point for a theoretical analysis that explores regions of parameter space not represented in our empirical system. 
+
+The role of rapid evolution in range expansion is a very active research area and several foundational, highly cited papers in this field have been published in Am Nat. For historical reasons alone, we think Am Nat is the perfect venue in which to move the conversation forward. Furthermore, the general topic and our particular approach to it refelct the journal's priority of highly integrative, conceptually oriented research based on rigorous quantitative approaches. We think the focus on joint ecological-evolutionary dynamics, the combination of data and models, and the compelling topic of range expansion make our work a strong fit for the journal.
+
+We have opted out of double-blind peer review because we identify ourselves in the manuscript in reference to previous work. Our previous work was a critical foundation for the new work presented here, so there was no way to write this paper in a way that maintains anonymity. 
+
+All authors approve of this submission. Our analysis code is publicly available on Github (links provided in the manuscript) and our data will be deposited on Dryad should the paper be accepted for publication. 
+
+We look forward to your response.
+
+Tom Miller
