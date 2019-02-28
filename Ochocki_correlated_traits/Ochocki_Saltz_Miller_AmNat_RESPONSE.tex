@@ -1,0 +1,109 @@
+% ======================================================= %
+% Document: TEMPLATE FOR RESPONSES TO REVIEWERS
+% Author: Andrea Ballatore
+% Date: Jan 7, 2013
+% Source: https://raw.githubusercontent.com/ucd-spatial/Datasets/master/tex_response_to_reviewers_template/responses_to_reviewers.tex
+% Modified by Eduard Szöcs, 10.03.2015
+% ======================================================= %
+\documentclass[12pt]{article}
+
+% packages
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{color}
+\definecolor{mygray}{gray}{0.6}
+\usepackage[utf8]{inputenc}
+\usepackage[onehalfspacing]{setspace}
+\usepackage[
+	round,	%(defaultage in the main file and \input ) for round parentheses;
+	colon,	% (default) to separate multiple citations with colons;
+	authoryear,% (default) for author-year citations;
+	sort,		% orders multiple citations into the sequence in which they 
+]{natbib}					
+\usepackage[%disable
+	]{todonotes}
+
+\usepackage{anysize}
+\marginsize{2.5cm}{2.5cm}{1.5cm}{2.5cm}
+
+% macros
+% add a counter
+\newcounter{cN}
+\setcounter{cN}{0}
+
+\newcommand{\comment}[1]{
+	\vspace{2em} 
+	\refstepcounter{cN} % incrment counter
+	\noindent \hangindent=0em \textbf{\textcolor{Maroon}{\uline{Comment \thecN}:~}}\emph{``#1''}
+	}
+
+\newcommand{\response}[1]{
+	\\[0.25em] 
+	\hangindent=2.3em \textbf{\textcolor{NavyBlue}{\uline{Response}:~}}#1 
+	}
+
+\usepackage[normalem]{ulem}
+\definecolor{darkred}{rgb}{1,.6,.6}
+\DeclareRobustCommand\problemline{\bgroup\markoverwith{\textcolor{darkred}{\rule[-0.9ex]{4pt}{3pt}}}\ULon}
+\DeclareRobustCommand{\problem}[1]{\problemline{#1}} % soul
+\setcounter{secnumdepth}{-1}
+
+\begin{document}
+% ======================================================= %
+\title{MS58835 --- Response to reviewers}
+
+\maketitle
+% ======================================================= %
+\noindent To the editorial board,\\
+
+Thank you for the opportunity to submit a major revision of our manuscript for your consideration. In this document, we reproduce comments from the editors and reviewers and provide our point-by-point responses. As we explain in more detail below, our responses and corresponding revisions focus on the following major concerns that emerged from our previous review.
+\begin{enumerate}
+\item{Reviewer 1 found some of our results unsurprising and questioned the novelty of our work relative to previous papers in this field. We now use greater care to emphasize the novel results of our paper, highlighting these in a new section of the Discussion, as suggested by Dr. Winn, and we clarify the relationship between our work and related, foundational papers.}
+\item{Following suggestions from Dr.'s Winn and Duckworth, we discuss possible mechanisms underlying the negative trait correlations that we documented experimentally. We also provide greater context for interpreting dispersal patterns in our laboratory environment, and we have created a new figure to more transparently represent our quantitative-genetic estimates and the raw observations on which they are based.}
+\item{We provide new discussion of the limitations of our quantitative genetics experiments, specifically the inability to estimate maternal effects separately from additive genetic effects. In response to questions from Dr. Duckworth and Reviewer 2, we conducted new simulation analses to identify constraints on our abiity to estimate maternal effects.}
+\end{enumerate}
+
+\vspace{2em}
+\hfill On behalf of all coauthors,
+
+\hfill Tom Miller
+\newpage
+
+
+
+% ======================================================= %
+\section{Response to Dr. Winn}
+\vspace{-2em}
+
+\comment{I was interested to read about your work using a model of range expansion under constraints due to covariance between dispersal and life history to interpret data from a lab empirical system and to explore more broadly how different patterns of covariance would be expected to alter the speed and trajectory of invasion. 
+The goals of your efforts are clearly important and relevant for our readers, and I found the paper to offer a well written narrative describing a powerful integration of modeling and empirical work. 
+However, I share the perspective from the reviews that your conclusions regarding how covariance would affect invasion do not seem entirely novel or particularly surprising. 
+I do think that providing confirmation of previous predictions using a different approach is a valuable contribution, and I also think your work goes beyond previous modeling efforts to show how to use these insights to help make sense of empirical observations. }
+\response{We appreciate the opportunity to clarify the conceptual novelty and significance of our work relative to foundations in the literature, and we regret not having done this more effectively in our first submission. 
+While elements of our results do confirm familiar predictions (e.g., negative genetic correlations act as an evolutionary constraint), the core message of our paper is a novel one: trait correlations can alter expectations for the speed and variability of range expansion.
+There is abundant evidence for demography-dispersal trade-offs in the range expansion literature, as emphasized by Reviewer 1, but no previous study has explored how such trade-offs affect ecological outcomes. 
+As an example of why this matters, our results are the first to show that, under some conditions, negative genetic correlations between dispersal and reproductive rate can cause an evolutionary slow-down of range expansion, a new result that runs counter to most eco-evolutionary theory. 
+Furthermore, no previous studies have considered both positive and negative correlations spanning a single axis of covariation, or decomposed the contributions of genetic versus environmentally based covariance.
+In our revision, we more effectively summarize these and other sources of novelty and significance was a new Discussion section.}
+
+\comment{Thus, I agree with Dr. Duckworth that the paper could make a much stronger case if you connected your work more explicitly to its foundation in related published (and nearly published) work and also developed its potential to help interpret empirical patterns by further exploring the mechanisms that could drive your results for the bean beetle system.
+In addition to her suggestion to expand your consideration of the particulars of your lab system, there is perhaps scope to make broader predictions about how past selection on either life history or dispersal propensity in any population would affect its invasion potential by shaping the pattern and strength of covariation it expresses. 
+Such a broader perspective might also incorporate the possibility for super-invaders, as suggested by Reviewer one. 
+From a purely editorial perspective, I would also suggest that a more compact text that emphasizes the novel insight your work offers over what has not yet been done could make the paper more compelling.}
+\response{}
+
+\comment{In her comments to me, Dr. Duckworth summarizes the main concerns about the paper and along with the reviewers, offers other excellent suggestions for clarifying specific points in the paper. 
+Given the potential we see for the paper to make a contribution that would be widely appreciated by our readers, I look forward to seeing a revised manuscript that resolves all the issues raised in the full set of comments below.}
+\response{}
+
+
+%% --------------------------------
+%\newpage
+%\bibliography{refs}
+%\bibliographystyle{spbasic}
+
+
+% ======================================================= %
+\end{document}
+% ======================================================= % 
