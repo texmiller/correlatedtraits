@@ -8,6 +8,9 @@
 \documentclass[12pt]{article}
 
 % packages
+\usepackage{xr} 
+\externaldocument[ms-]{Ochocki_Saltz_Miller_AmNat_REVISION}
+
 \usepackage{graphicx}
 \usepackage{url}
 \usepackage[usenames,dvipsnames]{xcolor}
@@ -85,7 +88,7 @@ While elements of our results do confirm familiar predictions (e.g., negative ge
 There is abundant evidence for demography-dispersal trade-offs in the range expansion literature, as emphasized by Reviewer 1, but no previous study has explored how such trade-offs affect ecological outcomes.
 As an example of why this matters, our results are the first to show that, under some conditions, negative genetic correlations between dispersal and reproductive rate can cause an evolutionary slow-down of range expansion, a new result that runs counter to most eco-evolutionary theory.
 Furthermore, no previous studies have considered both positive and negative correlations spanning a single axis of covariation, or decomposed the contributions of genetic versus environmentally based covariance.
-In our revision, we more effectively summarize these and other sources of novelty and significance was a new Discussion section.}
+In our revision, we more effectively summarize these and other sources of novelty and significance was a new Discussion section. (l.\ref{ms-mod1})}
 
 \comment{Thus, I agree with Dr. Duckworth that the paper could make a much stronger case if you connected your work more explicitly to its foundation in related published (and nearly published) work and also developed its potential to help interpret empirical patterns by further exploring the mechanisms that could drive your results for the bean beetle system.
 In addition to her suggestion to expand your consideration of the particulars of your lab system, there is perhaps scope to make broader predictions about how past selection on either life history or dispersal propensity in any population would affect its invasion potential by shaping the pattern and strength of covariation it expresses.
@@ -97,7 +100,76 @@ From a purely editorial perspective, I would also suggest that a more compact te
 Given the potential we see for the paper to make a contribution that would be widely appreciated by our readers, I look forward to seeing a revised manuscript that resolves all the issues raised in the full set of comments below.}
 \response{}
 
+\section{Response to Dr. Duckworth}
+\vspace{-2em}
 
+\comment{We have now received two reviews and the reviewers were split in their assessment. Reviewer 2 was enthusiastic about the novelty of the study and the results; but Reviewer 1 was less so. 
+In particular, Reviewer 1 brings up several recent studies that have also done simulation studies on dispersal and invasion dynamics. 
+While the current study cites many of these recent papers, it could do a better job of explaining the differences in approaches with the current paper and how that may affect interpretation of results. 
+The current study should also evaluate the Fronhofer and Alternatt (2015) paper in particular and discuss how the current paper builds on and/or differs from the approach and conclusions there.}
+\response{}
+
+\comment{What I missed and I think is also implicit in some of Reviewer 2’s comments was a deeper discussion of the potential mechanisms underlying the results of both the simulation and the QG analysis. 
+Dispersal is comprised of a multitude of traits with unfolding over distinct stages (propensity to disperse, actual costs of moving, costs of settling, etc). 
+The authors mention this very briefly in the discussion (line 492-6) but admit they have nothing to say on this. 
+What are the possible costs of dispersal in this system? 
+In the uniform lab environment is the variation we observe among individuals due simply to their intrinsic propensity to move farther? 
+Or do interactions with other individuals in these lab systems impact the costs of dispersal and female fecundity? 
+It would be useful to have more details on what is known about the dispersal environment of the lab populations and how this may or may not apply to natural populations.}
+\response{}
+
+\comment{Finally, I agree with Reviewer 1 that it is strange that the maternal effect model did not converge. 
+Typically, this is because a model is over-specified, but that doesn’t seem to be the case here. 
+It makes me wonder if there is something strange in how the experimental set-up creates variance among sibs in dispersal. 
+Given that all groups in the trials are full sibs, if they all use a simple rule of dispersing until they no longer encounter a sibling or conspecific, this could lead to identical distributions of dispersal distances among sib groups, leading to high within relative to among-brood variance and also calling into question the biological relevance of the experimental set-up. 
+What are the ranges of dispersal in the system? The variation in both dispersal and fecundity looks extremely low overall – could this be the issue? 
+More details on the how these traits vary in the lab environment is needed to assess the QG analysis.}
+\response{}
+
+\section{Response to Reviewer 1}
+\vspace{-2em}
+
+\comment{In the simulation model presented here, evolution of traits is – as I understand it - limited by the given additive genetic variation, i.e. evolution is restricted to the effect of selection on the initial standing genetic variation. 
+This allows to model the evolution of reproductive rate without the assumption of any trade-offs (which generally prevent the evolution of super-fertile and super dispersive organisms) but restricts the validity of simulation outcomes. 
+This type of model is in line with the model used by Phillips (2015) who points out that this type of model necessarily focuses on small population sizes and short-term evolutionary dynamics, since it assumes that genetic variances are eroded by selection, but are not subject to the additional force of mutation. 
+I completely agree that this approach may be adequate for fort-term processes at the front of an expanding population. 
+However, this restriction should be discussed more extensively as it makes it more or less impossible to compare the simulation results presented here with those of more general (and rather influential) evolutionary models (e.g. Travis and Dytham 2002, Burton et al. 2010, Fronhofer and Altermatt 2015, Shaw and Kokko 2015).}
+\response{We agree that our assumption that selective processes act exclusively on standing genetic variation is only appropriate for short time-scales and creates some difficulty in comparing our results to others models that include novel mutations. We have added a paragraph to the Discussion section to highlight this issue and discuss its implications.}
+
+\comment{The authors mention in the discussion section (l. 377 ff) that ``...different bodies of literature emphasize connections between demography and dispersal traits through a myriad of mechanisms, ranging from trade-offs and costs of dispersal (typically corresponding to negative correlations) to dispersal 'syndromes' that package several life history and movement traits into a multivariate phenotype (typically corresponding to positive correlations).'' 
+In the context of these ``bodies of literature'' I found the general results of the present manuscript not particularly innovative or counter-intuitive. 
+It is generally assumed (and not surprising) that, all cost being ignored, selection will favor high fertility as well as high dispersal rates at the front of populations expanding into empty suitable habitat. 
+However, if increased dispersal comes at the cost of reduced fertility (negative correlation), selection on increased dispersal will be reduced and – depending on this cost (the strength of this correlation) – selection may even favor increased fertility and reduced dispersal instead.}
+\response{}
+
+\comment{For a more general discussion of evolutionary forces working at the front of an expanding population the results of the simulations presented here are - to my opinion - not really helpful.
+On the contrary: in comparison to the models of e.g. Burton et al. (2010) or Fronhofer and Andermatt (2015) I missed the consideration of trade-offs that limit the evolution of dispersal ability and fertility and prevent the evolution of ``super-organisms''. Hanski et al. 2006, Chuang et al. (2016), Phillips et al (2016), and Perkins et al (2016) all point out the importance of trade offs and Chuang et al. (2016) states that ``Accounting for the effects of edge phenotypes and related trade-offs could be critical for predicting the spread of invasive species and population responses to climate change.''}
+\response{We understand the reviewer's point here but we would like to emphasize important distinctions between our study and the papers that this reviewer cites.}
+
+\comment{l. 35 Concerning the statement ``Low-density conditions of the vanguard can also result in natural selection for increased reproductive rates ('r-selection').'' and similarly line 360 it might be interesting to discuss the results of Fronhofer and Altermatt 2015 (Eco-evolutionary feed-backs during experimental range expansions. Nature Communications 6:6844). 
+These authors state ``Interestingly, the experimentally and theoretically observed distribution of population densities across a species' range seems counter-intuitive, as population densities increase from low densities in range cores to high densities at range margins.''}
+\response{}
+
+\comment{l. 38 better: ``is expected to increased''}
+\response{}
+
+\comment{l 48. better: ``Then it is impossible''}
+\response{}
+
+\comment{1 140. better: ``make this species a popular model''}
+\response{}
+
+\comment{line following eq.3: Setting $Nt=1$ and dividing both side by B gives}
+\response{}
+
+\comment{l. 325 better: ``increases in dispersal ability''}
+\response{}
+
+\comment{l. 326 better: ``decreases in fertility''}
+\response{}
+
+\comment{l. 399 better:``increases in mean''}
+\response{}
 %% --------------------------------
 %\newpage
 %\bibliography{refs}
