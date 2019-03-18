@@ -38,6 +38,8 @@
 \usepackage{caption}
 \DeclareCaptionFormat{myformat}{#1#2#3\hrulefill}
 \captionsetup[figure]{format=myformat}
+\newcommand{\revise}[1]{{\color{Mahogany}{#1}}}
+
 %%%%%%%%%%%%%%%%%%%%%
 % Line numbering
 %%%%%%%%%%%%%%%%%%%%%
@@ -139,11 +141,21 @@ Negative environmental correlations between dispersal and fertility have been de
 Indeed, widespread evidence for dispersal `syndromes' -- the covariation of dispersal with other life history and behavioral traits within \citep{clobert2009informed} or between \citep{comte2018evidence,stevens2014comparative} species -- suggests that the classical assumption of demography and dispersal rates as independent parameters may break down for eco-evolutionary models that incorporate trait heterogeneity.
 How, then, should we expect the magnitude and sign of demography-dispersal covariance to alter predictions about range expansion?
 
-Only two previous studies, to our knowledge, have explored eco-evolutionary dynamics of spread under trade-offs (negative correlation) between life history traits, focusing on the trade-off axis of \textit{r}/\textit{K} selection \citep{burton_trade-offs_2010,perkins_after_2016}.
-These studies suggest that, for populations invading empty space, traits that promote fertility and dispersal should be maintained at the invasion front at the expense of competitive ability \citep{burton_trade-offs_2010,perkins_after_2016}.
-However, because they imposed a particular type of trade-off, these studies do not reveal how variation in the sign and magnitude of genetic and/or environmental trait correlations modify spread dynamics.
-Furthermore, although there is an expectation that evolutionary processes can make invasions more variable \citep{phillips_evolutionary_2015,ochocki_rapid_2017,weiss-lehman_rapid_2017}, it is not clear how genetic and/or environmental correlations interact with other evolutionary processes to influence variability in invasion outcomes.
+\revise{
+Only three previous studies, to our knowledge, have explored eco-evolutionary dynamics of invasion under trade-offs (negative correlation) between life history and dispersal traits\linelabel{mod2}.
+Burton \textit{et al.} \citeyearpar{burton_trade-offs_2010} simulated invasions with a tripartite trade-off between low-density reproductive rate, competitive ability, finding that, for populations invading empty space, traits that promote fertility and dispersal should be maintained at the invasion front at the expense of competitive ability.
+Perkins \textit{et al.} \citeyearpar{perkins_after_2016} further showed that, in simulated invasions, trade-offs cause evolved increases in dispersal to rapidly attenuate once the wave front has passed through a given location.
+Fronhofer and Altermatt \citeyearpar{fronhofer_eco-evolutionary_2015} used an experimental system (freshwater ciliates) and simulations to show that evolved increases in dispersal lead to reductions in foraging, with consequences for shape of the invasion wave.
+These studies made the important step of incorporating trait covariance into models of range expansion but, because they imposed a particular type of trade-off (strong, negative, genetic), they do not reveal the consequences of variation in the sign, magnitude, and type (genetic or environmental) of trait correlations.
+Also, previous studies of demography-dispersal trade-offs have focused on trait evolution druing spread and not on the ecological outcomes of invasion speed and variability.}
+Although there is an expectation that evolutionary processes can make invasions more variable \citep{phillips_evolutionary_2015,ochocki_rapid_2017,weiss-lehman_rapid_2017}, it is not clear how genetic and/or environmental correlations interact with other evolutionary processes to influence variability in invasion outcomes.
 Understanding the factors that drive invasion variability is essential for making useful predictions about the range of possible trajectories for spreading populations.
+
+%Only two previous studies, to our knowledge, have explored eco-evolutionary dynamics of spread under trade-offs (negative correlation) between life history traits, focusing on the trade-off axis of \textit{r}/\textit{K} selection \citep{burton_trade-offs_2010,perkins_after_2016}.
+%These studies suggest that, for populations invading empty space, traits that promote fertility and dispersal should be maintained at the invasion front at the expense of competitive ability \citep{burton_trade-offs_2010,perkins_after_2016}.
+%However, because they imposed a particular type of trade-off, these studies do not reveal how variation in the sign and magnitude of genetic and/or environmental trait correlations modify spread dynamics.
+%Furthermore, although there is an expectation that evolutionary processes can make invasions more variable \citep{phillips_evolutionary_2015,ochocki_rapid_2017,weiss-lehman_rapid_2017}, it is not clear how genetic and/or environmental correlations interact with other evolutionary processes to influence variability in invasion outcomes.
+%Understanding the factors that drive invasion variability is essential for making useful predictions about the range of possible trajectories for spreading populations.
 %The hunt for sources of invasion variability is thus an active area of research \citep{melbourne_highly_2009,wagner_genetic_2016,miller_sex_2013}.
 %\tom{[I have the hypothesis that environmental correlations should increase variance, but only in variable abiotic environments. If the spatial environment is constant then there is no way for this correlation to manifest. If the spatial environment is itself variable then there should be wider fluctuations in trait values at the front (if E correlation is positive). Worth testing/adding? How?]}-- add to discussion
 %I am experimenting with cutting these hypotheses, for the sake of both length and thunder
