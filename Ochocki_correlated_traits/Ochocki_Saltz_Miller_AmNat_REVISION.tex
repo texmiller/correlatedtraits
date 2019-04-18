@@ -434,6 +434,20 @@ Given estimation uncertainty, as quantified by the Bayesian posterior probabilit
 %\tom{[I don't think this is super important but I actually do not follow this argument. I think part of my confusion is that I am not sure where the correlation estimates come from (comment above where you say they were ``calculated'').
 %For related reasons, I think the covariances can be dropped from this figure, since they simply integrate the variances and correlations.]}
 
+
+\newpage
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\linewidth]{Figures/trait_biplots.pdf}
+\caption{\textbf{Trait measurements and fitted genetic, maternal, and environmental components.}
+\textit{A}, Raw observations for bean beetle dispersal distance and fertility (female offpsring per female per bean); phenotypic correlation $ = -0.12$ ($p < 0.004$).
+\textit{B}, Fitted breeding values (additive genetic effects) for dispersal ($a^{d}_{jk}$) and fertility ($a^{r}_{jk}$), corresponding to Equation \ref{corr:gen}; fitted genetic correlation: $\rho_{G} = -0.17$.
+\textit{C}, Fitted maternal effects for dispersal ($m^{d}_{k}$) and fertility ($m^{r}_{k}$), corresponding to Equation \ref{}; fitted correlation of maternal effects: $\rho_{M} = -0.26$.
+\textit{D}, Fitted environmental devites for dispersal ($e^{d}_{i}$) and fertility ($e^{r}_{i}$), corresponding to Equation \ref{corr:env}; fitted correlation of environmental deviates: $\rho_{M} = -0.18$.
+Additive genetic, maternal, and environmental effects are assumed to be multivariate-normally distributed with mean zero and variances and covariances given in Table \ref{corr:estimates}.
+}\label{corr:biplots}
+\end{figure}
+
 \newpage
 \begin{figure}[h!]
 \centering
@@ -527,9 +541,9 @@ Our findings that trait architecture, including genetic and environmental varian
 Second, the generalized simulation model expanded our breadth of inference, revealing which outcomes were particular to the trait architecture of \textit{C. maculatus} and which were more general.
 
 \revise{\linelabel{mod3}It is widely expected from evolutionary theory that genetic correlations can constrain responses to selective processes \citep{schluter1996adaptive,walsh2009abundant}, and this has been previously shown in the context of range-expanding populations \citep{burton_trade-offs_2010,perkins_after_2016,fronhofer_eco-evolutionary_2015}.
-Our work moves beyond these familiar expectations for trait evolution to show, for the first time, how the sign, magnitude, and type of correlation between demography and dipsersal affects higher-level, ecological outcomes of range expansion, specifically speed and variability across realizations. 
+Our work moves beyond these familiar expectations for trait evolution to show, for the first time, how the sign, magnitude, and type of correlation between demography and dipsersal affects higher-level, ecological outcomes of range expansion, specifically speed and variability across realizations.
 Our finding that, under some conditions, negative genetic correlations can cause an evolutionary-slow down of range expansion, for example, highlights the value of connecting trait evolution to ecological outcomes.
-We also provide novel evidence that trait covariance determines the extent to which evolution can amplify variability across realizations of spread.  
+We also provide novel evidence that trait covariance determines the extent to which evolution can amplify variability across realizations of spread.
 Collectively, our results identify trait correlations as a key factor modulating how evolution shapes trajectories of biological invasion.
 Below, we discuss our results in greater detail and connect their conceptual significance to the broader literature.}
 
@@ -545,7 +559,7 @@ The increase in invasion speed with increasing strength of demography-dispersal 
 This likely occurred because positive correlations align the dominant axis of phenotypic variation with the direction of selection, with high-dispersal / high-fertility (and therefore high-invasion speed) phenotypes favored at the leading edge \citep{phillips_life-history_2010}.
 The accelerating effect of positive genetic correlations may also reflect some contribution of `enhanced spatial selection', whereby \revise{the evolution of} greater reproductive rates at the leading edge strengthen spatial selection on dispersal \citep{perkins_evolution_2013}.
 On the other hand, negative genetic correlations constrain evolutionary acceleration of invasion, since an evolved increase in one trait would mean an evolved decrease in the other.
-This recent is anticipated by recent theory on the dual roles of reproduction and movement in 
+This recent is anticipated by recent theory on the dual roles of reproduction and movement in
 Importantly, our simulations revealed that a strongly negative demography-dispersal genetic correlation, combined with a large amount of heritable variation, can actually \textit{decelerate} invasion (Fig. \ref{corr:sim_vary_h2_Pvar}).
 Two previous theoretical studies have reported the potential for evolution to decelerate invasion when there is an Allee effect that selects against phenotypes that occur in low-density, leading-edge patches \citep{shaw_dispersal_2015, travis_dispersal_2002}.
 \linelabel{mod15}\revise{The accumulation of deleterious mutations at expanding fronts (`expansion load') is another process that can slow down invasions \citep{gilbert2017local,peischl2018evolution}.
@@ -553,16 +567,16 @@ Two previous theoretical studies have reported the potential for evolution to de
 Our results identify genetically based trade-offs as a new mechanism for evolutionary deceleration of spread.
 It is unknown how commonly conditions align to cause evolutionary deceleration of expanding populations, but the possibility of it should cause us to reconsider general expectations for eco-evolutionary invasion dynamics in light of genetic architecture.
 
-\revise{\linelabel{mod4}If trade-offs between dispersal and life history traits are common, as empirical studies suggest, then such negative correlations may be an important factor limiting the speed of range expansion and constraining the evolution of `super-invaders'. 
-\linelabel{mod6}For example, Fronhofer and Altermatt \citeyearpar{fronhofer_eco-evolutionary_2015} found that spatial sorting favored the evolution of increased dispersal in freshwater ciliates but this traded off with foraging success, leading to the dominance of `prudent' resource depletion strategies at range margins. 
-\linelabel{mod8}The cane toad invasion of Australia is a classic case of evolution during range expansion \citep{phillips_invasion_2006}, yet evolved increases in dispersal ability have been associated with reduced reproductive rates at the leading edge \citep{hudson_virgins_2015}, suggesting that negative correlations may constrain evolutionary acceleration in this system, as we showed in \textit{C. maculatus}. 
+\revise{\linelabel{mod4}If trade-offs between dispersal and life history traits are common, as empirical studies suggest, then such negative correlations may be an important factor limiting the speed of range expansion and constraining the evolution of `super-invaders'.
+\linelabel{mod6}For example, Fronhofer and Altermatt \citeyearpar{fronhofer_eco-evolutionary_2015} found that spatial sorting favored the evolution of increased dispersal in freshwater ciliates but this traded off with foraging success, leading to the dominance of `prudent' resource depletion strategies at range margins.
+\linelabel{mod8}The cane toad invasion of Australia is a classic case of evolution during range expansion \citep{phillips_invasion_2006}, yet evolved increases in dispersal ability have been associated with reduced reproductive rates at the leading edge \citep{hudson_virgins_2015}, suggesting that negative correlations may constrain evolutionary acceleration in this system, as we showed in \textit{C. maculatus}.
 Other examples, however, suggest the inverse case of positive trait correlations promoting rapid range expansion.
 In Western bluebirds, positive genetic correlation of dispersal propensity and aggressive behavior allowed them to expand into the territory of a competitor species \citep{duckworth_coupling_2007,duckworth2009evolution}.
 Our results provide new context for interpreting the consequences of trait correlations and their associated evolutionary constraints (if negative) or opportunities (if positive) in range-expanding species such as these.
 }
 
 \revise{
-Perhaps not surprisingly, the role of genetic correlations as a decelerating or accelerating factor depended on the amounts of heritable variation in demography and dispersal traits (Fig \ref{corr:sim_vary_h2_Pvar}). 
+Perhaps not surprisingly, the role of genetic correlations as a decelerating or accelerating factor depended on the amounts of heritable variation in demography and dispersal traits (Fig \ref{corr:sim_vary_h2_Pvar}).
 \linelabel{mod5}This suggests that historical factors may be an important contingency on the expression of genetically based correlations and their ecological consequences.
 For example, genetic bottlenecks associated with species' introductions may limit genetic variances and covariances in range-expanding species \citep{dlugosch2008founding,wagner2017genetic}.
 In the Western bluebird system, historical metapopulation dynamics were important for the maintence of alternative dispersal/aggression phenotypes, which promoted subsequent range expansion \citep{duckworth2008adaptive}.
@@ -609,7 +623,7 @@ The two traits that we consider are more likely `meta-traits' that capture many 
 Understanding these lower-level mechanisms was not essential for the purposes of our study, but may be important in other contexts.
 Other work we have done in this system suggests that dispersal distance is density dependent, with beetles (especially females) traveling greater distances with increasing conspecific density (T.E.X. Miller and B.D.Inouye, \textit{unpubl. data}).
 All of the dispersal trials in the present study used a constant density, so density dependence does not confound interpretation of the dispersal results.
-However, it is possible that the apparent genetic variation in innate dispersal distance is actually genetic variation in sensitivity to conspecific density. 
+However, it is possible that the apparent genetic variation in innate dispersal distance is actually genetic variation in sensitivity to conspecific density.
 \linelabel{mod11}The mechanistic basis for the apparent trade-off between dispersal and fertility is similarly unclear, but other life-history trade-offs in \textit{C. maculatus} have been attributed to resource acquisition \citep{messina2003environment}.
 Thus, it is possible that the bean environment of larvae (the resource consumption stage) affected the expression of demography-dispersal trade-offs in the adult stage.
 \linelabel{mod12}Our dispersal set-up was not intended to mimic natural conditions for this species but we think it provides a reasonable approximation given that \textit{C. maculatus} is a pest of stored grains.
