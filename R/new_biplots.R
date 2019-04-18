@@ -101,6 +101,23 @@ breeding_vals <- unique(data.frame(rstan::summary(fits, pars = "a")$summary))
 maternal_vals <- unique(data.frame(rstan::summary(fits, pars = "m")$summary))
 enviro_vals <- unique(data.frame(rstan::summary(fits, pars = "d")$summary))
 
+hist(breeding_vals$Rhat)
+hist(maternal_vals$Rhat)
+hist(enviro_vals$Rhat)
+
+hist(maternal_vals$X97.5.-maternal_vals$X2.5.)
+test<-maternal_vals %>%
+  mutate(width = X97.5.-X2.5.) %>%
+  filter(width < 1)
+plot(maternal_vals[seq(1,nrow(maternal_vals),by=2),"mean"],
+     maternal_vals[seq(2,nrow(maternal_vals),by=2),"mean"],pch=16,cex=1.2,cex.lab=1.2,
+     xlab = expression(paste("Maternal effects on dispersal ( ",m[k]^d," )")),
+     ylab = expression(paste("Maternal effects on fertility ( ",m[k]^r," )")))
+plot(test[seq(1,nrow(test),by=2),"mean"],
+     test[seq(2,nrow(test),by=2),"mean"],pch=16,cex=1.2,cex.lab=1.2,
+     xlab = expression(paste("Maternal effects on dispersal ( ",m[k]^d," )")),
+     ylab = expression(paste("Maternal effects on fertility ( ",m[k]^r," )")))
+
 win.graph(width = 8, height = 8)
 par(mfrow=c(2,2),mar=c(5,5,2,1))
 
