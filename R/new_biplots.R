@@ -94,6 +94,8 @@ ggplot(ped)+
   geom_point(aes(x=beans,y=f))
 ggplot(ped)+
   geom_histogram(aes(x=f/beans))
+## Is there a correlation in the raw data?
+cor.test(abs(ped$dist), ped$f/ped$beans)
 
 breeding_vals <- unique(data.frame(rstan::summary(fits, pars = "a")$summary))
 maternal_vals <- unique(data.frame(rstan::summary(fits, pars = "m")$summary))
