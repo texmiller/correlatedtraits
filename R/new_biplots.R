@@ -5,6 +5,7 @@ library(mvtnorm)
 library(RColorBrewer)
 library(colorspace)
 library(colorRamps)
+library(rstan)
 
 ## parameters of experimental design (matching our actual experiment)
 n_sires <- 50
@@ -77,6 +78,49 @@ plot(md_k,mr_k,pch=16,cex=1.2,cex.lab=1.2,
      ylab = expression(paste("Maternal effects on fertility ( ",m[k]^r," )")))
 title("C",adj=0)
 plot(ed_i,er_i,pch=16,cex=1.2,cex.lab=1.2,
+     xlab = expression(paste("Environmental effects on dispersal ( ",e[i]^d," )")),
+     ylab = expression(paste("Environmental effects on fertility ( ",e[i]^r," )")))
+title("D",adj=0)
+
+
+# real data and model outputs ---------------------------------------------
+# load the workspace that Brad shared with Tom (17 April 2019 ) - it's big
+load("D:/Dropbox/Manuscripts/Brad demography dispersal correlation/bev_holt_maternal_effects.rda")
+
+## check on raw data - looks right
+ggplot(ped)+
+  geom_histogram(aes(x=abs(dist)))
+ggplot(ped)+
+  geom_point(aes(x=beans,y=f))
+ggplot(ped)+
+  geom_histogram(aes(x=f/beans))
+
+breeding_vals <- unique(data.frame(rstan::summary(fits, pars = "a")$summary))
+maternal_vals <- unique(data.frame(rstan::summary(fits, pars = "m")$summary))
+enviro_vals <- unique(data.frame(rstan::summary(fits, pars = "d")$summary))
+
+win.graph(width = 8, height = 8)
+par(mfrow=c(2,2),mar=c(5,5,2,1))
+
+plot(jitter(abs(ped$dist)),jitter(ped$f/ped$beans),pch=1,cex=1.2,cex.lab=1.2,lwd=2,
+     xlab = "Observed dispersal distance (# patches)",
+     ylab = "Observed fertility (beetles/female/bean)")
+title("A",adj=0)
+
+plot(breeding_vals[seq(1,nrow(breeding_vals),by=2),"mean"],
+     breeding_vals[seq(2,nrow(breeding_vals),by=2),"mean"],pch=16,cex=1.2,cex.lab=1.2,
+     xlab = expression(paste("Additive genetic effects on dispersal ( ",a[jk]^d," )")),
+     ylab = expression(paste("Additive genetic effects on fertility ( ",a[jk]^r," )")))
+title("B",adj=0)
+
+plot(maternal_vals[seq(1,nrow(maternal_vals),by=2),"mean"],
+     maternal_vals[seq(2,nrow(maternal_vals),by=2),"mean"],pch=16,cex=1.2,cex.lab=1.2,
+     xlab = expression(paste("Maternal effects on dispersal ( ",m[k]^d," )")),
+     ylab = expression(paste("Maternal effects on fertility ( ",m[k]^r," )")))
+title("C",adj=0)
+
+plot(enviro_vals[seq(1,nrow(enviro_vals),by=2),"mean"],
+     enviro_vals[seq(2,nrow(enviro_vals),by=2),"mean"],pch=16,cex=1.2,cex.lab=1.2,
      xlab = expression(paste("Environmental effects on dispersal ( ",e[i]^d," )")),
      ylab = expression(paste("Environmental effects on fertility ( ",e[i]^r," )")))
 title("D",adj=0)
