@@ -434,26 +434,13 @@ Given estimation uncertainty, as quantified by the Bayesian posterior probabilit
 %\tom{[I don't think this is super important but I actually do not follow this argument. I think part of my confusion is that I am not sure where the correlation estimates come from (comment above where you say they were ``calculated'').
 %For related reasons, I think the covariances can be dropped from this figure, since they simply integrate the variances and correlations.]}
 
-
 \newpage
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.8\linewidth]{Figures/trait_biplots.pdf}
-\caption{\textbf{Trait measurements and fitted genetic, maternal, and environmental components.}
-\textit{A}, Raw observations for bean beetle dispersal distance and fertility (female offpsring per female per bean); phenotypic correlation $ = -0.12$ ($p < 0.004$).
-\textit{B}, Fitted breeding values (additive genetic effects) for dispersal ($a^{d}_{jk}$) and fertility ($a^{r}_{jk}$), corresponding to Equation \ref{corr:gen}; fitted genetic correlation: $\rho_{G} = -0.17$.
-\textit{C}, Fitted maternal effects for dispersal ($m^{d}_{k}$) and fertility ($m^{r}_{k}$), corresponding to Equation \ref{}; fitted correlation of maternal effects: $\rho_{M} = -0.26$.
-\textit{D}, Fitted environmental devites for dispersal ($e^{d}_{i}$) and fertility ($e^{r}_{i}$), corresponding to Equation \ref{corr:env}; fitted correlation of environmental deviates: $\rho_{M} = -0.18$.
-Additive genetic, maternal, and environmental effects are assumed to be multivariate-normally distributed with mean zero and variances and covariances given in Table \ref{corr:estimates}.
-}\label{corr:biplots}
+\includegraphics[width=0.8\linewidth]{Figures/data_corr_posteriors.pdf}
+\caption{\textbf{Trait measurements and fitted genetic, maternal, and environmental components.}}\label{corr:post}
 \end{figure}
 
-\newpage
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\linewidth]{Figures/corr_posteriors.pdf}
-\caption{\textbf{Posteriors of parameter estimates.} Posterior densities of variance- and covariance-related parameter estimates from the animal model. Subscripts identify whether parameters relate to the genetic ($G$) or environmental ($E$) covariance matrices, and whether they describe the dispersal ($d$) or fertility ($r$) trait. Dispersal-related parameters are shown in dark gray, fertility parameters are shown in white, and covariances/correlations between the two traits are shown in light gray. Panels show: trait variances ($V$) and covariances ($C$) (left); trait correlations ($\rho$) (center); and trait heritabilities ($h^{2}$) (right). Note the different x-axis scales.}\label{corr:posteriors}
-\end{figure}
 
 \newpage
 \subsection*{\textit{Simulation results}}
