@@ -390,23 +390,22 @@ We replicated each parameter combination 1000 times.
 \caption[Estimates of key parameters from the beetle experiment]{\textbf{Estimates of key parameters from the beetle experiment.} Parameter estimates are grouped by the demographic process that they correspond to: dispersal, fertility, or both. Percentages show parameter estimates in the 95\% credible interval and the median (50\%) parameter estimate.}\label{corr:estimates}\vspace{0.1in}
 \begin{tabularx}{0.95\linewidth}{lXrrrrr}
 \toprule
-Parameter   & Description                               & Mean & SD   & 2.5\% & 50\% & 97.5\% \\ \midrule
-$\mu_{d}$   & Mean dispersal phenotype (log(patches)) & 1.63 & 0.07 & 1.49   & 1.63 & 1.76   \\
-$h^{2}_{d}$ & Dispersal heritability              & 0.55 & 0.17 & 0.22   & 0.54 & 0.91   \\
-$V_{P,d}$   & Phenotypic variance in dispersal & 0.41 & 0.05 & 0.32   & 0.40 & 0.52   \\
-$V_{G,d}$   & Additive genetic variance in dispersal & 0.23 & 0.09 & 0.08   & 0.21 & 0.45   \\
-$V_{E,d}$   & Environmental variance in dispersal    & 0.18 & 0.06 & 0.04   & 0.18 & 0.30   \\ \midrule
-$\mu_{r}$   & Mean fertility phenotype (log(offspring)) & 2.74 & 0.07 & 2.61   & 2.74 & 2.87   \\
-$h^{2}_{r}$ & Fertility heritability              & 0.17 & 0.07 & 0.05   & 0.16 & 0.31   \\
-$V_{P,r}$   & Phenotypic variance in fertility & 0.35 & 0.02 & 0.30   & 0.35 & 0.40   \\
-$V_{G,r}$   & Additive genetic variance in fertility & 0.06 & 0.03 & 0.02   & 0.06 & 0.12   \\
-$V_{E,r}$   & Environmental variance in fertility    & 0.29 & 0.03 & 0.24   & 0.29 & 0.35   \\
-$K$         & Carrying capacity per bean              & 3.82 & 2.59 & 3.34   & 3.81 & 4.36   \\ \midrule
-$C_{P}$     & Total phenotypic covariance    &-0.08 & 0.02 &-0.13   &-0.08 &-0.03   \\
-$C_{G}$     & Additive genetic covariance &-0.04 & 0.03 &-0.11   &-0.04 & 0.01   \\
-$C_{E}$     & Environmental covariance   &-0.04 & 0.03 &-0.09   &-0.04 & 0.02   \\
-$\rho_{G}$  & Additive genetic correlation  &-0.36 & 0.24 &-0.79   &-0.37 & 0.15   \\
-$\rho_{E}$  & Environmental correlation     &-0.16 & 0.13 &-0.43   &-0.16 & 0.09   \\
+Parameter   & Description                               & Mean (95\% CI) \\ \midrule
+$\mu_{d}$   & Mean dispersal phenotype (log(patches)) & 1.64 (1.54 -- 1.74) \\
+$V_{G,d}$   & Additive genetic variance in dispersal &  0.03 (0.000042 -- 0.14)  \\
+$V_{M,d}$   & Maternal variance in dispersal    &  0.1 (0.047 -- 0.17)  \\ 
+$V_{E,d}$   & Environmental variance in dispersal  &  0.25 (0.17 -- 0.32)  \\ \midrule
+$\mu_{r}$   & Mean fertility phenotype (log(offspring)) &  2.74 (2.6 -- 2.87)  \\
+$V_{G,r}$   & Additive genetic variance in fertility &  0.033 (0.026 -- 0.096)  \\
+$V_{M,r}$   & Maternal variance in fertility &  0.018 (0.000078 -- 0.05)  \\
+$V_{E,r}$   & Environmental variance in fertility    &  0.29 (0.24 -- 0.35) \\
+$K$         & Carrying capacity per bean   &  3.56 (3.14 -- 4.04)  \\ \midrule
+$C_{G}$     & Additive genetic covariance &  -0.0071 (-0.049 -- 0.014) \\
+$C_{M}$     & Maternal covariance & -0.011 (-0.039 -- 0.0095) \\
+$C_{E}$     & Environmental covariance   & -0.049 (-0.093 -- -0.005)  \\
+$\rho_{G}$  & Additive genetic correlation  &  -0.17 (-0.87 -- 0.75)\\
+$\rho_{M}$  & Additive genetic correlation  &  -0.26 (-0.79 -- 0.45) \\
+$\rho_{E}$  & Environmental correlation     &  -0.18 (-0.33 -- -0.019) \\
 \bottomrule
 \end{tabularx}
 \end{table}
