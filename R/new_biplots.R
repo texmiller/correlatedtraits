@@ -361,3 +361,9 @@ legend("topright",legend=c(expression(rho[G]),expression(rho[M]),expression(rho[
        lwd=4,
        col=c("#1b9e77","#d95f02","#7570b3"),
        bty="n")
+
+
+# Update Table 1 ----------------------------------------------------------
+
+params <- c("beta","G","E","ME","P","h2","K","corrG","corrE","corrME")
+summ_tab <- rstan::summary(fits, pars = params)$summary
