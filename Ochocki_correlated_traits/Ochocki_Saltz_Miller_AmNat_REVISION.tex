@@ -361,9 +361,9 @@ Finally, the environmental deviates -- individual-to-individual variation that i
 %
 In the bean beetle system, microsite variation in larval environment is a good candidate for the environmental variation $\bm{E}$, as host beans may vary in, for example, nutrient content, water content, geometry, age, etc.
 For all covariances, genetic, maternal, and environmental correlations were derived as $\rho = \frac{C}{\sqrt{V_{d}}\sqrt{V_{r}}}$.
-
 %Heritability with maternal effects gets very complicated and I would simply rather not go there.-TM
-%Assuming that genetic and environmental effects are not correlated with each other, the total phenotypic variances and covariances in these traits can be described by a covariance matrix $\bm{P}$, which is simply $\bm{P} = \bm{G} + \bm{E}$.
+Assuming that genetic, maternal, and environmental effects are not correlated with each other, the total phenotypic variance in each trait is simply the sum of all variance components (e.g., $V_{P,d} = V_{G,d} + V_{M,d} + V_{E,d}$). 
+%s and covariances in these traits can be described by a covariance matrix $\bm{P}$, which is simply $\bm{P} = \bm{G} + \bm{M} + \bm{E}$.
 %Calculating $\bm{P}$ enables us to calculate the narrow-sense heritability of each trait, which reflects the proportion of variance in the phenotype (on the latent scale) attributable to additive genetic factors.
 %For dispersal,
 %
@@ -383,22 +383,21 @@ Each simulation began with 20 individuals in a single starting patch; we modeled
 The additive genetic ($\bm{a}_{jk}$), \revise{maternal ($\bm{m}_{k}$),} and environmental deviates ($\bm{e}_i$) for each individual were drawn at random given covariance matrices $\bm{G}$, $\bm{M}$, and $\bm{E}$.
 The initial conditions of the simulation mimic a small founding population being introduced to an empty landscape from some genetically well-mixed source population.
 Complete details of the simulations are provided in Online Appendix A.
-%\footnote{\tom{I think we need to say something about whether or not our model allows correlations to evolve. I think yes, based on previous conversations with Brad, but I am not sure how to explain how or why this is so. Brad, can you add a sentence to this effect?}}
-%Again, I don't think this is critical to address at this stage, though we can add this content if reviewers request it.
 
 For analysis of the simulation output, we defined an invasion's extent in each generation as the location of the individual farthest to the right of the starting patch.
 Since the duration of spread was fixed, the final extent is proportional to mean invasion speed (patches per generation), and this is how we frame the interpretation that follows.
 %Because dispersal direction was unbiased, both the left- and right-moving wave fronts should exhibit similar dynamics, but we restricted our analysis to the right-moving fronts to avoid pseudo-replication.
 To understand how trait variation and covariation altered simulated invasion outcomes, we focused on mean invasion extent after 20 generations and the coefficient of variation (CV) in extent as a measure of variability.
-We quantified trait evolution in the simulations by comparing the genetically based quantitative trait values (population mean $\bm{\mu}$ plus breeding value $\bm{a}_{jk}$) between the value in the center patch in generation 0 and the value at the range-edge patch in generation 20.
+We also quantified trait evolution in the simulations by comparing the genetically based quantitative trait values (population mean $\bm{\mu}$ plus breeding value $\bm{a}_{jk}$) between the value in the center patch in generation 0 and the value at the range-edge patch in generation 20.
 
 We first ran the simulated invasions with parameter values estimated from the \textit{C. maculatus} laboratory experiments (Table \ref{corr:estimates}) to establish whether the model could generate invasion outcomes that were qualitatively consistent with our previous experimental work. % in terms of evolutionary effects on invasion speed and variability, as well as trait evolution underlying those effects.
 We contrasted results against a `no evolution' scenario in which %trait variation was not heritable ($h^{2}_d = h^{2}_r = 0$).
-\revise{genetic variances were set to zero and redistributed across maternal and environmental components such that total phenotypic variances were unchanged.}
+\revise{genetic variances were set to zero and redistributed across maternal and environmental components; this allowed us to contrast simulated invasions with and without genetic variation in demography and dispersal traits, holding total phenotypic variation constant.}
 We did not attempt direct quantitative comparison between our previous experiment and present simulation because they differed in some known, important ways (e.g., for convenience, the simulations assumed hermaphroditism).%, and evolutionary effects were quantified with respect to a zero-heritability scenario rather than the spatial shuffle treatment of our previous experiment).
 We generalized the \textit{C. maculatus}-specific results by exploring realistic variation in trait correlations and genetic variance.%, heritability, and phenotypic variance.
-To test the role of variation in the sign and magnitude or trait correlations and contrast the effects of genetic, \revise{maternal}, and environmental correlations, we varied $\rho_{G}$, \revise{$\rho_{M}$,} and $\rho_{E}$ factorially such that each correlation coefficient took a range of values (-0.9, -0.5, -0.1, 0, 0.1, 0.5, 0.9 for $\rho_{G}$; -0.9, 0, 0.9 for $\rho_{M}$ and $\rho_{E}$).
-To further expand beyond the beetle system, we replicated the full range of trait correlations across variation in trait heritabilities \revise{by modifying the} proportion of total phenotypic variance \revise{that was genetically based}.
+To test the role of variation in the sign and magnitude of trait correlations and contrast the effects of genetic, \revise{maternal}, and environmental correlations, we varied $\rho_{G}$, \revise{$\rho_{M}$,} and $\rho_{E}$ factorially such that each correlation coefficient took a range of values (-0.9, -0.5, -0.1, 0, 0.1, 0.5, 0.9 for $\rho_{G}$; -0.9, 0, 0.9 for $\rho_{M}$ and $\rho_{E}$).
+\revise{To further expand beyond the beetle system -- where additive genetic variance accounted for a minority of the total phenotypic variance in dispersal ($V_{G,d} < V_{M,d} < V_{E,d}$) and fertility ($V_{G,r} < V_{M,r} < V_{E,r}$; Table \ref{corr:estimates}) -- we replicated the full range of trait correlations across variation in trait heritabilities by modifying the proportion of total phenotypic variance that was genetically based.
+We considered two additional cases, one in which phenotypic variance for both traits was evenly distributed between additive genetic, maternal, and environmental components ($V_{G,d} = V_{M,d} = V_{E,d} = V_{P,d}/3$ and $V_{G,r} = V_{M,r} = V_{E,r} = V_{P,d}/3$) and another in which all of the phenotypic variation was assumed to be genetically based ($V_{G,d} = V_{P,d}$ and $V_{G,r} = V_{P,r}$).} 
 The complete parameter space of the simulations is described in Online Appendix A.
 We replicated each parameter combination 1000 times.
 
@@ -436,11 +435,14 @@ $\rho_{E}$  & Environmental correlation     &  -0.18 (-0.33 -- -0.019) \\
 \section*{Results}
 
 \subsection*{\textit{Architecture of \textup{C. maculatus} demography and dispersal traits}}
-%We found that demography and dispersal traits in \textit{C. maculatus} were linked through additive genetic, \revise{maternal}, and environmental covariation.
+%
 \revise{
-We found additive genetic variation in demography and dispersal traits, though genetic and maternal variances were small in magnitude relative to environmental variances (Table \ref{corr:estimates}). 
-Dispersal distance and fertility exhibited a similar amount of totaly phenotypic variance (the sum of the variance components) and a similar fraction of it was attributed to additive genetic effects.
-There was a negative correlation (Pearson's $r = -0.118$) between raw phenotypic values of dispersal distance and fertility (averaged over variation bean densities) (Fig. \ref{corr:post}A), indicating that long-distance dispersers tended to produce fewer offspring.
+
+We found evidence for additive genetic variation in demography and dispersal traits, though genetic and maternal variances were small in magnitude relative to environmental variances -- essentially the residual variation that could not be explained by parentage (Table \ref{corr:estimates}). 
+Dispersal distance and fertility exhibited a similar amount of totaly phenotypic variance and a similar fraction of it was attributed to additive genetic effects, suggesting similar evolutionary potential of the two traits.
+
+%We found that demography and dispersal traits in \textit{C. maculatus} were linked through additive genetic, \revise{maternal}, and environmental covariation.
+There was a negative correlation (Pearson's $r = -0.118$) between raw phenotypic values of dispersal distance and fertility (averaged over variation in bean densities) (Fig. \ref{corr:post}A), indicating that long-distance dispersers tended to produce fewer offspring.
 Underlying these raw observations, our quantitative genetics analysis revealed that demography and dispersal traits in \textit{C. maculatus} were linked through additive genetic, maternal, and environmental correlations, all of them negative (Fig. \ref{corr:post}B). 
 While there was uncertainty in our correation estimates, particularly for genetic and maternal correlations, the majority of the posterior densities were negative (Fig. \ref{corr:post}B).
 Given estimation uncertainty, as quantified by the Bayesian posterior probability distributions, the genetic, maternal, and environmental correlations were, respectively, $2$, $4.6$, and $68.7$ times more likely to be negative than positive.
@@ -451,26 +453,14 @@ Given estimation uncertainty, as quantified by the Bayesian posterior probabilit
 \begin{figure}[h!]
 \centering
 \includegraphics[width=1\linewidth]{Figures/data_corr_posteriors.pdf}
-\caption{\revise{{\textbf{Trait measurements and fitted genetic, maternal, and environmental correlations.} \textit{A}, Raw observations for dispersal distance and fertility, which were negatively correlated (Pearson's $r = -0.118$). \textit{B}, Trait correlations estimated from the quantitative genetic model, including additive genetic ($\rho_{G}$), maternal ($\rho_{M}$), and environmental ($\rho_{M}$) correlation. Vertical lines show the posterior means and translucent lines show the full posterior probability distributions.}}}
+\caption{\revise{{\textbf{Trait measurements and fitted genetic, maternal, and environmental correlations.} \textit{A}, Raw observations for dispersal distance and fertility, which were negatively correlated (Pearson's $r = -0.118$). \textit{B}, Trait correlations estimated from the quantitative genetic model, including additive genetic ($\rho_{G}$), maternal ($\rho_{M}$), and environmental ($\rho_{M}$) correlations. Vertical lines show the posterior means and translucent lines show the full posterior probability distributions.}}}
 \label{corr:post}
 \end{figure}
 
-
-%Correlations between dispersal and fertility were negative (Fig. \ref{corr:posteriors}), more so for the additive genetic effects (median $\rho_{G}$: -0.37) than the environmental effects (median $\rho_{E}$: -0.16).
-%While posterior distributions for both correlations included zero, the majority of both posterior densities were negative (Fig. \ref{corr:posteriors}, center panel).
-%Given estimation uncertainty, as quantified by the Bayesian posterior probability distributions, the genetic correlation was 12 times and the environmental correlation was 9.8 times more likely to be negative than positive.
-
-%The estimated additive genetic correlation had a 95\% credible interval that was notably wider than the estimated environmental correlation ($\rho_{G}$: -0.79 to 0.15; $\rho_{E}$: -0.43 to 0.09).
-%This occurs even though the credible intervals for the covariance estimates are similar to each other ($C_{G}$: -0.11 to 0.01; $C_{E}$: -0.09 to 0.02; Figure \ref{corr:posteriors}).
-%This discrepancy is likely due to the relatively wide credible interval in the additive genetic variance in the dispersal trait ($V_{G,d}$: 0.08 to 0.45), which would necessarily result in a relatively wide credible interval in the additive genetic correlation.
-%\tom{[I don't think this is super important but I actually do not follow this argument. I think part of my confusion is that I am not sure where the correlation estimates come from (comment above where you say they were ``calculated'').
-%For related reasons, I think the covariances can be dropped from this figure, since they simply integrate the variances and correlations.]}
-
-%\newpage
 \subsection*{\textit{Simulation results}}
 \subsubsection*{Simulations of \textup{C. maculatus} invasion}
-Simulations of eco-ecolutionary spread dynamics using empirical point estimates for genetic and environmental variation in demography and dispersal generated results that were consistent with our previous experimental studies of \textit{C. maculatus} invasions (Fig. \ref{corr:barplot}).
-After 20 generations, evolving invasions spread farther and had elevated variability in final extent across simulation replicates, compared to invasions with the same amount phenotypic variance but zero trait heritability.
+Simulations of eco-ecolutionary spread dynamics using point estimates from the beetle system generated results that were consistent with our previous experimental studies of \textit{C. maculatus} invasions (Fig. \ref{corr:barplot}).
+Evolving invasions spread farther and had elevated variability in final extent across simulation replicates, compared to invasions with the same amount phenotypic variance in demography and dispersal traits but none of it genetically based.
 As we found experimentally, the evolutionary effect on variability was proportionally much stronger than the effect on the mean invasion speed.
 Trait evolution in the simulated invasions also aligned well with empirical observations: range-edge patches showed a genetically based increase in dispersal ability and virtually no evolved change in fertility (Fig. \ref{corr:barplot}).
 
@@ -478,68 +468,80 @@ Trait evolution in the simulated invasions also aligned well with empirical obse
 \centering
 \includegraphics[width=0.5\linewidth]{Figures/foldchange_barplot}
 \caption{\textbf{Simulation results for \textit{C. maculatus} invasions.} Bars show the natural logarithm of fold-change due to evolution in invasion metrics and demography and dispersal traits for simulation results corresponding to empirical estimates for \textit{C. maculatus} (Table \ref{corr:estimates}).
-White bars show the mean and CV of final extent after 20 generations of spread, and the fold-change is relative to `control' invasions with no genetically based trait variation ($h^{2}_{d} = h^{2}_{r} = 0$).
-Black bars show genetically based quantitative trait values for dispersal distance ($\mu^{d} + a^{d}$) and low-density fertility ($\mu^{r} + a^{r}$), and fold-change compares the mean range-edge genotype in generation 20 with the initial genotype in generation 1.}
+White bars show the mean and CV of final extent after 20 generations of spread, and the fold-change is relative to invasions with no genetically based trait variation but similar amounts of total phenotypic variance.
+Black bars show genetically based quantitative trait values for dispersal distance ($\mu^{d} + a^{d}$) and low-density fertility ($\mu^{r} + a^{r}$), and fold-change compares the mean range-edge genotype in generation 20 with the initial genotype in generation 1.
+The log fold-change in fertility was very close to zero.}
 \label{corr:barplot}
 \end{figure}
 
 \subsubsection*{Generalizing beyond the \textup{C. maculatus} system}
 \paragraph{Invasion speed and variability}
-Beyond the bean beetle-specific parameter estimates, we found that evolutionary changes in invasion speed and variability were general outcomes when there was genetic variation in demography and dispersal traits, but that trait correlations could modify how evolution shapes these ecological measures of spread, quantitatively and even qualitatively.
-Simulated invasions were fastest when both genetic and environmental correlations were strongly positive, and slowest when both correlations were strongly negative (Fig. \ref{corr:sim_default}A, solid lines).
-As expected, genetic correlations only accelerated spread when trait heritabilities were non-zero, while environmental correlations could accelerate spread in the absence of genetic variation (Fig. \ref{corr:sim_default}A, dashed lines).
-Comparing invasions with and without genetic variation and quantifying their difference in speed as a fold-change (Fig. \ref{corr:sim_default}B) shows that evolution accelerated spread even under the strongest negative genetic correlation, where evolved increases \revise{in} dispersal ability necessarily meant evolved decreases \revise{in} fertility, and vice versa.
+We found that evolutionary changes in invasion speed and variability were general outcomes when there was genetic variation in demography and dispersal traits, but that trait correlations could modify how evolution shapes these ecological measures of spread, quantitatively and even qualitatively.
+Under the trait variances estimated from the beetle system, simulated invasions were fastest when genetic, maternal, and environmental correlations were all strongly positive, and slowest when these correlations were strongly negative (Fig. \ref{corr:sim_extent_CV}A, inset).
+%As expected, genetic correlations only accelerated spread when trait heritabilities were non-zero, while environmental correlations could accelerate spread in the absence of genetic variation (Fig. \ref{corr:sim_default}A, dashed lines).
+Comparing invasions with vs. without genetic variation and quantifying their difference in speed as a fold-change, Fig. \ref{corr:sim_extent_CV}A shows that evolution accelerated spread even under the strongest negative genetic correlation, where evolved increases \revise{in} dispersal ability necessarily meant evolved decreases \revise{in} fertility, and vice versa.
 More positive genetic correlations led to stronger evolutionary acceleration, since selection could favor high-dispersal / high-fertiltiy phenotypes.
-Interestingly, the magnitude of evolutionary acceleration responded in the opposite way to environmental correlations, being greatest at negative values of $\rho_{E}$ (Fig. \ref{corr:sim_default}B).
-This was likely because invasions already accelerated by positive environmental correlations have less opportunity for further increases in speed due to trait evolution, given a fixed amount of total phenotypic variation.
+Variance in invasion outcome, measured as the CV of final invasion extent across simulation replicates, was also greater for invasions with vs. without genetically based trait variation, and the evolutionary increase in variance was positively related to the genetic correlation (Fig. \ref{corr:sim_extent_CV}D).
+%Variance-generating effects of evolution and, consequently, the change in variance with vs. without evolution were both greatest under strong, positive correlations.
+Under beetle-specific parameters, non-genetic trait correlations ($\rho_{M}$ and $\rho_{E}$) weakly affected the degree to which evolution accelerated invasion. 
+%However, in contrast to results for the mean speed of invasion, variance across realizations was largely unaffected by environmental correlations.
+Black points in Figures \ref{corr:sim_extent_CV}A,D identify the beetle system in the context of variation in $\rho_{G}$, $\rho_{M}$ and $\rho_{E}$.
+This visualization illustrates how, in this system, empirically observed increases in invasion speed and variability due to evolution were likely constrained by the negative genetic correlation between dispersal and fertility, whereas the trait correlations stemming from maternal and environmental effects had little influence on evolutionary outcomes.
 
-Variance in invasion outcome, measured as the CV of final invasion extent across simulation replicates, also responded positively to genetic correlations when trait heritabilities were non-zero (Fig. \ref{corr:sim_default}C,D).
-Variance-generating effects of evolution and, consequently, the change in variance with vs. without evolution were both greatest under strong, positive correlations.
-However, in contrast to results for the mean speed of invasion, variance across realizations was largely unaffected by environmental correlations.
+\revise{Effects of trait correlations on the mean and CV of invasion speed described above generally held when we expanded the simulations beyond beetle-specific parameters to explore cases of greater genetic variation in dispersal and fertility, but considering this expanded parameter space provided several additional insights.
+First, as expected, the influence of genetic correlations on mean invasion speed strengthened as more of the phenotypic variation was genetically-based (Fig. \ref{corr:sim_extent_CV}A--C). 
+Second, maternal and environmental correlations had a greater influence under greater genetic variance in demography and dispersal, particularly for mean invasion speed. 
+Interestingly, the magnitude of evolutionary acceleration responded in the opposite way to \revise{maternal} and environmental correlations as it did to genetic correlations, being greatest at negative values of $\rho_{M}$ and $\rho_{E}$.
+This was likely because, even in the absence of evolution, invasions were accelerated by positive environmental and maternal correlations (Online Appendix Figure); thus, there was more `room for improvement' in speed via evolution when non-genetic negative trait correlations held invasions back. 
+It is also noteworthy that maternal and environmental correlations seemed to have inter-changeable effects in this regard. 
+Third, and most importantly, we found that it was possible for evolution to \textit{decelerate} invasion (Fig. \ref{corr:sim_extent_CV}C).
+The evolutionary decrease in invasion speed occurred only when dispersal and fertility traits were highly heritable and genetic correlations were very negative, where the best dispersers at the leading edge were very likely to have low fertility.
+Even under conditions where evolution decelerated spread, evolutionary effects on variance remained positive (Fig. \ref{corr:sim_extent_CV}D--F).
+Thus, the evolutionary increase in variance across realizations of spread was a general result across the dimensions of parameter space that we considered, but the evolutionary increase in average speed was not: genetically based trade-offs between dispersal and reproduction could sometimes cause an evolutionary slow-down.
+}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.75\linewidth]{Figures/sim_invasions_default_h2_4panel}
-\caption{\textbf{Simulation results for evolutionary effects on invasion speed and variability.}
-\textit{A}, Final invasion extent (patch number); \textit{B}, Fold-change in final extent due to evolution; \textit{C}, Coefficient of variation (CV) of invasion extent; \textit{D}, Fold-change in CV due to evolution.
-For all panels, responses are shown in relation to $\rho_{G}$ (\textit{x}-axes) and $\rho_{E}$ (colored lines).
-In \textit{A},\textit{C} dashed and solid lines show simulation output for zero and non-zero trait heritabilities, respectively, where non-zero values correpond to \textit{C. maculatus} (Table \ref{corr:estimates}); panels \textit{B},\textit{D} contrast these cases as fold-change.
-Black lines show results for the $\rho_{E} = -0.16$ and points further show $\rho_{G} = -0.37$, the point estimates from the \textit{C. maculatus} system.}
-\label{corr:sim_default}
+\includegraphics[width=1\linewidth]{Figures/sim_extent_CV_revised}
+\caption{\revise{\textbf{Trait correlations modify evolutionary effects on invasion speed and variability.}
+\textit{A--C}, Fold-change in final invasion extent due to evolution (inset in \textit{A} shows raw final extent for evolving invasions); \textit{D--F}, Fold-change in CV of final extent due to evolution.
+For all panels, responses are shown in relation to $\rho_{G}$ (\textit{x}-axes), $\rho_{M}$ (colors) and $\rho_{E}$ (line types).
+Gray lines at $y=0$ indicate no difference between invasions with and without additive genetic variation in dispersal and fertility. 
+%In \textit{A},\textit{C} dashed and solid lines show simulation output for zero and non-zero trait heritabilities, respectively, where non-zero values correpond to \textit{C. maculatus} (Table \ref{corr:estimates}); panels \textit{B},\textit{D} contrast these cases as fold-change.
+Columns correspond to three cases of genetic variation: \textit{A,D}, genetic, maternal, and environmental variances estimated from the beetle system ($V_{G} < V_{M} < V_{E}$); \textit{B,E}, equal distribution of variance components ($V_{G} = V_{M} = V_{E}$); \textit{C,F}, all phenotypic variance is genetically based ($V_{G} = V_{P}$). 
+Black dots in \textit{A} and \textit{D} show outcomes using parameter estimates from the \textit{C. maculatus} system.}}
+\label{corr:sim_extent_CV}
 \end{figure}
-
-Figure \ref{corr:sim_default} shows the influence of trait correlations for point values of trait heritabilities and variances estimated from the beetle system, where black lines and points identify the beetle system in the context of variation in $\rho_{G}$ and $\rho_{E}$.
-This visualization illustrates how empirically observed increases in invasion speed and variability due to evolution were likely constrained by the negative genetic correlation between dispersal and fertility, while the negative environmental correlation enhanced the evolutionary effect on mean speed.
-As shown in Online Appendix B, we found qualitatively identical results for evolutionary effects on invasions when we varied parameters of trait architecture ($h^{2}_d$, $h^{2}_r$, $V_{P,d}$, $V_{P,r}$), with one important exception: with more phenotypic variation and higher trait (especially fertility) heritability than we observed in the beetle system, it was possible for evolution to \textit{decelerate} invasion (Fig. \ref{corr:sim_vary_h2_Pvar}).
-The evolutionary decrease in invasion speed occurred only when genetic correlations were very negative, where the best dispersers at the leading edge were very likely to carry low-fertility genotypes.
-Even under conditions where evolution decelerated spread, evolutionary effects on variance remained positive.
-Thus, the evolutionary increase in variance across realizations of spread was a general result across the dimensions of parameter space that we considered, but the evolutionary increase in average speed was not.
 
 \paragraph{Trait evolution}
 Simulation results for evolved trait changes provide a mechanistic basis for the invasion metrics described above, and help contextualize the trait changes observed in the \textit{C. maculatus} system (Fig. \ref{corr:traits}).
-Dipsersal showed strong, positive evolutionary responses across all values of genetic and environmental correlations.
-In contrast, evolutionary change in fertility during invasion was strongly dependent on the sign and magnitude of genetic correlations.
-Under no correlation ($\rho_{G}$ = 0), there was a small evolved increase in fertility, consistent with theoretical expectations for `\textit{r}-selection’ on fertility at low-density wave fronts.
-However, strong evolved increases in fertility occurred only when it was positively genetically linked to dispersal.
-On the other hand, negative correlations caused either no change or an evolved decrease in fertility at the invasion front, depending on the magnitude of the correlation.
-%Thus, our previous finding of no evolved changed in fertility during \textit{C. maculatus} range expansion was at least partially driven by its negative genetic correlation with dispersal.
+For the conditions of the beetle system (Fig. \ref{corr:traits}A) and more generally(Fig. \ref{corr:traits}B,C), dipsersal showed strong, positive evolutionary responses across all values of genetic and environmental correlations, consistent with expectations for dispersal evolution via spatial sorting.
+Evolved increases in dispersal were strongested under positive demography-dispersal genetic correlations ($\rho_{G}$), whereas maternal ($\rho_{M}$) and environmental ($\rho_{E}$) trait correlations had virtually no influence on trait evolution. 
 
-Regardless of direction, the magnitude of the evolutionary response in fertility was lower than that of dispersal (Fig. \ref{corr:traits}).
-This was true for the trait architecture correspding to \textit{C. maculatus}, where there was more additive genetic variance in dispersal than in fertility (Fig. \ref{corr:posteriors}).
-However, that asymmetry alone does not explain the stronger evolutionary response of dispersal.
-In Online Appendix B, we show that spatial \revise{sorting of} dispersal generally predominated `\textit{r}-selection’ on low-density fertility, even when fertility was as or more heritable than dispersal distance (Fig. \ref{corr:traits_app}).
-Across the entire parameter space we considered, strong, positive evolutionary responses in fertility occurred only when it was positively genetically linked with dispersal, but not \textit{vice versa}.
-%Finally, also in Online Appendix C, we show that variability in range-edge trait values across simulation replicates was generally greatest for both traits under positive correlations, consistent with the increase in variability of invasion outcomes under positive correlations (Fig. \ref{corr:sim_default}C,D). \footnote{\tom{I still need to make this figure.}}
-%I am now thinking this is not necessary, though we can provide this if reviewers ask for it.
+In contrast to dispersal, the direction of evolutionary change in fertility during invasion was strongly dependent on the sign and magnitude of genetic correlations.
+Under no correlation ($\rho_{G}$ = 0), there were evolved increases in fertility (stronger when there was more genetic variation in this trait), consistent with theoretical expectations for `\textit{r}-selection’ on fertility at low-density wave fronts.
+Across the parameter space we considered, strong evolved increases in fertility occurred only when it was positively genetically linked to dispersal, whereas strong negative correlations caused an evolved decrease in fertility at the invasion front.
+%Thus, our previous finding of no evolved changed in fertility during \textit{C. maculatus} range expansion was at least partially driven by its negative genetic correlation with dispersal.
+Regardless of direction, the magnitude of the evolutionary response in fertility was lower than that of dispersal (Fig. \ref{corr:traits}), despite similar levels of genetic variance in the beetle system (Table \ref{corr:estimates}) and in our generalized cases (Online Appendix A).
+Thus, spatial \revise{sorting of} dispersal generally predominated `\textit{r}-selection’ on low-density fertility such that genetically based trade-offs always tipped the balance in favor of increased dispersal ability at the invasion front. 
+
+\revise{Predicted trait changes specific to the \textit{C. maculatus} system are shown as black points in Figure \ref{corr:traits}A. In this context, it is clear that the overall evolutionary response was expected to be greater for dispersal than for fertility, regardless of the genetic correlation between them. However, the outcome of no change in fertility was likely a direct consequence of the moderately negative genetic correlation in this system. } 
+
+\revise{We have focused our analyses on contrasts between invasions with vs. without genetically based trait variation as measures of how evolution affects invasions.
+This approach combines evolutionary processes that are unique to spreading populations (spatial sorting) with those that are not (natural selection), and thus represents the `total' effect of evolution.
+In Online Appendix A, we present simulation results that isolate the specific influence of spatial sorting from other evolutionary processes. }
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.5\linewidth]{Figures/trait_change}
-\caption{\textbf{Simulation results for evolutionary change in dispersal and fertility.} Lines show the natural logarithm of fold-change in dispersal (log(patches)) and fertility (log(offspring)) in relation to $\rho_{G}$ (\textit{x}-axis) and $\rho_{E}$ (colored lines).
+\includegraphics[width=1\linewidth]{Figures/trait_change_revised}
+\caption{\textbf{Simulation results for evolutionary change in dispersal and fertility.} 
+\textit{A}, genetic, maternal, and environmental variances estimated from the beetle system ($V_{G} < V_{M} < V_{E}$); \textit{B}, equal distribution of variance components ($V_{G} = V_{M} = V_{E}$); \textit{C}, all phenotypic variance is genetically based ($V_{G} = V_{P}$)
+Lines show the natural logarithm of fold-change in dispersal (log(patches)) and fertility (log(offspring)) in relation to $\rho_{G}$ (\textit{x}-axis), $\rho_{M}$ (colors), and $\rho_{E}$ (line types).
 Fold-change compares trait values ($\mu^{d} + a^{d}$ and $\mu^{r} + a^{r}$) in the farthest occupied patch after 20 generations of range expansion to their respective starting values.
-Black lines show results for the $\rho_{E} = -0.16$ and point shows $\rho_{G} = -0.37$, the point estimates from the \textit{C. maculatus} system.}
+Black points show outcomes using parameters estimates from the \textit{C. maculatus} system.}
 \label{corr:traits}
 \end{figure}
+%As shown in Online Appendix B, we found qualitatively identical results for evolutionary effects on invasions when we varied parameters of trait architecture ($h^{2}_d$, $h^{2}_r$, $V_{P,d}$, $V_{P,r}$), with one important exception: 
 
 % Discussion -------------
 \section*{Discussion}
@@ -548,11 +550,11 @@ But, in both classes of theory, regeneration and movement are usually assumed to
 On the other hand, different bodies of literature emphasize connections between demography and dispersal traits through a myriad of mechanisms, ranging from trade-offs and costs of dispersal (typically corresponding to negative corrrelations) to dispersal `syndromes' that package several life history and movement traits into a multivariate phenotype (typically corresponding to positive correlations).
 Our work unifies both ends of this continuum into a cohesive framework for understanding the role of trait correlations in invasion dynamics, and carries significance at two levels.
 First, the quantitative genetics experiment and empirically parameterized simulation model allowed us to retrospectively diagnose the contributions of demography-dispersal correlations to observed spread dynamics and trait evolution in the \textit{C. maculatus} model system.
-Our findings that trait architecture, including genetic and environmental variances and covariance, imposed important constraints on trait evolution and invasion dynamics provide a novel window of insight onto this empirical case study.
+Our findings that trait architecture imposed important constraints on trait evolution and invasion dynamics provide a novel window of insight onto this empirical case study.
 Second, the generalized simulation model expanded our breadth of inference, revealing which outcomes were particular to the trait architecture of \textit{C. maculatus} and which were more general.
 
 \revise{\linelabel{mod3}It is widely expected from evolutionary theory that genetic correlations can constrain responses to selective processes \citep{schluter1996adaptive,walsh2009abundant}, and this has been previously shown in the context of range-expanding populations \citep{burton_trade-offs_2010,perkins_after_2016,fronhofer_eco-evolutionary_2015}.
-Our work moves beyond these familiar expectations for trait evolution to show, for the first time, how the sign, magnitude, and type of correlation between demography and dipsersal affects higher-level, ecological outcomes of range expansion, specifically speed and variability across realizations.
+Our work builds upon these familiar expectations for trait evolution to show, for the first time, how the sign, magnitude, and type of correlation between demography and dipsersal affects higher-level, ecological outcomes of range expansion, specifically speed and variability across realizations.
 Our finding that, under some conditions, negative genetic correlations can cause an evolutionary-slow down of range expansion, for example, highlights the value of connecting trait evolution to ecological outcomes.
 We also provide novel evidence that trait covariance determines the extent to which evolution can amplify variability across realizations of spread.
 Collectively, our results identify trait correlations as a key factor modulating how evolution shapes trajectories of biological invasion.
@@ -561,22 +563,21 @@ Below, we discuss our results in greater detail and connect their conceptual sig
 
 Simulated invasions based on \textit{C. maculatus} parameters recapitulated our previous experimental results \citep{ochocki_rapid_2017}: invasions subject to the influence of selective forces on dispersal and fertility at the low-density leading edge were faster, on average, and more variable, and showed evolved increases in dispersal but not fertility, compared to invasions in which that influence was suppressed (Figure \ref{corr:barplot}).
 This correspondence bolstered our confidence that the simulation model was an appropriate vehicle for testing how trait correlations contributed to those results.
-\linelabel{mod14}We found that evolutionary increases \revise{in} mean and variance were expected for \textit{C. maculatus} regardless of trait correlations: even a strict genetic trade-off ($\rho_{G} = -1$) could not have prevented evolutionary acceleration\revise{, a result anticipated by recent theory \citep{phillips2018spatial}}.
+\linelabel{mod14}We found that evolutionary increases \revise{in} mean and variance were expected for \textit{C. maculatus} regardless of trait correlations: even a strict genetic trade-off ($\rho_{G} = -1$) could not have prevented evolutionary acceleration.
 However, the sign and magnitude of correlations could modify the strength of the response.
 Specifically, increasing the genetic correlation from negative to positive values increased the speed of invasion, on average, as well as its variability across realizations.
-Thus, the negative genetic correlation that we detected between dispersal and fertility in \textit{C. maculatus} (Fig. \ref{corr:posteriors}) caused the evolutionary increases in invasion speed and variability observed in our prevoius study to be weaker than they would have been under no, or especially positive, genetic correlations (Fig. \ref{corr:sim_default}).
+Thus, the negative genetic correlation that we detected between dispersal and fertility in \textit{C. maculatus} (Fig. \ref{corr:post}) caused the evolutionary increases in invasion speed and variability observed in our prevoius study to be weaker than they would have been under no, or especially positive, genetic correlations (Fig. \ref{corr:sim_extent_CV}).
 
-The increase in invasion speed with increasing strength of demography-dispersal correlation was a general result, not limited to beetle-specific parameter estimates (Fig \ref{corr:sim_vary_h2_Pvar}).
+The increase in invasion speed with increasing strength of demography-dispersal correlation was a general result, not limited to beetle-specific parameter estimates (Fig \ref{corr:sim_extent_CV}).
 This likely occurred because positive correlations align the dominant axis of phenotypic variation with the direction of selection, with high-dispersal / high-fertility (and therefore high-invasion speed) phenotypes favored at the leading edge \citep{phillips_life-history_2010}.
 The accelerating effect of positive genetic correlations may also reflect some contribution of `enhanced spatial selection', whereby \revise{the evolution of} greater reproductive rates at the leading edge strengthen spatial selection on dispersal \citep{perkins_evolution_2013}.
-On the other hand, negative genetic correlations constrain evolutionary acceleration of invasion, since an evolved increase in one trait would mean an evolved decrease in the other.
-This recent is anticipated by recent theory on the dual roles of reproduction and movement in
-Importantly, our simulations revealed that a strongly negative demography-dispersal genetic correlation, combined with a large amount of heritable variation, can actually \textit{decelerate} invasion (Fig. \ref{corr:sim_vary_h2_Pvar}).
+On the other hand, negative genetic correlations constrain evolutionary acceleration of invasion since an evolved increase in one trait would mean an evolved decrease in the other\revise{, a result anticipated by recent theory \citep{phillips2018spatial}}.
+Importantly, our simulations revealed that a strongly negative demography-dispersal genetic correlation, combined with a large amount of heritable variation, can actually \textit{decelerate} invasion (Fig. \ref{corr:sim_extent_CV}).
 Two previous theoretical studies have reported the potential for evolution to decelerate invasion when there is an Allee effect that selects against phenotypes that occur in low-density, leading-edge patches \citep{shaw_dispersal_2015, travis_dispersal_2002}.
-\linelabel{mod15}\revise{The accumulation of deleterious mutations at expanding fronts (`expansion load') is another process that can slow down invasions \citep{gilbert2017local,peischl2018evolution}.
+\linelabel{mod15}\revise{The accumulation of deleterious mutations at expanding fronts (`expansion load') is another evolutionary process that can slow down invasions \citep{gilbert2017local,peischl2018evolution}.
 }
 Our results identify genetically based trade-offs as a new mechanism for evolutionary deceleration of spread.
-It is unknown how commonly conditions align to cause evolutionary deceleration of expanding populations, but the possibility of it should cause us to reconsider general expectations for eco-evolutionary invasion dynamics in light of genetic architecture.
+It is unknown how commonly conditions align to cause evolutionary deceleration of expanding populations via negative genetic correlations, but the possibility of it should cause us to reconsider general expectations for eco-evolutionary invasion dynamics in light of genetic architecture.
 
 \revise{\linelabel{mod4}If trade-offs between dispersal and life history traits are common, as empirical studies suggest, then such negative correlations may be an important factor limiting the speed of range expansion and constraining the evolution of `super-invaders'.
 \linelabel{mod6}For example, Fronhofer and Altermatt \citeyearpar{fronhofer_eco-evolutionary_2015} found that spatial sorting favored the evolution of increased dispersal in freshwater ciliates but this traded off with foraging success, leading to the dominance of `prudent' resource depletion strategies at range margins.
@@ -587,31 +588,31 @@ Our results provide new context for interpreting the consequences of trait corre
 }
 
 \revise{
-Perhaps not surprisingly, the role of genetic correlations as a decelerating or accelerating factor depended on the amounts of heritable variation in demography and dispersal traits (Fig \ref{corr:sim_vary_h2_Pvar}).
+Perhaps not surprisingly, the role of genetic correlations as a decelerating or accelerating factor depended on the amounts of genetic variation in demography and dispersal traits (Fig \ref{corr:sim_extent_CV}).
 \linelabel{mod5}This suggests that historical factors may be an important contingency on the expression of genetically based correlations and their ecological consequences.
 For example, genetic bottlenecks associated with species' introductions may limit genetic variances and covariances in range-expanding species \citep{dlugosch2008founding,wagner2017genetic}.
 In the Western bluebird system, historical metapopulation dynamics were important for the maintence of alternative dispersal/aggression phenotypes, which promoted subsequent range expansion \citep{duckworth2008adaptive}.
 Furthermore, genetic architecture of demography and dispersal traits may itself evolve during expansion \citep{arnold2008understanding}, as selective processes deplete genetic variation and covariation at the expansion front.
-This was likely the case in our experiments and simulations, though we did not attempt to quantify such changes.
+This was likely the case in our experiments and simulations, though we did not quantify such changes.
 }
 
 In addition to increasing the average speed of invasion, evolution of demography and dispersal traits can also amplify variability across realizations of spread.
-This result that has been shown in previous theoretical and experimental studies (\citealt{ochocki_rapid_2017}; \citealt{weiss-lehman_rapid_2017}; \citealt{phillips_evolutionary_2015}; but see \citealt{williams_rapid_2016} for a case of evolution \textit{decreasing} variability) and is typically interpreted as a signature of `gene surfing', whereby founder events at the low-density leading edge lead to stochastic allele fixation, either reinforcing or counter-acting selection on demography and dispersal \citep{edmonds_mutations_2004,klopfstein_fate_2006,excoffier_surfing_2008,peischl_expansion_2015}.
-Our new results indicate that genetic correlations are an important modifier of invasion variability (Fig. \ref{corr:sim_default}), likely for reasons related to their influence on average speed.
+This result that has been shown in previous theoretical and experimental studies (\citealt{ochocki_rapid_2017}; \citealt{weiss-lehman_rapid_2017}; \citealt{phillips_evolutionary_2015}; but see \citealt{williams_rapid_2016} for a case of evolution \textit{decreasing} variability) and is typically interpreted as a signature of `gene surfing', whereby founder events at the low-density leading edge lead to stochastic allele fixation that either reinforces or opposes selection on demography and dispersal \citep{edmonds_mutations_2004,klopfstein_fate_2006,excoffier_surfing_2008,peischl_expansion_2015}.
+Our new results indicate that genetic correlations are an important modifier of invasion variability (Fig. \ref{corr:sim_extent_CV}), likely for reasons related to their influence on average speed.
 Under a positive genetic correlation, the major axis of phenotypic variance spans low-dispersal / low-fertility (and thus low invasion speed) to high-dispersal / high-fertility (and thus high invasion speed).
 Stochastic fixation of alleles sampled from this axis of variation should therefore generate a wide range of invasion speeds across realizations.
 Conversely, under a negative genetic correlation, the major axis of phenotypic variance spans low-dispersal / high-fertility to \textit{vice versa}; opposite ends of this axis are phenotypically different but similar in their resulting invasion speeds, due to the counter-acting effects of the two traits.
 \revise{\linelabel{mod16}These outcomes echo the classic result for invasion by diffusion, where speed equals $2\sqrt{rD}$, and are consistent with recent theory that highlights the compensatory nature of selection on spatial versus temporal components of fitness \citep{phillips2018spatial}.}
-The corresponding range of variation in invasion speed should therefore be smaller than under a positive correlation, all else equal.
-In this way, increasing a genetic correlation between demography and dispersal from negative to positive values increases the opportunity for fixation of ecologically different phenotypes.
-Empirical work has shown that evolutionary effects on replicate-to-replicate invasion variance may themselves be highly variable across systems \citep{ochocki_rapid_2017,weiss-lehman_rapid_2017,williams_rapid_2016,van2018kin}.
+The range of variation in invasion speed should therefore be smaller under a negative demography-dispersal correlation than a positive one, all else equal.
+In this way, increasing a genetic correlation from negative to positive values increases the opportunity for fixation of ecologically different phenotypes.
+Empirical work has shown that evolutionary effects on replicate-to-replicate invasion variance may themselves be highly variable across systems \citep{ochocki_rapid_2017,weiss-lehman_rapid_2017,williams_rapid_2016,van2018kin,williams_TREE}.
 Our results suggest that, as with mean invasion speed, understanding the genetic architecture of demography and dispersal traits may help resolve this heterogeneity across studies.
 
 In addition to the large-scale patterns of mean and variance in invasion speed, our results also provide insight into underlying mechanisms: trait evolution during range expansion.
 Empirical studies of range-core vs. range-edge values for life history and movement traits have been rapidly accumlating, often but not always supporting the theoretical expectation of increased dispersal and reproductive output at the range edge (reviewed in \citealt{chuang_expanding_2016}).
-Our results show that, in the \textit{C. maculatus} system (Fig. \ref{corr:traits}) and in general (Fig. \ref{corr:traits_app}), the evolutionary response of dispersal ability exceeded that of low-density reproductive rate, which only showed a strong evolved increase when it was genetically linked to dispersal ability.
+Our results show that, in the \textit{C. maculatus} system and in general, the evolutionary response of dispersal ability exceeded that of low-density reproductive rate, which only showed a strong evolved increase when it was genetically linked to dispersal ability (Fig. \ref{corr:trait_change_revised}).
 Furthermore, under negative genetic correlations, it was always dispersal that increased at the expense of fertility (evolutionary acceleration occurred as long as gains in dispersal more than compensated for losses in fertility).
-These results point to \revise{a combination of three for} reasons why we failed to detect any evolved change in fertility in our previous invasion experiment: \revise{the relatively low additive genetic variance in fertility,} the pre-dominance of spatial \revise{sorting of} dispersal over \textit{r}-selection on fertility, and the negative genetic correlation between the two \revise{traits}, which further limited any evolved increase \revise{in fertility}.
+These results point to two reasons why we failed to detect any evolved change in fertility in our previous invasion experiment: \revise{the relatively low additive genetic variance in fertility,} the pre-dominance of spatial \revise{sorting of} dispersal over \textit{r}-selection on fertility, and the negative genetic correlation between the two \revise{traits}, which further limited any evolved increase \revise{in fertility}.
 Our trait evolution results also shed light on empirical results elsewhere in the literature, including evidence for evolved increases in dispersal but decreases in fertility in range-edge populations \citep{simmons_changes_2004,hughes_evolutionary_2003}.
 Working with laboratory invasions of flour beetles, \cite{weiss-lehman_rapid_2017} found that evolution increased the mean and variance of invasion speed at the population-level, while at the trait level dispersal increased but fertility significantly decreased; in our simulations, a negative genetic correlation often yielded exactly these results.
 By considering both invasion dynamics and underlying traits, our results highlight their sometimes counter-intuitive connections, including cases where evolved increases in dispersal ability may fail to accelerate or even decelerate range expansion due to corresponding reductions in fertility.

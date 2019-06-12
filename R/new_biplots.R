@@ -362,6 +362,11 @@ legend("topright",legend=c(expression(rho[G]),expression(rho[M]),expression(rho[
        col=c("#1b9e77","#d95f02","#7570b3"),
        bty="n")
 
+## over/under zero?
+sum(data.frame(corrs)$corrG.2.1 < 0) / sum(data.frame(corrs)$corrG.2.1 > 0)
+sum(data.frame(corrs)$corrME.2.1 < 0) / sum(data.frame(corrs)$corrME.2.1 > 0)
+sum(data.frame(corrs)$corrE.2.1 < 0) / sum(data.frame(corrs)$corrE.2.1 > 0)
+
 
 # Update Table 1 ----------------------------------------------------------
 
