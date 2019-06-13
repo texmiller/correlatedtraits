@@ -62,11 +62,21 @@
 % ======================================================= %
 \noindent To the editorial board,\\
 
-Thank you for the opportunity to submit a major revision of our manuscript for your consideration. In this document, we reproduce comments from the editors and reviewers and provide our point-by-point responses. As we explain in more detail below, our responses and corresponding revisions focus on the following major concerns that emerged from our previous review.
+Thank you for the opportunity to submit a major revision of our manuscript for your consideration. Thanks also for giving us the extra time we needed to prepare a revision that (we hope) rises to the challenges set out for us by the reviewers and associate editor. 
+
+In this document, we reproduce comments from the editors and reviewers and provide our point-by-point responses. As we explain in more detail below, our responses and corresponding revisions focus on the following major concerns that emerged from our previous review.
 \begin{enumerate}
-\item{Reviewer 1 found some of our results unsurprising and questioned the novelty of our work relative to previous papers in this field. We now more clearly emphasize the novel results of our paper, highlighting these in a new sections of the Introduction and Discussion, as suggested by Dr. Winn, and we clarify the relationship between our work and related, foundational papers.}
-\item{Following suggestions from Dr.'s Winn and Duckworth, we discuss possible mechanisms underlying the negative trait correlations that we documented experimentally. We also provide greater context for interpreting dispersal patterns in our laboratory environment, and we have created a new figure to more transparently represent our quantitative-genetic estimates and the raw observations on which they are based.}
-\item{We provide new discussion of the limitations of our quantitative genetics experiments, specifically the inability to estimate maternal effects separately from additive genetic effects. In response to questions from Dr. Duckworth and Reviewer 2, we conducted new simulation analses to identify constraints on our abiity to estimate maternal effects.}
+\item{Reviewer 2 and AE Duckworth questioned why we were not able to fit maternal effects in our quantitative genetics analysis. 
+These comments sent us down a rabbit hole from which we have just recently emerged - fortunately, with the maternal effects in hand. 
+The revised manuscript now includes maternal effects in the statistical analysis as well as the simulations of eco-evolutionary invasion dynamics.
+This required some substantial changes to our code, hence the delay in our resubmission.}
+\item{Reviewer 1 found some of our results unsurprising and questioned the novelty of our work relative to previous papers in this field. 
+We now more clearly emphasize the novel results of our paper, highlighting these in new sections of the Introduction and Discussion, as suggested by Dr. Winn.
+We also take greater care to clarify the relationship between our work and related, foundational papers.}
+\item{Following suggestions from Dr.'s Winn and Duckworth, we discuss possible mechanisms underlying the negative trait correlations that we documented experimentally. 
+We also provide greater context for interpreting dispersal patterns in our laboratory environment, and we have created a new figure to more transparently represent our quantitative-genetic estimates and the raw observations on which they are based.}
+\item{We have added new analyses in the Online Appendix to isolate the role of spatial sorting (an evolutionary process unique to spreading populations) from other evolutionary mechanisms.
+This was not requested by reviewers but, in preparing this revision, we found that these analyses add nuance to the findings presented in the main manuscript, so we include them in the Online Appendix for interested readers.}
 \end{enumerate}
 
 All of our revisions are denoted in the manuscript with \revise{Mahogany font}.
@@ -117,7 +127,7 @@ Given the potential we see for the paper to make a contribution that would be wi
 In particular, Reviewer 1 brings up several recent studies that have also done simulation studies on dispersal and invasion dynamics.
 While the current study cites many of these recent papers, it could do a better job of explaining the differences in approaches with the current paper and how that may affect interpretation of results.}
 \response{We have added new content that clarifies the novelty and significance of our study with respect to foundational papers in this area (l. \ref{ms-mod2},\ref{ms-mod3}).
-As we explain in these new paragraphs, previous studies have incorporated trade-offs into eco-evolutionary range expansion models, but none have examined how trade-offs (or trait correlations more generally) affect expansion speed and variability, and none have decomposed the relative roles of genetic and environmental correlations.
+As we explain in these new paragraphs, previous studies have incorporated trade-offs into eco-evolutionary range expansion models, but none have examined how trade-offs (or trait correlations more generally) affect expansion speed and variability, and none have decomposed the relative roles of genetic and non-genetic correlations.
 %If our focus were strictly on trait evolution, then we agree that our finding that a negative genetic correlation constrained evolutionary responses during spread is neither new nor surprising.
 %However, as we now more clearly explain, this is not the main point of our paper.
 %Instead, we emphasize how trait correlations and their role in eco-evolutionary feedbacks can affect ecological outcomes of expansion speed and variability.
@@ -137,7 +147,7 @@ In the uniform lab environment is the variation we observe among individuals due
 Or do interactions with other individuals in these lab systems impact the costs of dispersal and female fecundity?
 It would be useful to have more details on what is known about the dispersal environment of the lab populations and how this may or may not apply to natural populations.}
 \response{We understand these comments from the AE and reviewers, and our revision addresses this in several ways.
-First, we have added a new figure to more transparently communicate the traits that we are modeling.
+First, we have added a new figure (Fig. 1) to more transparently communicate the traits that we are modeling.
 Our previous submission showed only the parameter estimates from the QG analysis; based on comments raised in our previous review (including the AE's next comment), we think that showing the underlying data may help put these parameter estimates into context.
 Second, we have added information about what we know about density-dependent movement in our system and we discuss how genetic variation in dispersal may reflect either innate movement tendencies or responses to conspecifif density (paragraph beginning l.\ref{ms-mod10}).
 Finally, while it remains the case that we do not have a clear mechanistic understanding of costs of dispersal in our system, we now discuss some hypotheses for this (l.\ref{ms-mod11}) and for how our lab results might translate to natural populations (l.\ref{ms-mod12}).
@@ -150,12 +160,14 @@ Given that all groups in the trials are full sibs, if they all use a simple rule
 What are the ranges of dispersal in the system? The variation in both dispersal and fecundity looks extremely low overall – could this be the issue?
 More details on the how these traits vary in the lab environment is needed to assess the QG analysis.}
 \response{As mentioned in our previous response, we have added a new figure that shows the empirical observations to help put our QG results into context.
-Regarding the AE's concerns about variance being greater within versus among groups of full sibs, this precisely what our heritability estimates are meant capture.
-While it is fair to question the biological relevance of our dispersal set-up in this lab system, the results of this study and our previous work (Ochocki and Miller 2017) clearly indicate that, in this context, there is significant among-brood variance in dispersal. \\
-\\
-Like the AE and Reviewer 2, we were surprised and disappointed that we could not estimate maternal effects from our data.
-In responses to these comments raised in our review, we have dug into this issue with new simulation work (not added to the manuscript because it is tangential to the scope, though we are open to including this).
-\revise{Summarise findings.}
+%Regarding the AE's concerns about variance being greater within versus among groups of full sibs, this precisely what our breeding design was meant to disentangle.
+%While it is fair to question the biological relevance of our dispersal set-up in this lab system, the results of this study and our previous work (Ochocki and Miller 2017) clearly indicate that, in this context, there is among-brood variance in dispersal. \\
+%\\
+%Like the AE and Reviewer 2, we were surprised and disappointed that we could not estimate maternal effects from our data.
+In responses to these comments about maternal effects, we dug into this issue.
+After some tinkering and re-parameterization, we were able to get the maternal variance estimates to converge; this means we also now estimate the corresponding maternal covariance between dispersal and fertility as an additional component of trait covariance. 
+As we anticipated in our original submission, the explicit estimation of maternal effects led to lower estimates of additive genetic variance in dispersal and fertility; i.e., variance that we previously attribtued to additive genetic effects we now know to reflect maternal effects. 
+While our genetic variances are now lower and quantitative details of our results are now different (see changes throughout the Results section), the qualitative `story' of our paper has not changed. 
 }
 
 \section{Response to Reviewer 1}
@@ -248,7 +260,7 @@ Clarification: “After 28 days of development. . . Within 48 hours of eclosion.
 
 \comment{Surprising that the maternal effects model would not converge. You should have sufficient data.
 Still, if it won’t converge...}
-\response{\revise{Waiting on sim results.}}
+\response{We now include maternal effects in our analsis and simulation model. See response to AE Duckworth.}
 
 \comment{Eqn 4: I think you should drop the hat from $N_{t+1}$ because it isn’t an estimator here, it is a parameter.
 Though conventions vary.}
@@ -259,11 +271,11 @@ Yes? If so, it might be simplest to just state earlier that your ``latent'' scal
 \response{It is true that, because both traits are Poisson distributed, they both use a log link to translate the observations to the latent scale.
 However, we have opted against implmenting this suggestion because there is more to the latent scale issue than just the log link.
 The latent scale is unobservable, but we can draw inferences about it via stochastic realizations.
-We don't want to imply that the latent scale is simply the log of the dispersal distances or offspring counts.
-The particular statistical transformation is the less important piece of it.}
+We don't want to imply that the latent scale is simply the log of the dispersal distances or offspring counts.}
+%The particular statistical transformation is the less important piece of it.}
 
 \comment{rstan in text citation seems to have formatted incorrectly.}
-\response{\revise{I can't figure this out!}}
+\response{This is now fixed.}
 
 \comment{Great to see all the code up and available on github!}
 \response{We are glad that some readers find this useful.}
