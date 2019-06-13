@@ -363,7 +363,7 @@ Finally, the environmental deviates -- individual-to-individual variation that i
 In the bean beetle system, microsite variation in larval environment is a good candidate for the environmental variation $\bm{E}$, as host beans may vary in, for example, nutrient content, water content, geometry, age, etc.
 For all covariances, genetic, maternal, and environmental correlations were derived as $\rho = \frac{C}{\sqrt{V_{d}}\sqrt{V_{r}}}$.
 %Heritability with maternal effects gets very complicated and I would simply rather not go there.-TM
-Assuming that genetic, maternal, and environmental effects are not correlated with each other, the total phenotypic variance in each trait is simply the sum of all variance components (e.g., $V_{P,d} = V_{G,d} + V_{M,d} + V_{E,d}$). 
+\revise{Assuming that genetic, maternal, and environmental effects are not correlated with each other, the total phenotypic variance in each trait is simply the sum of all variance components (e.g., $V_{P,d} = V_{G,d} + V_{M,d} + V_{E,d}$).} 
 %s and covariances in these traits can be described by a covariance matrix $\bm{P}$, which is simply $\bm{P} = \bm{G} + \bm{M} + \bm{E}$.
 %Calculating $\bm{P}$ enables us to calculate the narrow-sense heritability of each trait, which reflects the proportion of variance in the phenotype (on the latent scale) attributable to additive genetic factors.
 %For dispersal,
@@ -530,7 +530,9 @@ Thus, spatial \revise{sorting of} dispersal generally predominated `\textit{r}-s
 
 \revise{We have focused our analyses on contrasts between invasions with vs. without genetically based trait variation as measures of how evolution affects invasions.
 This approach combines evolutionary processes that are unique to spreading populations (spatial sorting) with those that are not (natural selection), and thus represents the `total' effect of evolution.
-In Online Appendix A, we present simulation results that isolate the specific influence of spatial sorting from other evolutionary processes. }
+In Online Appendix A, we present simulation results that isolate the specific influence of spatial sorting from other evolutionary processes. 
+These additional analyses reveal how genetic correlations may continue to influence invasion dynamics even when spatial sorting is suppressed.
+Thus, the total effect of evolution on invasion dynamics is largely but not entirely driven by spatial sorting and associated evolutionary mechanisms that are unique to spreading populations.}
 
 \begin{figure}[h!]
 \centering
@@ -588,8 +590,8 @@ Our results provide new context for interpreting the consequences of trait corre
 }
 
 \revise{
-Perhaps not surprisingly, the role of genetic correlations as a decelerating or accelerating factor depended on the amounts of genetic variation in demography and dispersal traits (Fig \ref{corr:sim_extent_CV}).
-\linelabel{mod5}This suggests that historical factors may be an important contingency on the expression of genetically based correlations and their ecological consequences.
+\linelabel{mod5}Perhaps not surprisingly, the role of genetic correlations as a decelerating or accelerating factor depended on the amounts of genetic variation in demography and dispersal traits (Fig \ref{corr:sim_extent_CV}).
+This suggests that historical factors may be an important contingency on the expression of genetically based correlations and their ecological consequences.
 For example, genetic bottlenecks associated with species' introductions may limit genetic variances and covariances in range-expanding species \citep{dlugosch2008founding,wagner2017genetic}.
 In the Western bluebird system, historical metapopulation dynamics were important for the maintence of alternative dispersal/aggression phenotypes, which promoted subsequent range expansion \citep{duckworth2008adaptive}.
 Furthermore, genetic architecture of demography and dispersal traits may itself evolve during expansion \citep{arnold2008understanding}, as selective processes deplete genetic variation and covariation at the expansion front.
