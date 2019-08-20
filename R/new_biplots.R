@@ -372,3 +372,7 @@ sum(data.frame(corrs)$corrE.2.1 < 0) / sum(data.frame(corrs)$corrE.2.1 > 0)
 
 params <- c("beta","G","E","ME","P","h2","K","corrG","corrE","corrME")
 summ_tab <- rstan::summary(fits, pars = params)$summary
+
+# Print the ped data frame to post on datadryad along for final publication
+write.csv(ped,"C:/Users/tm9/Desktop/git local/correlatedtraits_tom/Ochocki_correlated_traits/Final publication files/QG_exp_dat.csv",
+          row.names = F)

@@ -1,0 +1,54 @@
+\begin{thebibliography}{8}
+\providecommand{\natexlab}[1]{#1}
+
+\bibitem[{Bezanson et~al.(2017)Bezanson, Edelman, Karpinski, and
+  Shah}]{bezanson_julia:_2017}
+Bezanson, J., A.~Edelman, S.~Karpinski, and V.~Shah. 2017.
+\newblock Julia: a fresh approach to numerical computing.
+\newblock SIAM Review 59:65--98.
+
+\bibitem[{Miller and Inouye(2013)}]{miller_sex_2013}
+Miller, T. E.~X., and B.~D. Inouye. 2013.
+\newblock Sex and stochasticity affect range expansion of experimental
+  invasions.
+\newblock Ecology Letters 16:354--361.
+
+\bibitem[{Ochocki and Miller(2017)}]{ochocki_rapid_2017}
+Ochocki, B.~M., and T.~E.~X. Miller. 2017.
+\newblock Rapid evolution of dispersal ability makes biological invasions
+  faster and more variable.
+\newblock Nature Communications 8:14315.
+
+\bibitem[{Phillips(2015)}]{phillips_evolutionary_2015}
+Phillips, B.~L. 2015.
+\newblock Evolutionary processes make invasion speed difficult to predict.
+\newblock Biological Invasions 17:1949--1960.
+
+\bibitem[{{R Core Team}(2015)}]{r_core_team_r:_2015}
+{R Core Team}. 2015.
+\newblock R: a language and environment for statistical computing.
+\newblock R Foundation for Statistical Computing, Vienna, Austria.
+
+\bibitem[{Wagner et~al.(2017)Wagner, Ochocki, Crawford, Compagnoni, and
+  Miller}]{wagner2017genetic}
+Wagner, N.~K., B.~M. Ochocki, K.~M. Crawford, A.~Compagnoni, and T.~E. Miller.
+  2017.
+\newblock Genetic mixture of multiple source populations accelerates invasive
+  range expansion.
+\newblock Journal of Animal Ecology 86:21--34.
+
+\bibitem[{Weiss-Lehman et~al.(2017)Weiss-Lehman, Hufbauer, and
+  Melbourne}]{weiss-lehman_rapid_2017}
+Weiss-Lehman, C., R.~A. Hufbauer, and B.~A. Melbourne. 2017.
+\newblock Rapid trait evolution drives increased speed and variance in
+  experimental range expansions.
+\newblock Nature Communications 8:14303.
+
+\bibitem[{Williams et~al.(2016)Williams, Kendall, and
+  Levine}]{williams_rapid_2016}
+Williams, J.~L., B.~E. Kendall, and J.~M. Levine. 2016.
+\newblock Rapid evolution accelerates plant population spread in fragmented
+  experimental landscapes.
+\newblock Science 353:482--485.
+
+\end{thebibliography}
