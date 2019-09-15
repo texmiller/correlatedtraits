@@ -95,6 +95,12 @@ extent_results %>% filter(gen==20) %>%
   facet_grid(treatment~case)+
   theme_bw()
 
+CV_extent_results <- extent_results %>% 
+  select(gen,case,rho_G,rho_M,rho_E,treatment,CV_extent) %>% 
+  spread(key=treatment,value = CV_extent) %>% 
+  mutate(log_fold_change_A = log(sorting / shuffle),
+         log_fold_change_B = log(sorting / evooff))
+
 mean_extent_results <- extent_results %>% 
   select(gen,case,rho_G,rho_M,rho_E,treatment,mean_extent) %>% 
   spread(key=treatment,value = mean_extent) %>% 
@@ -112,7 +118,9 @@ mean_extent_results %>% filter(gen==20) %>%
 cors <- c(-.9,0,.9)
 cor_cols <- alpha(c('#b2182b','#f4a582','#2166ac'),.75)
 bw_cor_cols <- c('#969696','#636363','#252525')
-win.graph()
+
+pdf("C:/Users/tm9/Desktop/git local/correlatedtraits_tom/Ochocki_correlated_traits/Final publication files/Figures/Fig3_dingbatsF.pdf",
+    useDingbats = F,width = 9, height = 6)
 par(mfrow=c(2,3),mar=c(5,5,2,1))
 with(mean_extent_results %>% filter(gen==20),{
   plot(rho_G,log_fold_change_B,type="n",cex.lab=1.4,
@@ -219,6 +227,7 @@ with(extent_results %>% filter(gen==20),{
     }
   }
 })
+dev.off()
 ############################################
 
 # Extent CV ---------------------------------------------------------------
@@ -228,12 +237,6 @@ extent_results %>% filter(gen==20) %>%
   geom_line(size=1,aes(x=rho_G,y=CV_extent,color=as.factor(rho_M),linetype=as.factor(rho_E)))+
   facet_grid(treatment~case)+
   theme_bw()
-
-CV_extent_results <- extent_results %>% 
-  select(gen,case,rho_G,rho_M,rho_E,treatment,CV_extent) %>% 
-  spread(key=treatment,value = CV_extent) %>% 
-  mutate(log_fold_change_A = log(sorting / shuffle),
-         log_fold_change_B = log(sorting / evooff))
 
 CV_extent_results %>% filter(gen==20) %>% 
   gather(log_fold_change_A,log_fold_change_B,key=method,value=fold_change) %>% 
@@ -290,7 +293,8 @@ dispersal_plot <-dispersal_fold_change %>% filter(gen==20)
 fertility_plot <-fertility_fold_change %>% filter(gen==20)
 
 ###### **** Manuscript version **** ######
-win.graph()
+pdf("C:/Users/tm9/Desktop/git local/correlatedtraits_tom/Ochocki_correlated_traits/Final publication files/Figures/Fig4_dingbatsF.pdf",
+    useDingbats = F,width = 10, height = 3.7)
 par(mfrow=c(1,3))
 plot(dispersal_plot$rho_G,dispersal_plot$log_fold_change_B,type="n",ylim=c(-.2,.6),
      ylab="log Fold-change in trait value",cex.lab=1.4,
@@ -350,6 +354,7 @@ for(i in 1:3){
 }
 text(-.9,.37,"Dispersal",adj=0,font=3)
 text(-.9,-.2,"Fertility",adj=0,font=3)
+dev.off()
 ##############################################
 
 

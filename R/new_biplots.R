@@ -327,7 +327,8 @@ mcmc_areas(data.frame(corrs), pars=c("corrG.1.2","corrME.1.2","corrE.1.2"))+
 
 ## fuck ggplot
 
-win.graph(width = 8, height = 4)
+pdf("C:/Users/tm9/Desktop/git local/correlatedtraits_tom/Ochocki_correlated_traits/Final publication files/Figures/Fig1_dingbatsF.pdf",
+    width = 8, height = 4, useDingbats = F)
 par(mfrow=c(1,2),mar=c(5,5,2,1))
 
 plot(jitter(abs(ped$dist)),jitter(ped$f/ped$beans),pch=1,cex=1,cex.lab=1,lwd=1,
@@ -361,6 +362,8 @@ legend("topright",legend=c(expression(rho[G]),expression(rho[M]),expression(rho[
        lwd=4,
        col=c("#1b9e77","#d95f02","#7570b3"),
        bty="n")
+
+dev.off()
 
 ## over/under zero?
 sum(data.frame(corrs)$corrG.2.1 < 0) / sum(data.frame(corrs)$corrG.2.1 > 0)
